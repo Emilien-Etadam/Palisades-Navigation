@@ -110,6 +110,7 @@ namespace Palisades.ViewModel
             };
 
             Thread saveThread = new(SaveAsync);
+            saveThread.IsBackground = true;
             saveThread.Start();
         }
 
@@ -134,6 +135,11 @@ namespace Palisades.ViewModel
             PalisadesManager.CreatePalisade();
         });
 
+        public ICommand NewFolderPortalCommand { get; private set; } = new RelayCommand(() =>
+        {
+            PalisadesManager.ShowCreateFolderPortalDialog();
+        });
+
         public ICommand DeletePalisadeCommand { get; private set; } = new RelayCommand<string>((identifier) => PalisadesManager.DeletePalisade(identifier));
 
         public ICommand EditPalisadeCommand { get; private set; } = new RelayCommand<PalisadeViewModel>((viewModel) =>
@@ -141,7 +147,7 @@ namespace Palisades.ViewModel
             EditPalisade edit = new()
             {
                 DataContext = viewModel,
-                Owner = PalisadesManager.GetPalisade(viewModel.Identifier)
+                Owner = PalisadesManager.GetWindow(viewModel.Identifier)
             };
             edit.ShowDialog();
         });
@@ -151,7 +157,7 @@ namespace Palisades.ViewModel
             About about = new()
             {
                 DataContext = new AboutViewModel(),
-                Owner = PalisadesManager.GetPalisade(viewModel.Identifier)
+                Owner = PalisadesManager.GetWindow(viewModel.Identifier)
             };
             about.ShowDialog();
         });

@@ -1,0 +1,227 @@
+<Window x:Class="Palisades.View.FolderPortal"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Palisades.View"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:helpers="clr-namespace:Palisades.Helpers"
+        xmlns:viewModel="clr-namespace:Palisades.ViewModel"
+        xmlns:converters="clr-namespace:Palisades.Converters"
+        helpers:WindowBlur.IsEnabled="True"
+        helpers:WindowSinker.AlwaysOnBottom="True"
+        ShowInTaskbar="False"
+        mc:Ignorable="d"
+        Title="FolderPortal"
+        Width="{Binding Width, Mode=TwoWay}"
+        Height="{Binding Height, Mode=TwoWay}"
+        AllowsTransparency="True"
+        WindowStyle="None"
+        ResizeMode="CanResize"
+        Background="Transparent"
+        Left="{Binding FenceX, Mode=TwoWay}"
+        Top="{Binding FenceY, Mode=TwoWay}"
+        UseLayoutRounding="True"
+        >
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0" ResizeBorderThickness="5" CornerRadius="20" GlassFrameThickness="0" NonClientFrameEdges="None" UseAeroCaptionButtons="False" />
+    </WindowChrome.WindowChrome>
+    <Window.DataContext>
+        <viewModel:FolderPortalViewModel />
+    </Window.DataContext>
+    <Window.Resources>
+        <converters:PathToImageConverter x:Key="PathToImage" />
+        <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
+        <helpers:BindingProxy x:Key="proxy" Data="{Binding}" />
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </Window.Resources>
+    <Border x:Name="LayoutRoot" CornerRadius="20">
+        <DockPanel>
+            <!-- Header area -->
+            <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="#00000000" Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}">
+                <Grid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Edit" Command="{Binding Path=Data.EditFolderPortalCommand, Source={StaticResource proxy}}" CommandParameter="{Binding}" />
+                        <MenuItem Header="Refresh" Command="{Binding Path=Data.RefreshCommand, Source={StaticResource proxy}}" />
+                        <MenuItem Header="Open in Explorer" Command="{Binding Path=Data.OpenInExplorerCommand, Source={StaticResource proxy}}" />
+                        <Separator />
+                        <MenuItem Header="Delete" Command="{Binding Path=Data.DeletePalisadeCommand, Source={StaticResource proxy}}" CommandParameter="{Binding Identifier}" />
+                        <Separator />
+                        <MenuItem Header="New fence" Command="{Binding Path=Data.NewPalisadeCommand, Source={StaticResource proxy}}" />
+                        <MenuItem Header="New Folder Portal" Command="{Binding Path=Data.NewFolderPortalCommand, Source={StaticResource proxy}}" />
+                        <Separator />
+                        <MenuItem Header="About" Command="{Binding Path=Data.OpenAboutCommand, Source={StaticResource proxy}}" CommandParameter="{Binding}" />
+                    </ContextMenu>
+                </Grid.ContextMenu>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Title row -->
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Rectangle Grid.ColumnSpan="3">
+                        <Rectangle.Fill>
+                            <SolidColorBrush Color="{Binding HeaderColor}" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+
+                    <!-- Back button -->
+                    <Button Grid.Column="0"
+                            Command="{Binding NavigateBackCommand}"
+                            Background="Transparent"
+                            BorderBrush="Transparent"
+                            Foreground="{Binding TitleColor}"
+                            FontSize="18"
+                            FontWeight="Bold"
+                            Padding="10,5"
+                            Cursor="Hand"
+                            ToolTip="Navigate back"
+                            Visibility="{Binding CanNavigateBack, Converter={StaticResource BoolToVis}}">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" CornerRadius="4">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="#30FFFFFF" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                        &#x2190;
+                    </Button>
+
+                    <!-- Title -->
+                    <Label Grid.Column="1" Content="{Binding Name, Mode=OneWay}" Margin="5" FontSize="28" Foreground="{Binding TitleColor}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+
+                    <!-- Home button -->
+                    <Button Grid.Column="2"
+                            Command="{Binding NavigateToRootCommand}"
+                            Background="Transparent"
+                            BorderBrush="Transparent"
+                            Foreground="{Binding TitleColor}"
+                            FontSize="16"
+                            Padding="10,5"
+                            Cursor="Hand"
+                            ToolTip="Go to root folder"
+                            Visibility="{Binding CanNavigateBack, Converter={StaticResource BoolToVis}}">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" CornerRadius="4">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="#30FFFFFF" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                        &#x2302;
+                    </Button>
+                </Grid>
+
+                <!-- Breadcrumb row -->
+                <Grid Grid.Row="1">
+                    <Rectangle>
+                        <Rectangle.Fill>
+                            <SolidColorBrush Color="{Binding HeaderColor}" Opacity="0.7" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                    <TextBlock Text="{Binding Breadcrumb}"
+                               Foreground="{Binding LabelsColor}"
+                               FontSize="12"
+                               Margin="15,2,15,4"
+                               TextTrimming="CharacterEllipsis"
+                               ToolTip="{Binding Breadcrumb}"
+                               VerticalAlignment="Center" />
+                </Grid>
+            </Grid>
+
+            <!-- Main content area -->
+            <Grid x:Name="content">
+                <Rectangle>
+                    <Rectangle.Fill>
+                        <SolidColorBrush Color="{Binding BodyColor}" />
+                    </Rectangle.Fill>
+                </Rectangle>
+
+                <!-- Error message -->
+                <TextBlock Text="{Binding ErrorMessage}"
+                           Foreground="#FFFF6666"
+                           FontSize="13"
+                           Margin="15,10"
+                           TextWrapping="Wrap"
+                           Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}, FallbackValue=Collapsed}" />
+
+                <!-- Items list -->
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <ItemsControl ItemsSource="{Binding Items}" Margin="10,10,10,10">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <ContentControl>
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="MouseDoubleClick">
+                                            <i:InvokeCommandAction Command="{Binding Path=Data.NavigateIntoFolderCommand, Source={StaticResource proxy}}" CommandParameter="{Binding}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                    <Border Margin="0,0,0,10" CornerRadius="4" Width="100">
+                                        <Border.Style>
+                                            <Style>
+                                                <Style.Triggers>
+                                                    <Trigger Property="Border.IsMouseOver" Value="True">
+                                                        <Setter Property="Border.Background" Value="#20FFFFFF" />
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <StackPanel VerticalAlignment="Top" HorizontalAlignment="Center" Cursor="Hand">
+                                            <Image
+                                                Source="{Binding IconPath, Converter={StaticResource PathToImage}}"
+                                                Width="48"
+                                                Height="48"
+                                                Stretch="UniformToFill" Margin="5,5,5,5"
+                                            />
+                                            <TextBlock TextWrapping="NoWrap"
+                                                       TextAlignment="Center"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       Text="{Binding Name}"
+                                                       Foreground="{Binding DataContext.LabelsColor, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                                       HorizontalAlignment="Center"
+                                                       Margin="5,0,5,5"
+                                                       ToolTip="{Binding Name}" />
+                                        </StackPanel>
+                                    </Border>
+                                </ContentControl>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </DockPanel>
+    </Border>
+</Window>

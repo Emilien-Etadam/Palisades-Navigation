@@ -1,16 +1,18 @@
-﻿using Palisades.Helpers;
+using Palisades.Helpers;
 using Palisades.Model;
 using Palisades.View;
 using Palisades.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Windows;
 using System.Xml.Serialization;
 
 namespace Palisades
 {
     internal static class PalisadesManager
     {
-        public static readonly Dictionary<string, Palisade> palisades = new();
+        public static readonly Dictionary<string, Window> palisades = new();
 
         public static void LoadPalisades()
         {
@@ -21,26 +23,38 @@ namespace Palisades
 
             foreach (string identifierDirname in Directory.GetDirectories(saveDirectory))
             {
-                XmlSerializer deserializer = new(typeof(PalisadeModel));
-                using StreamReader reader = new(Path.Combine(saveDirectory, identifierDirname, "state.xml"));
-                if (deserializer.Deserialize(reader) is PalisadeModel model)
+                string stateFile = Path.Combine(identifierDirname, "state.xml");
+                if (!File.Exists(stateFile))
+                    continue;
+
+                try
                 {
-                    loadedModels.Add(model);
+                    XmlSerializer deserializer = new(typeof(PalisadeModel));
+                    using StreamReader reader = new(stateFile);
+                    if (deserializer.Deserialize(reader) is PalisadeModel model)
+                    {
+                        loadedModels.Add(model);
+                    }
+                    reader.Close();
                 }
-                reader.Close();
+                catch
+                {
+                    // Skip corrupted state files
+                }
             }
 
             foreach (PalisadeModel loadedModel in loadedModels)
             {
-                palisades.Add(loadedModel.Identifier, new Palisade(new PalisadeViewModel(loadedModel)));
+                if (loadedModel.Type == PalisadeType.FolderPortal)
+                {
+                    var viewModel = new FolderPortalViewModel(loadedModel);
+                    palisades.Add(loadedModel.Identifier, new FolderPortal(viewModel));
+                }
+                else
+                {
+                    palisades.Add(loadedModel.Identifier, new Palisade(new PalisadeViewModel(loadedModel)));
+                }
             }
-
-        }
-
-        private static void LoadPalisade(PalisadeViewModel initialModel)
-        {
-            Palisade palisade = new(initialModel);
-            palisades.Add(initialModel.Identifier, palisade);
         }
 
         public static void CreatePalisade()
@@ -50,31 +64,69 @@ namespace Palisades
             viewModel.Save();
         }
 
+        public static void CreateFolderPortal(string rootPath, string title)
+        {
+            PalisadeModel model = new()
+            {
+                Type = PalisadeType.FolderPortal,
+                Name = title,
+                RootPath = rootPath,
+                CurrentPath = rootPath
+            };
+
+            FolderPortalViewModel viewModel = new(model);
+            palisades.Add(viewModel.Identifier, new FolderPortal(viewModel));
+            viewModel.Save();
+        }
+
+        public static void ShowCreateFolderPortalDialog()
+        {
+            CreateFolderPortalDialog dialog = new();
+            if (dialog.ShowDialog() == true)
+            {
+                CreateFolderPortal(dialog.SelectedPath, dialog.PortalTitle);
+            }
+        }
+
         public static void DeletePalisade(string identifier)
         {
-            palisades.TryGetValue(identifier, out Palisade? palisade);
-            if (palisade == null)
+            palisades.TryGetValue(identifier, out Window? window);
+            if (window == null)
             {
                 return;
             }
-            if (palisade.DataContext != null)
+
+            if (window.DataContext is PalisadeViewModel palisadeVm)
             {
-                ((PalisadeViewModel)palisade.DataContext).Delete();
+                palisadeVm.Delete();
+            }
+            else if (window.DataContext is FolderPortalViewModel folderPortalVm)
+            {
+                folderPortalVm.Delete();
             }
 
-            palisade.Close();
+            window.Close();
             palisades.Remove(identifier);
+        }
 
+        public static Window GetWindow(string identifier)
+        {
+            palisades.TryGetValue(identifier, out Window? window);
+            if (window == null)
+            {
+                throw new KeyNotFoundException(identifier);
+            }
+            return window;
         }
 
         public static Palisade GetPalisade(string identifier)
         {
-            palisades.TryGetValue(identifier, out Palisade? palisade);
-            if (palisade == null)
+            var window = GetWindow(identifier);
+            if (window is Palisade palisade)
             {
-                throw new KeyNotFoundException(identifier);
+                return palisade;
             }
-            return palisade;
+            throw new KeyNotFoundException(identifier);
         }
     }
 }
