@@ -190,6 +190,13 @@
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                     <Border Margin="0,0,0,10" CornerRadius="4" Width="100">
+                                        <Border.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Open" FontWeight="Bold" Command="{Binding Path=Data.OpenItemCommand, Source={StaticResource proxy}}" CommandParameter="{Binding}" />
+                                                <MenuItem Header="Show in Explorer" Command="{Binding Path=Data.ShowInExplorerCommand, Source={StaticResource proxy}}" CommandParameter="{Binding}" />
+                                                <MenuItem Header="Copy path" Command="{Binding Path=Data.CopyPathCommand, Source={StaticResource proxy}}" CommandParameter="{Binding}" />
+                                            </ContextMenu>
+                                        </Border.ContextMenu>
                                         <Border.Style>
                                             <Style>
                                                 <Style.Triggers>
