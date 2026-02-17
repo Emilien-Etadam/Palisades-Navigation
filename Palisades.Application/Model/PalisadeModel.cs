@@ -19,6 +19,9 @@ namespace Palisades.Model
         private Color bodyColor;
         private Color titleColor;
         private Color labelsColor;
+        private PalisadeType type;
+        private string rootPath;
+        private string currentPath;
 
         public PalisadeModel()
         {
@@ -31,6 +34,9 @@ namespace Palisades.Model
             width = 800;
             height = 450;
             shortcuts = new();
+            type = PalisadeType.Standard;
+            rootPath = "";
+            currentPath = "";
         }
 
         public string Identifier { get { return identifier; } set { identifier = value; } }
@@ -46,6 +52,10 @@ namespace Palisades.Model
         public Color BodyColor { get { return bodyColor; } set { bodyColor = value; } }
         public Color TitleColor { get { return titleColor; } set { titleColor = value; } }
         public Color LabelsColor { get { return labelsColor; } set { labelsColor = value; } }
+
+        public PalisadeType Type { get { return type; } set { type = value; } }
+        public string RootPath { get { return rootPath; } set { rootPath = value; } }
+        public string CurrentPath { get { return currentPath; } set { currentPath = value; } }
 
         [XmlArrayItem(typeof(LnkShortcut))]
         [XmlArrayItem(typeof(UrlShortcut))]
