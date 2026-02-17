@@ -29,12 +29,13 @@ Just download the latest installer on the [Releases](https://github.com/Xstoudi/
 - Reorder shortcuts in Palisades by drag and dropping them.
 - Individually customize name, background color and text colors for headers and body of your Palisades.
 - Creating more and deleting existing Palisades.
+- **Folder Portals**: A palisade type that acts as a mini file explorer for a chosen folder, displayed directly on the desktop. Browse files and subfolders, navigate with breadcrumbs, and open files with their default application.
 
 ## Usage
 Just drag and drop shortcuts in a Palisade to add it in. If you want to customize your Palisade or add a new one, right click on a Palisade header.
 
 ## Techs used
 
-Palisades was made using .NET 6 and WPF. It uses Material Design In XAML for some part of the UI and Sentry to automagically report issues you could encounters.
+Palisades was made using .NET 10 and WPF. It uses Material Design In XAML for some part of the UI and Sentry to automagically report issues you could encounters.
 
 Palisade is greatly by [Twometer's NoFences](https://github.com/Twometer/NoFences), which was inspired by [Stardock's Fences](https://www.stardock.com/products/fences/). I didn't want to pay 11€ but I also wanted to train on WPF.
