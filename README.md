@@ -1,14 +1,14 @@
 # Palisades
 
 <p align="center">
-  <a href="https://github.com/Xstoudi/Palisades/blob/main/LICENSE">
-    <img alt="mit" src="https://img.shields.io/github/license/Xstoudi/Palisades?style=for-the-badge"/>
+  <a href="https://github.com/Emilien-Etadam/Palisades-Navigation/blob/main/LICENSE">
+    <img alt="mit" src="https://img.shields.io/github/license/Emilien-Etadam/Palisades-Navigation?style=for-the-badge"/>
   </a>
-  <a href="https://github.com/Xstoudi/Palisades/releases">
-    <img alt="mit" src="https://img.shields.io/github/v/release/Xstoudi/Palisades?label=Version&style=for-the-badge"/>
+  <a href="https://github.com/Emilien-Etadam/Palisades-Navigation/releases">
+    <img alt="mit" src="https://img.shields.io/github/v/release/Emilien-Etadam/Palisades-Navigation?label=Version&style=for-the-badge"/>
   </a>
-  <a href="https://github.com/Xstoudi/Palisades/releases">
-    <img alt="mit" src="https://img.shields.io/github/downloads/Xstoudi/Palisades/total?style=for-the-badge"/>
+  <a href="https://github.com/Emilien-Etadam/Palisades-Navigation/releases">
+    <img alt="mit" src="https://img.shields.io/github/downloads/Emilien-Etadam/Palisades-Navigation/total?style=for-the-badge"/>
   </a>
 </p>
 
@@ -21,7 +21,7 @@ Palisades allow you to organize your desktop icons.
 
 ## Getting Started
 
-Just download the latest installer on the [Releases](https://github.com/Xstoudi/Palisades/releases) page, use it to install Palisades and run the software.
+Just download the latest installer on the [Releases](https://github.com/Emilien-Etadam/Palisades-Navigation/releases) page, use it to install Palisades and run the software.
 
 ## Features
 

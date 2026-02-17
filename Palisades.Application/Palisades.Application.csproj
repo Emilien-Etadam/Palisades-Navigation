@@ -14,10 +14,10 @@
     <Authors>Xavier Stouder</Authors>
     <Company>StouderIO</Company>
     <Product>Palisades</Product>
-    <PackageProjectUrl>https://github.com/Xstoudi/Palisades</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/Emilien-Etadam/Palisades-Navigation</PackageProjectUrl>
     <Copyright></Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryUrl>https://github.com/Xstoudi/Palisades</RepositoryUrl>
+    <RepositoryUrl>https://github.com/Emilien-Etadam/Palisades-Navigation</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <AssemblyName>Palisades</AssemblyName>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
