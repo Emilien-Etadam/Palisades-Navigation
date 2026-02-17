@@ -1,0 +1,36 @@
+name: Build Palisades (Windows)
+
+on:
+  push:
+    branches: [ main, master, "claude/**" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 6
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '6.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore Palisades.Application/Palisades.Application.csproj
+
+      - name: Build (Debug)
+        run: dotnet build Palisades.Application/Palisades.Application.csproj --configuration Debug --no-restore
+
+      - name: Build (Release)
+        run: dotnet publish Palisades.Application/Palisades.Application.csproj --configuration Release --output ./publish --no-restore
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Palisades-win-x64
+          path: ./publish/
+          retention-days: 14

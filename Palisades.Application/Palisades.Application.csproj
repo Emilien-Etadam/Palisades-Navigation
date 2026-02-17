@@ -20,7 +20,7 @@
     <RepositoryUrl>https://github.com/Xstoudi/Palisades</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <AssemblyName>Palisades</AssemblyName>
-    <PackageLicenseFile>D:\Programmation\Perso\Palisades\LICENSE</PackageLicenseFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <ApplicationIcon>Ressources\icon.ico</ApplicationIcon>
   </PropertyGroup>
@@ -44,6 +44,10 @@
 
   <ItemGroup>
     <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\LICENSE">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
