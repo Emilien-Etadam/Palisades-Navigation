@@ -209,18 +209,22 @@ namespace Palisades.ViewModel
             {
                 var newItems = new ObservableCollection<FolderPortalItem>();
 
-                // Load subdirectories first
+                // Load subdirectories first (skip hidden)
                 foreach (string dir in Directory.GetDirectories(path).OrderBy(d => Path.GetFileName(d), StringComparer.OrdinalIgnoreCase))
                 {
+                    if (IsHiddenOrSystemEntry(dir))
+                        continue;
                     string dirName = Path.GetFileName(dir);
                     string iconPath = GetOrCreateFolderIcon(dir);
                     newItems.Add(new FolderPortalItem(dirName, dir, true, iconPath));
                 }
 
-                // Then load files
+                // Then load files (skip hidden and temp files like ~$*)
                 foreach (string file in Directory.GetFiles(path).OrderBy(f => Path.GetFileName(f), StringComparer.OrdinalIgnoreCase))
                 {
                     string fileName = Path.GetFileName(file);
+                    if (fileName.StartsWith("~$") || IsHiddenOrSystemEntry(file))
+                        continue;
                     string iconPath = GetOrCreateFileIcon(file);
                     newItems.Add(new FolderPortalItem(fileName, file, false, iconPath));
                 }
@@ -273,6 +277,19 @@ namespace Palisades.ViewModel
                 string relativePath = currentFull.Substring(rootFull.Length).TrimStart(Path.DirectorySeparatorChar);
                 string[] parts = relativePath.Split(Path.DirectorySeparatorChar);
                 Breadcrumb = rootName + " > " + string.Join(" > ", parts);
+            }
+        }
+
+        private static bool IsHiddenOrSystemEntry(string path)
+        {
+            try
+            {
+                FileAttributes attrs = File.GetAttributes(path);
+                return (attrs & FileAttributes.Hidden) != 0 || (attrs & FileAttributes.System) != 0;
+            }
+            catch
+            {
+                return false;
             }
         }
 
