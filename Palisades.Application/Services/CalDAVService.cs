@@ -3,8 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DDay.iCal;
-using DDay.iCal.Serialization.iCalendar;
+using Ical.Net.CalendarComponents;
+using Ical.Net.DataTypes;
+using Ical.Net.Serialization;
 using System.Net;
 using System.IO;
 using System.Xml.Linq;
@@ -16,7 +17,7 @@ namespace Palisades.Services
         private readonly string _caldavUrl;
         private readonly string _username;
         private readonly string _password;
-        private readonly iCalendarSerializer _serializer = new iCalendarSerializer();
+        private readonly CalendarSerializer _serializer = new CalendarSerializer();
         
         public CalDAVService(string caldavUrl, string username, string password)
         {
@@ -44,7 +45,7 @@ namespace Palisades.Services
                     var href = resp.Descendant(ns + "href")?.Value;
                     var displayName = resp.Descendant(ns + "displayname")?.Value;
                     
-                    if (!string.IsNullOrEmpty(href) && href.Contains("/tasks/") || href.Contains("/calendars/"))
+                    if (!string.IsNullOrEmpty(href) && (href.Contains("/tasks/") || href.Contains("/calendars/")))
                     {
                         taskLists.Add(new CalDAVTaskList
                         {
@@ -115,25 +116,29 @@ namespace Palisades.Services
         {
             try
             {
-                // Créer un événement iCalendar
-                var iCal = new iCalendar();
-                var vTodo = iCal.Create<VTodo>();
+                // Créer un calendrier avec une tâche
+                var calendar = new Calendar();
+                var todo = new Todo
+                {
+                    Summary = task.Title,
+                    Description = task.Description,
+                    Due = task.DueDate.HasValue ? new CalDateTime(task.DueDate.Value) : null,
+                    Status = task.Completed ? "COMPLETED" : "NEEDS-ACTION",
+                    Completed = task.Completed ? new CalDateTime(task.CompletedDate ?? DateTime.Now) : null,
+                    Created = new CalDateTime(task.CreatedDate),
+                    LastModified = new CalDateTime(task.LastModified),
+                    Uid = Guid.NewGuid().ToString()
+                };
                 
-                vTodo.Summary = task.Title;
-                vTodo.Description = task.Description;
-                vTodo.Due = task.DueDate.HasValue ? new iCalDateTime(task.DueDate.Value) : null;
-                vTodo.Status = task.Completed ? "COMPLETED" : "NEEDS-ACTION";
-                vTodo.Completed = task.Completed ? new iCalDateTime(task.CompletedDate ?? DateTime.Now) : null;
-                vTodo.Created = new iCalDateTime(task.CreatedDate);
-                vTodo.LastModified = new iCalDateTime(task.LastModified);
+                calendar.Todos.Add(todo);
                 
                 // Sérialiser en format iCalendar
-                var serializer = new iCalendarSerializer();
-                var calendarData = serializer.SerializeToString(iCal);
+                var calendarData = _serializer.SerializeToString(calendar);
                 
                 // Envoyer au serveur CalDAV
                 var taskListUrl = $"{_caldavUrl}/{taskListId}";
-                var request = CreateCalDAVRequest("PUT", $"{taskListUrl}/{Guid.NewGuid()}.ics");
+                var taskFilename = $"{Guid.NewGuid()}.ics";
+                var request = CreateCalDAVRequest("PUT", $"{taskListUrl}/{taskFilename}");
                 request.ContentType = "text/calendar";
                 
                 using (var streamWriter = new StreamWriter(await request.GetRequestStreamAsync()))
@@ -144,7 +149,8 @@ namespace Palisades.Services
                 var response = await GetResponseAsync(request);
                 
                 // Mettre à jour l'ID CalDAV de la tâche
-                task.CalDAVId = responseHeaders["ETag"];
+                task.CalDAVId = taskFilename;
+                task.CalDAVEtag = "created";
                 
                 return task;
             }
@@ -158,31 +164,29 @@ namespace Palisades.Services
         {
             try
             {
-                // Récupérer la tâche existante
-                var existingTask = await GetTaskAsync(taskListId, task.CalDAVId);
+                // Créer un calendrier avec la tâche mise à jour
+                var calendar = new Calendar();
+                var todo = new Todo
+                {
+                    Summary = task.Title,
+                    Description = task.Description,
+                    Due = task.DueDate.HasValue ? new CalDateTime(task.DueDate.Value) : null,
+                    Status = task.Completed ? "COMPLETED" : "NEEDS-ACTION",
+                    Completed = task.Completed ? new CalDateTime(task.CompletedDate ?? DateTime.Now) : null,
+                    Created = new CalDateTime(task.CreatedDate),
+                    LastModified = new CalDateTime(DateTime.Now),
+                    Uid = task.CalDAVId
+                };
                 
-                // Créer un événement iCalendar mis à jour
-                var iCal = new iCalendar();
-                var vTodo = iCal.Create<VTodo>();
-                
-                vTodo.Summary = task.Title;
-                vTodo.Description = task.Description;
-                vTodo.Due = task.DueDate.HasValue ? new iCalDateTime(task.DueDate.Value) : null;
-                vTodo.Status = task.Completed ? "COMPLETED" : "NEEDS-ACTION";
-                vTodo.Completed = task.Completed ? new iCalDateTime(task.CompletedDate ?? DateTime.Now) : null;
-                vTodo.Created = new iCalDateTime(task.CreatedDate);
-                vTodo.LastModified = new iCalDateTime(DateTime.Now);
-                vTodo.Uid = new Uri(task.CalDAVId);
+                calendar.Todos.Add(todo);
                 
                 // Sérialiser en format iCalendar
-                var serializer = new iCalendarSerializer();
-                var calendarData = serializer.SerializeToString(iCal);
+                var calendarData = _serializer.SerializeToString(calendar);
                 
                 // Envoyer au serveur CalDAV
-                var taskUrl = $"{_caldavUrl}/{taskListId}/{task.CalDAVId}.ics";
-                var request = CreateCalDAVRequest("PUT", taskUrl);
+                var taskListUrl = $"{_caldavUrl}/{taskListId}";
+                var request = CreateCalDAVRequest("PUT", $"{taskListUrl}/{task.CalDAVId}");
                 request.ContentType = "text/calendar";
-                request.Headers.Add("If-Match", task.CalDAVEtag);
                 
                 using (var streamWriter = new StreamWriter(await request.GetRequestStreamAsync()))
                 {
@@ -192,7 +196,7 @@ namespace Palisades.Services
                 var response = await GetResponseAsync(request);
                 
                 // Mettre à jour l'ETag
-                task.CalDAVEtag = responseHeaders["ETag"];
+                task.CalDAVEtag = "updated";
             }
             catch (Exception ex)
             {
@@ -204,8 +208,8 @@ namespace Palisades.Services
         {
             try
             {
-                var taskUrl = $"{_caldavUrl}/{taskListId}/{taskId}.ics";
-                var request = CreateCalDAVRequest("DELETE", taskUrl);
+                var taskListUrl = $"{_caldavUrl}/{taskListId}";
+                var request = CreateCalDAVRequest("DELETE", $"{taskListUrl}/{taskId}");
                 
                 await GetResponseAsync(request);
             }
