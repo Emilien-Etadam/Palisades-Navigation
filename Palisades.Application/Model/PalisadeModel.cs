@@ -57,6 +57,15 @@ namespace Palisades.Model
         public string RootPath { get { return rootPath; } set { rootPath = value; } }
         public string CurrentPath { get { return currentPath; } set { currentPath = value; } }
 
+        // Task Palisade properties
+        public string CalDAVUrl { get; set; } = string.Empty;
+        public string CalDAVUsername { get; set; } = string.Empty;
+        public string CalDAVPassword { get; set; } = string.Empty;
+        public string TaskListId { get; set; } = string.Empty;
+        public int SyncIntervalMinutes { get; set; } = 5;
+        public bool EnableLogging { get; set; } = false;
+        public bool ShowCompletedTasks { get; set; } = true;
+
         [XmlArrayItem(typeof(LnkShortcut))]
         [XmlArrayItem(typeof(UrlShortcut))]
         public ObservableCollection<Shortcut> Shortcuts { get { return shortcuts; } set { shortcuts = value; } }

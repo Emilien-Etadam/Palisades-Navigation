@@ -1,0 +1,27 @@
+using System;
+using System.Xml.Serialization;
+
+namespace Palisades.Model
+{
+    [Serializable]
+    public class CalDAVTask
+    {
+        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public string Title { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public DateTime? DueDate { get; set; }
+        public bool Completed { get; set; }
+        public DateTime? CompletedDate { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime LastModified { get; set; } = DateTime.Now;
+        public string CalDAVId { get; set; } = string.Empty;
+        public string CalDAVEtag { get; set; } = string.Empty;
+        
+        public CalDAVTask() { }
+        
+        public CalDAVTask(string title)
+        {
+            Title = title;
+        }
+    }
+}

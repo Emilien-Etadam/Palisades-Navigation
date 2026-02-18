@@ -50,6 +50,15 @@ namespace Palisades
                     var viewModel = new FolderPortalViewModel(loadedModel);
                     palisades.Add(loadedModel.Identifier, new FolderPortal(viewModel));
                 }
+                else if (loadedModel.Type == PalisadeType.TaskPalisade)
+                {
+                    var caldavService = new Services.CalDAVService(
+                        loadedModel.CalDAVUrl ?? string.Empty,
+                        loadedModel.CalDAVUsername ?? string.Empty,
+                        loadedModel.CalDAVPassword ?? string.Empty);
+                    var viewModel = new TaskPalisadeViewModel(loadedModel, caldavService);
+                    palisades.Add(loadedModel.Identifier, new TaskPalisade(viewModel));
+                }
                 else
                 {
                     palisades.Add(loadedModel.Identifier, new Palisade(new PalisadeViewModel(loadedModel)));
@@ -79,12 +88,41 @@ namespace Palisades
             viewModel.Save();
         }
 
+        public static void CreateTaskPalisade(string caldavUrl, string username, string password, string taskListId, string title)
+        {
+            PalisadeModel model = new()
+            {
+                Type = PalisadeType.TaskPalisade,
+                Name = title,
+                CalDAVUrl = caldavUrl,
+                CalDAVUsername = username,
+                CalDAVPassword = password,
+                TaskListId = taskListId,
+                Width = 600,
+                Height = 400
+            };
+
+            var caldavService = new Services.CalDAVService(caldavUrl, username, password);
+            var viewModel = new TaskPalisadeViewModel(model, caldavService);
+            palisades.Add(viewModel.Identifier, new TaskPalisade(viewModel));
+            viewModel.Save();
+        }
+
         public static void ShowCreateFolderPortalDialog()
         {
             CreateFolderPortalDialog dialog = new();
             if (dialog.ShowDialog() == true)
             {
                 CreateFolderPortal(dialog.SelectedPath, dialog.PortalTitle);
+            }
+        }
+
+        public static void ShowCreateTaskPalisadeDialog()
+        {
+            CreateTaskPalisadeDialog dialog = new();
+            if (dialog.ShowDialog() == true)
+            {
+                CreateTaskPalisade(dialog.CalDAVUrl, dialog.Username, dialog.Password, dialog.TaskListId, dialog.PalisadeTitle);
             }
         }
 
