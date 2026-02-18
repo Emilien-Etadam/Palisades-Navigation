@@ -70,7 +70,7 @@
                                         </Grid.ColumnDefinitions>
 
                                         <!-- Task completion checkbox -->
-                                        <CheckBox IsChecked="{Binding Completed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged" 
+                                        <CheckBox IsChecked="{Binding Completed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                                   VerticalAlignment="Center" Grid.Column="0" 
                                                   Command="{Binding DataContext.ToggleTaskCompletedCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
                                                   CommandParameter="{Binding}"/>
