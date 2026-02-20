@@ -33,11 +33,6 @@
     <DebugType>None</DebugType>
   </PropertyGroup>
 
-  <!-- Fichier de tests xUnit : à déplacer dans Palisades.Tests (Phase 8.1 du plan). Exclu pour que l'app compile sans référence xUnit. -->
-  <ItemGroup>
-    <Compile Remove="Services\CalDAVServiceTests.cs" />
-  </ItemGroup>
-
   <ItemGroup>
     <None Include="..\README.md">
       <Pack>True</Pack>

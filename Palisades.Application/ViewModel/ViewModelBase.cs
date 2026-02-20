@@ -73,16 +73,29 @@ namespace Palisades.ViewModel
             set { Model.BodyColor = value; OnPropertyChanged(); Save(); }
         }
 
+        private SolidColorBrush? _titleColorBrush;
+        private SolidColorBrush? _labelsColorBrush;
+
         public SolidColorBrush TitleColor
         {
-            get => new(Model.TitleColor);
-            set { Model.TitleColor = value.Color; OnPropertyChanged(); Save(); }
+            get
+            {
+                if (_titleColorBrush == null || _titleColorBrush.Color != Model.TitleColor)
+                    _titleColorBrush = new SolidColorBrush(Model.TitleColor);
+                return _titleColorBrush;
+            }
+            set { Model.TitleColor = value.Color; _titleColorBrush = value; OnPropertyChanged(); Save(); }
         }
 
         public SolidColorBrush LabelsColor
         {
-            get => new(Model.LabelsColor);
-            set { Model.LabelsColor = value.Color; OnPropertyChanged(); Save(); }
+            get
+            {
+                if (_labelsColorBrush == null || _labelsColorBrush.Color != Model.LabelsColor)
+                    _labelsColorBrush = new SolidColorBrush(Model.LabelsColor);
+                return _labelsColorBrush;
+            }
+            set { Model.LabelsColor = value.Color; _labelsColorBrush = value; OnPropertyChanged(); Save(); }
         }
 
         #endregion
@@ -142,6 +155,12 @@ namespace Palisades.ViewModel
         public ICommand NewCalendarPalisadeCommand { get; } = new RelayCommand(() => PalisadesManager.ShowCreateCalendarPalisadeDialog());
 
         public ICommand NewMailPalisadeCommand { get; } = new RelayCommand(() => PalisadesManager.ShowCreateMailPalisadeDialog());
+
+        public ICommand ManageZimbraAccountsCommand { get; } = new RelayCommand(() =>
+        {
+            var dialog = new ManageAccountsDialog();
+            dialog.ShowDialog();
+        });
 
         public ICommand DeletePalisadeCommand { get; } = new RelayCommand<string>(identifier => PalisadesManager.DeletePalisade(identifier));
 

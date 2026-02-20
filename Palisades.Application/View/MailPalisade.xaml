@@ -51,6 +51,8 @@
                         <MenuItem Header="New Calendar Palisade" Command="{Binding Path=Data.NewCalendarPalisadeCommand, Source={StaticResource proxy}}" />
                         <MenuItem Header="New Mail Palisade" Command="{Binding Path=Data.NewMailPalisadeCommand, Source={StaticResource proxy}}" />
                         <Separator />
+                        <MenuItem Header="Manage Zimbra Accounts" Command="{Binding Path=Data.ManageZimbraAccountsCommand, Source={StaticResource proxy}}" />
+                        <Separator />
                         <MenuItem Header="About" Command="{Binding Path=Data.OpenAboutCommand, Source={StaticResource proxy}}" CommandParameter="{Binding}" />
                     </ContextMenu>
                 </Grid.ContextMenu>

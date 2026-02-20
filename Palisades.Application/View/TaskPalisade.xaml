@@ -29,6 +29,8 @@
                 <ContextMenu>
                     <MenuItem Header="New Calendar Palisade" Command="{Binding NewCalendarPalisadeCommand}"/>
                     <MenuItem Header="New Mail Palisade" Command="{Binding NewMailPalisadeCommand}"/>
+                    <Separator/>
+                    <MenuItem Header="Manage Zimbra Accounts" Command="{Binding ManageZimbraAccountsCommand}"/>
                 </ContextMenu>
             </Border.ContextMenu>
             <StackPanel Orientation="Horizontal">

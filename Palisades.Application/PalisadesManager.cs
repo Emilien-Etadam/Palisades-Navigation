@@ -118,15 +118,19 @@ namespace Palisades
             }
         }
 
-        public static void CreatePalisade()
+        public static void CreatePalisade(int? x = null, int? y = null, int? width = null, int? height = null)
         {
             var model = new StandardPalisadeModel();
+            if (x.HasValue) model.FenceX = x.Value;
+            if (y.HasValue) model.FenceY = y.Value;
+            if (width.HasValue) model.Width = width.Value;
+            if (height.HasValue) model.Height = height.Value;
             var viewModel = new PalisadeViewModel(model);
             palisades.Add(viewModel.Identifier, new Palisade(viewModel));
             viewModel.Save();
         }
 
-        public static void CreateFolderPortal(string rootPath, string title)
+        public static void CreateFolderPortal(string rootPath, string title, int? x = null, int? y = null, int? width = null, int? height = null)
         {
             var model = new FolderPortalModel
             {
@@ -134,13 +138,16 @@ namespace Palisades
                 RootPath = rootPath,
                 CurrentPath = rootPath
             };
-
+            if (x.HasValue) model.FenceX = x.Value;
+            if (y.HasValue) model.FenceY = y.Value;
+            if (width.HasValue) model.Width = width.Value;
+            if (height.HasValue) model.Height = height.Value;
             var viewModel = new FolderPortalViewModel(model);
             palisades.Add(viewModel.Identifier, new FolderPortal(viewModel));
             viewModel.Save();
         }
 
-        public static void CreateTaskPalisade(string caldavUrl, string username, string password, string taskListId, string title)
+        public static void CreateTaskPalisade(string caldavUrl, string username, string password, string taskListId, string title, int? x = null, int? y = null, int? width = null, int? height = null)
         {
             var model = new TaskPalisadeModel
             {
@@ -149,10 +156,11 @@ namespace Palisades
                 CalDAVUsername = username,
                 CalDAVPassword = CredentialEncryptor.Encrypt(password),
                 TaskListId = taskListId,
-                Width = 600,
-                Height = 400
+                Width = width ?? 600,
+                Height = height ?? 400
             };
-
+            if (x.HasValue) model.FenceX = x.Value;
+            if (y.HasValue) model.FenceY = y.Value;
             var caldavService = new Services.CalDAVService(caldavUrl, username, password);
             var viewModel = new TaskPalisadeViewModel(model, caldavService);
             palisades.Add(viewModel.Identifier, new TaskPalisade(viewModel));
@@ -177,7 +185,7 @@ namespace Palisades
             }
         }
 
-        public static void CreateCalendarPalisade(string caldavUrl, string username, string password, List<string> calendarIds, string title, CalendarViewMode viewMode, int daysToShow)
+        public static void CreateCalendarPalisade(string caldavUrl, string username, string password, List<string> calendarIds, string title, CalendarViewMode viewMode, int daysToShow, int? x = null, int? y = null, int? width = null, int? height = null)
         {
             var model = new CalendarPalisadeModel
             {
@@ -188,9 +196,11 @@ namespace Palisades
                 CalendarIds = calendarIds ?? new List<string>(),
                 ViewMode = viewMode,
                 DaysToShow = daysToShow,
-                Width = 500,
-                Height = 400
+                Width = width ?? 500,
+                Height = height ?? 400
             };
+            if (x.HasValue) model.FenceX = x.Value;
+            if (y.HasValue) model.FenceY = y.Value;
             var calendarService = new CalendarCalDAVService(caldavUrl, username, password);
             var viewModel = new CalendarPalisadeViewModel(model, calendarService);
             palisades.Add(viewModel.Identifier, new CalendarPalisade(viewModel));
@@ -206,7 +216,7 @@ namespace Palisades
             }
         }
 
-        public static void CreateMailPalisade(string imapHost, int imapPort, string username, string password, List<string> monitoredFolders, string title, MailDisplayMode displayMode, int pollIntervalMinutes, string? webmailUrl = null)
+        public static void CreateMailPalisade(string imapHost, int imapPort, string username, string password, List<string> monitoredFolders, string title, MailDisplayMode displayMode, int pollIntervalMinutes, string? webmailUrl = null, int? x = null, int? y = null, int? width = null, int? height = null)
         {
             var model = new MailPalisadeModel
             {
@@ -219,9 +229,11 @@ namespace Palisades
                 DisplayMode = displayMode,
                 PollIntervalMinutes = pollIntervalMinutes,
                 WebmailUrl = webmailUrl,
-                Width = 320,
-                Height = 240
+                Width = width ?? 320,
+                Height = height ?? 240
             };
+            if (x.HasValue) model.FenceX = x.Value;
+            if (y.HasValue) model.FenceY = y.Value;
             var viewModel = new MailPalisadeViewModel(model);
             palisades.Add(viewModel.Identifier, new MailPalisade(viewModel));
             viewModel.Save();

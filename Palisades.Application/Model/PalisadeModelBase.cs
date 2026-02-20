@@ -52,5 +52,9 @@ namespace Palisades.Model
         public Color TitleColor { get => _titleColor; set => _titleColor = value; }
         public Color LabelsColor { get => _labelsColor; set => _labelsColor = value; }
         public PalisadeType Type { get => _type; set => _type = value; }
+        /// <summary>Groupe d'onglets (Phase 10.2). Null = palisade autonome.</summary>
+        public string? GroupId { get; set; }
+        /// <summary>Position de l'onglet dans le groupe (défaut 0).</summary>
+        public int TabOrder { get; set; }
     }
 }

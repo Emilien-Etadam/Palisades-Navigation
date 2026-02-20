@@ -30,6 +30,11 @@ namespace Palisades.Helpers
             return Path.Combine(GetAppDirectory(), "accounts.xml");
         }
 
+        internal static string GetSnapshotsDirectory()
+        {
+            return Path.Combine(GetAppDirectory(), "snapshots");
+        }
+
         internal static void EnsureExists(string directory)
         {
             DirectoryInfo infos = new(directory);

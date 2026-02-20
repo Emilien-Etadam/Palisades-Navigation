@@ -356,6 +356,8 @@ namespace Palisades.ViewModel
             PalisadesManager.ShowCreateMailPalisadeDialog();
         });
 
+        public ICommand ManageZimbraAccountsCommand { get; private set; } = new RelayCommand(() => { var d = new View.ManageAccountsDialog(); d.ShowDialog(); });
+
         public ICommand DeletePalisadeCommand { get; private set; } = new RelayCommand<string>((identifier) => PalisadesManager.DeletePalisade(identifier));
 
         public ICommand EditTaskPalisadeCommand { get; private set; } = new RelayCommand<TaskPalisadeViewModel>((viewModel) =>

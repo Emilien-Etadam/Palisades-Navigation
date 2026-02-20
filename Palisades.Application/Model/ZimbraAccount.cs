@@ -16,5 +16,9 @@ namespace Palisades.Model
         public string EncryptedPassword { get; set; } = string.Empty;
         /// <summary>URL de base CalDAV, ex. https://server/dav/user@domain/</summary>
         public string CalDAVBaseUrl { get; set; } = string.Empty;
+        /// <summary>Hôte IMAP pour Mail Palisade (ex. ssl0.ovh.net).</summary>
+        public string ImapHost { get; set; } = string.Empty;
+        /// <summary>Statut du dernier test (affiché dans ManageAccountsDialog).</summary>
+        public string? LastTestStatus { get; set; }
     }
 }

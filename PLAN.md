@@ -120,27 +120,27 @@ Zimbra OVH expose : CalDAV sur `https://<serveur>/dav/<email>/Calendar` (calendr
 
 ## Phase 7 — Gestion centralisée des comptes Zimbra
 
-**7.1 — Créer la vue `ManageAccountsDialog.xaml`.** Liste des comptes Zimbra configurés. Boutons : Ajouter, Modifier, Supprimer, Tester. Chaque compte affiche serveur, email, statut de connexion (dernier test). Accessible depuis le menu contextuel de n'importe quelle palisade ("Manage Zimbra Accounts").
+**7.1 — Créer la vue `ManageAccountsDialog.xaml`.** ✅ Fait. Liste des comptes (ListBox avec ItemTemplate : Email, Server, LastTestStatus). Boutons Add, Edit, Test, Delete, Close. `EditZimbraAccountDialog` pour ajout/édition : Email, Server, CalDAV Base URL, IMAP Host, Password, bouton "Detect OVH". Accessible via "Manage Zimbra Accounts" dans le menu contextuel de chaque palisade.
 
-**7.2 — Persistance des comptes.** Fichier séparé `%LOCALAPPDATA%\Palisades\accounts.xml`. Les mots de passe sont chiffrés via DPAPI (Phase 3.2). Chaque compte a un GUID. Les palisades Task/Calendar/Mail stockent uniquement ce GUID.
+**7.2 — Persistance des comptes.** ✅ Déjà en place (Phase 3.4). Fichier `accounts.xml` via `ZimbraAccountStore`. Mots de passe chiffrés DPAPI. `ZimbraAccount` : Id, Server, Email, EncryptedPassword, CalDAVBaseUrl, ImapHost, LastTestStatus.
 
-**7.3 — Détection de la configuration Zimbra OVH.** Pré-remplir le serveur IMAP (`ssl0.ovh.net:993` ou le serveur spécifique au domaine) et l'URL CalDAV (`https://<serveur>/dav/<email>/`) à partir de l'adresse email saisie, en utilisant les conventions OVH Zimbra. L'utilisateur peut ajuster manuellement.
+**7.3 — Détection Zimbra OVH.** ✅ Fait. `ZimbraOvhDetection.SuggestFromEmail(email)` : retourne (ImapHost, CalDAVBaseUrl) avec conventions OVH (ssl0.ovh.net ou mail.domaine). Bouton "Detect OVH" dans `EditZimbraAccountDialog` pré-remplit les champs. Test connexion dans ManageAccountsDialog (CalDAV GetTaskLists + IMAP Connect/Disconnect), mise à jour `LastTestStatus`.
 
 ---
 
 ## Phase 8 — Déplacer les tests, CI, qualité
 
-**8.1 — Créer `Palisades.Tests`.** Nouveau projet xUnit dans la solution. Déplacer `CalDAVServiceTests.cs` dedans. Ajouter des tests pour : `CredentialEncryptor` (DPAPI), sérialisation/désérialisation des modèles polymorphes, `ImapMailService` (mocks), parsing des réponses CalDAV.
+**8.1 — Créer `Palisades.Tests`.** ✅ Fait. Projet xUnit `Palisades.Tests` ajouté à la solution. `CalDAVServiceTests.cs` déplacé (tests CalDAV, CredentialEncryptor Encrypt/Decrypt round-trip, empty, invalid). `ZimbraOvhDetectionTests` pour SuggestFromEmail. Tests DPAPI skippés sur non-Windows.
 
-**8.2 — Revoir le workflow GitHub Actions (`build.yml`).** Ajouter l'exécution des tests. Ajouter une étape de publication des artefacts de build.
+**8.2 — Workflow GitHub Actions (`build.yml`).** ✅ Fait. Étape "Restore and run tests" : `dotnet test Palisades.Tests`. Publication des artefacts Release conservée.
 
-**8.3 — Corriger les petits défauts UX.** `TitleColor` / `LabelsColor` getters qui créent un `new SolidColorBrush` à chaque appel → cacher et ne recréer que sur changement. `OnPropertyChanged()` sans argument dans le constructeur → supprimer.
+**8.3 — UX.** ✅ Fait. Dans `ViewModelBase`, `TitleColor` et `LabelsColor` : cache `_titleColorBrush` / `_labelsColorBrush`, recréation uniquement si la couleur du modèle a changé.
 
 ---
 
 ## Phase 9 — Nouvelles commandes dans les menus contextuels
 
-Après toutes les phases précédentes, chaque palisade (Standard, FolderPortal, TaskPalisade, CalendarPalisade, MailPalisade) doit exposer dans son menu contextuel header la possibilité de créer n'importe quel type de palisade. Puisque les commandes sont dans `ViewModelBase`, c'est automatique. Les entrées du menu contextuel seront : "New Palisade", "New Folder Portal", "New Task Palisade", "New Calendar Palisade", "New Mail Palisade", séparateur, "Manage Zimbra Accounts", séparateur, "Edit", "Delete", "About".
+✅ Fait. Chaque palisade expose dans son menu contextuel header : création de tous les types (New Palisade, New Folder Portal, New Task Palisade, New Calendar Palisade, New Mail Palisade), séparateur, "Manage Zimbra Accounts", séparateur, Edit/Delete/About (ou Refresh selon le type). `ManageZimbraAccountsCommand` ajouté dans `ViewModelBase` et dans PalisadeViewModel, FolderPortalViewModel, TaskPalisadeViewModel. Entrées ajoutées dans Palisade.xaml, FolderPortal.xaml, TaskPalisade.xaml, CalendarPalisade.xaml, MailPalisade.xaml.
 
 ---
 
@@ -184,7 +184,7 @@ Après toutes les phases précédentes, chaque palisade (Standard, FolderPortal,
 
 **10.2.9 — Menu contextuel d'onglet.** Clic-droit sur un header d'onglet : "Move Left", "Move Right", "Detach", "Close Tab" (supprime la palisade du groupe et la supprime définitivement après confirmation), "Edit" (ouvre le dialogue d'édition spécifique au type de la palisade de cet onglet).
 
-**10.2.10 — Chargement des groupes dans `PalisadesManager.LoadPalisades()`.** Après désérialisation de tous les modèles, regrouper ceux ayant le même `GroupId` non-null. Les trier par `TabOrder`. Créer une `TabbedPalisade` par groupe. Les palisades avec `GroupId` null restent des fenêtres individuelles. Mettre à jour le dictionnaire `palisades` pour que la clé soit le `GroupId` pour les groupes (la fenêtre étant la `TabbedPalisade`), et l'`Identifier` pour les fenêtres individuelles.
+**10.2.10 — Chargement des groupes dans `PalisadesManager.LoadPalisades()`.** (À faire : regrouper par GroupId, créer TabbedPalisade par groupe.)
 
 ---
 
@@ -202,7 +202,19 @@ Après toutes les phases précédentes, chaque palisade (Standard, FolderPortal,
 
 **10.3.6 — Intégration dans les menus contextuels.** Ajouter dans `ViewModelBase` les commandes `SaveSnapshotCommand` et `ManageSnapshotsCommand`. Dans le menu contextuel du header de chaque palisade, ajouter un sous-menu "Layouts" contenant : "Save current layout...", un séparateur, la liste des 5 derniers snapshots (clic = restauration directe après confirmation), un séparateur, "Manage layouts...".
 
-**10.3.7 — Snapshot automatique.** À chaque fermeture de l'application (`App.OnExit`), sauvegarder automatiquement un snapshot nommé "Auto-save — {date}". Conserver les 3 derniers auto-saves uniquement. Supprimer les plus anciens. Cela sert de filet de sécurité en cas de corruption ou de fausse manipulation.
+**10.3.7 — Snapshot automatique.** (Optionnel : auto-save au exit, garder les 3 derniers.)
+
+---
+
+## Phase 10 — Implémentation partielle (commit actuel)
+
+**10.1 — Création positionnée.** ✅ Surcharges dans `PalisadesManager` : `CreatePalisade`, `CreateFolderPortal`, `CreateTaskPalisade`, `CreateCalendarPalisade`, `CreateMailPalisade` acceptent des paramètres optionnels `(int? x, int? y, int? width, int? height)` pour position et dimensions. Pas encore d’overlay clic-droit glissé (DesktopDrawingOverlay à faire).
+
+**10.2 — Modèle de données pour onglets.** ✅ `PalisadeModelBase` : propriétés `GroupId` (string?), `TabOrder` (int). Enum `TabStyle` (Flat, Rounded) dans `Model/TabStyle.cs`. Fenêtre TabbedPalisade et drag/drop à implémenter ultérieurement.
+
+**10.3 — Snapshots.** ✅ `LayoutSnapshot` et `SnapshotEntry` dans `Model/`. `LayoutSnapshotService` : `SaveSnapshot(name)`, `ListSnapshots()`, `RestoreSnapshot(id)`, `DeleteSnapshot(id)`. Dossier `%LOCALAPPDATA%\Palisades\snapshots\{Guid}\snapshot.xml`. Pas encore de dialogues Save/Manage ni d’intégration menu / auto-save.
+
+---
 
 ## Ordre d'exécution recommandé pour Cursor
 

@@ -100,8 +100,22 @@ namespace Palisades.ViewModel
         {
             if (_mailService == null)
             {
-                var password = CredentialEncryptor.Decrypt(_model.ImapPassword ?? "");
-                _mailService = new ImapMailService(_model.ImapHost, _model.ImapPort, _model.ImapUsername, password);
+                string host; int port; string username; string password;
+                if (_model.ZimbraAccountId is Guid id && ZimbraAccountStore.GetById(id) is ZimbraAccount acc)
+                {
+                    host = !string.IsNullOrEmpty(acc.ImapHost) ? acc.ImapHost : acc.Server;
+                    port = 993;
+                    username = acc.Email ?? "";
+                    password = CredentialEncryptor.Decrypt(acc.EncryptedPassword ?? "");
+                }
+                else
+                {
+                    host = _model.ImapHost;
+                    port = _model.ImapPort > 0 ? _model.ImapPort : 993;
+                    username = _model.ImapUsername;
+                    password = CredentialEncryptor.Decrypt(_model.ImapPassword ?? "");
+                }
+                _mailService = new ImapMailService(host, port, username, password);
             }
             try
             {
