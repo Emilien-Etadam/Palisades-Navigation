@@ -1,8 +1,9 @@
-﻿namespace Palisades.Model
+using Palisades.Helpers;
+
+namespace Palisades.Model
 {
     public class LnkShortcut : Shortcut
     {
-
         public LnkShortcut() : base()
         {
         }
@@ -12,13 +13,14 @@
 
         public static LnkShortcut? BuildFrom(string shortcut, string palisadeIdentifier)
         {
-            IWshRuntimeLibrary.WshShell shell = new();
-            IWshRuntimeLibrary.IWshShortcut link = shell.CreateShortcut(shortcut);
+            string? targetPath = LnkReader.GetTargetPath(shortcut);
+            if (string.IsNullOrEmpty(targetPath))
+                return null;
 
             string name = Shortcut.GetName(shortcut);
             string iconPath = Shortcut.GetIcon(shortcut, palisadeIdentifier);
 
-            return new LnkShortcut(name, iconPath, link.TargetPath);
+            return new LnkShortcut(name, iconPath, targetPath);
         }
     }
 }

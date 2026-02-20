@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 
 namespace Palisades.Helpers
@@ -23,6 +23,11 @@ namespace Palisades.Helpers
         internal static string GetPalisadeIconsDirectory(string identifier)
         {
             return Path.Combine(GetPalisadeDirectory(identifier), "icons");
+        }
+
+        internal static string GetAccountsFilePath()
+        {
+            return Path.Combine(GetAppDirectory(), "accounts.xml");
         }
 
         internal static void EnsureExists(string directory)

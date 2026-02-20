@@ -14,7 +14,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign2.Defaults.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.DeepPurple.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Lime.xaml" />
             </ResourceDictionary.MergedDictionaries>
@@ -25,6 +25,12 @@
         <!-- Header with drag handle -->
         <Border x:Name="Header" Background="{Binding HeaderColor}" CornerRadius="8,8,0,0" 
                 Height="30" VerticalAlignment="Top" MouseLeftButtonDown="Header_MouseLeftButtonDown">
+            <Border.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="New Calendar Palisade" Command="{Binding NewCalendarPalisadeCommand}"/>
+                    <MenuItem Header="New Mail Palisade" Command="{Binding NewMailPalisadeCommand}"/>
+                </ContextMenu>
+            </Border.ContextMenu>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="{Binding Name}" Foreground="{Binding TitleColor}" 
                            VerticalAlignment="Center" Margin="10,0,0,0" FontWeight="Bold"/>

@@ -14,7 +14,10 @@ namespace Palisades.Model
         public DateTime? CompletedDate { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime LastModified { get; set; } = DateTime.Now;
+        /// <summary>Chemin/href serveur (ex. nom fichier .ics).</summary>
         public string CalDAVId { get; set; } = string.Empty;
+        /// <summary>Uid iCalendar (identifiant interne du VTODO).</summary>
+        public string Uid { get; set; } = string.Empty;
         public string CalDAVEtag { get; set; } = string.Empty;
         
         public CalDAVTask() { }

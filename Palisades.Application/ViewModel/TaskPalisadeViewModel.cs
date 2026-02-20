@@ -3,6 +3,7 @@ using Palisades.Model;
 using Palisades.Services;
 using Palisades.View;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -19,7 +20,7 @@ namespace Palisades.ViewModel
     public class TaskPalisadeViewModel : INotifyPropertyChanged
     {
         #region Attributes
-        private readonly PalisadeModel _model;
+        private readonly TaskPalisadeModel _model;
         private readonly CalDAVService _caldavService;
         private volatile bool _shouldSave;
         private CalDAVTask? _selectedTask;
@@ -27,7 +28,9 @@ namespace Palisades.ViewModel
         private bool _isSyncing;
         private bool _isLoading;
         private string _syncStatus = "Ready";
-        private Timer _syncTimer;
+        private Timer? _syncTimer;
+        private readonly object _saveLock = new object();
+        private readonly System.Threading.Timer _saveTimer;
         #endregion
 
         #region Accessors
@@ -105,41 +108,19 @@ namespace Palisades.ViewModel
 
         public string CalDAVPassword
         {
-            get 
+            get
             {
                 if (string.IsNullOrEmpty(_model.CalDAVPassword))
                     return string.Empty;
-                
-                // Déchiffrer le mot de passe
-                try
-                {
-                    return CredentialEncryptor.Decrypt(_model.CalDAVPassword, GetEncryptionKey());
-                }
-                catch
-                {
-                    return string.Empty;
-                }
+                try { return CredentialEncryptor.Decrypt(_model.CalDAVPassword); }
+                catch { return string.Empty; }
             }
-            set 
+            set
             {
-                if (string.IsNullOrEmpty(value))
-                {
-                    _model.CalDAVPassword = string.Empty;
-                }
-                else
-                {
-                    // Chiffrer le mot de passe avant de le sauvegarder
-                    _model.CalDAVPassword = CredentialEncryptor.Encrypt(value, GetEncryptionKey());
-                }
+                _model.CalDAVPassword = string.IsNullOrEmpty(value) ? string.Empty : CredentialEncryptor.Encrypt(value);
                 OnPropertyChanged();
                 Save();
             }
-        }
-=======
-        public string CalDAVPassword
-        {
-            get { return _model.CalDAVPassword ?? string.Empty; }
-            set { _model.CalDAVPassword = value; OnPropertyChanged(); Save(); }
         }
 
         public string TaskListId
@@ -199,16 +180,10 @@ namespace Palisades.ViewModel
         }
         #endregion
 
-        public TaskPalisadeViewModel() : this(new PalisadeModel
-        {
-            Type = PalisadeType.TaskPalisade,
-            Name = "Task Palisade",
-            Width = 600,
-            Height = 400
-        }, new CalDAVService("", "", ""))
+        public TaskPalisadeViewModel() : this(new TaskPalisadeModel { Name = "Task Palisade", Width = 600, Height = 400 }, new CalDAVService("", "", ""))
         { }
 
-        public TaskPalisadeViewModel(PalisadeModel model, CalDAVService caldavService)
+        public TaskPalisadeViewModel(TaskPalisadeModel model, CalDAVService caldavService)
         {
             _model = model;
             _caldavService = caldavService;
@@ -225,23 +200,9 @@ namespace Palisades.ViewModel
             // Démarrer le timer de synchronisation
             StartSyncTimer();
             
-            // Démarrer le thread de sauvegarde
-            Thread saveThread = new Thread(SaveAsync);
-            saveThread.IsBackground = true;
-            saveThread.Start();
+            _saveTimer = new System.Threading.Timer(_ => SaveAsync(), null, 1000, 1000);
         }
         
-        private string GetEncryptionKey()
-        {
-            // Dans une implémentation complète, cette clé devrait être stockée de manière sécurisée
-            // et protégée par un mot de passe principal ou le système d'exploitation
-            // Pour cette implémentation, nous utilisons une clé dérivée du nom d'utilisateur
-            if (string.IsNullOrEmpty(_model.CalDAVUsername))
-                return "DefaultPalisadesKey2024";
-                
-            return $"Palisades_{_model.CalDAVUsername}_Key";
-        }
-
         #region Methods
         public void Save()
         {
@@ -261,36 +222,39 @@ namespace Palisades.ViewModel
         {
             if (string.IsNullOrEmpty(TaskListId) || string.IsNullOrEmpty(CalDAVUrl))
             {
-                ErrorMessage = "CalDAV configuration incomplete";
+                Dispatch(() => { ErrorMessage = "CalDAV configuration incomplete"; });
                 return;
             }
 
             try
             {
-                IsLoading = true;
-                ErrorMessage = string.Empty;
-                SyncStatus = "Loading tasks...";
-                
+                Dispatch(() => { IsLoading = true; ErrorMessage = string.Empty; SyncStatus = "Loading tasks..."; });
                 var tasks = await _caldavService.GetTasksAsync(TaskListId);
-                
-                // Effacer et ajouter les nouvelles tâches
-                Tasks.Clear();
-                foreach (var task in tasks)
+                Dispatch(() =>
                 {
-                    Tasks.Add(task);
-                }
-                
-                SyncStatus = "Tasks loaded successfully";
+                    Tasks.Clear();
+                    foreach (var task in tasks)
+                        Tasks.Add(task);
+                    SyncStatus = "Tasks loaded successfully";
+                });
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Failed to load tasks: {ex.Message}";
-                SyncStatus = "Error loading tasks";
+                var msg = $"Failed to load tasks: {ex.Message}";
+                Dispatch(() => { ErrorMessage = msg; SyncStatus = "Error loading tasks"; });
             }
             finally
             {
-                IsLoading = false;
+                Dispatch(() => { IsLoading = false; });
             }
+        }
+
+        private static void Dispatch(Action action)
+        {
+            if (System.Windows.Application.Current?.Dispatcher.CheckAccess() == true)
+                action();
+            else
+                System.Windows.Application.Current?.Dispatcher.Invoke(action);
         }
 
         private void Tasks_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -315,32 +279,29 @@ namespace Palisades.ViewModel
         public async Task SyncWithCalDAVAsync()
         {
             if (string.IsNullOrEmpty(TaskListId) || string.IsNullOrEmpty(CalDAVUrl))
-            {
                 return;
-            }
 
             try
             {
-                IsSyncing = true;
-                SyncStatus = "Syncing with CalDAV...";
-                ErrorMessage = string.Empty;
-                
-                // Synchroniser les tâches locales avec le serveur CalDAV
-                await _caldavService.SyncTasksAsync(TaskListId, new List<CalDAVTask>(Tasks));
-                
-                // Recharger les tâches pour s'assurer que nous avons les dernières données
-                await LoadTasksAsync();
-                
-                SyncStatus = "Sync completed: " + DateTime.Now.ToShortTimeString();
+                Dispatch(() => { IsSyncing = true; SyncStatus = "Syncing with CalDAV..."; ErrorMessage = string.Empty; });
+                var tasksSnapshot = await System.Windows.Application.Current.Dispatcher.InvokeAsync(() => new List<CalDAVTask>(Tasks)).Task;
+                var merged = await _caldavService.SyncTasksAsync(TaskListId, tasksSnapshot);
+                Dispatch(() =>
+                {
+                    Tasks.Clear();
+                    foreach (var t in merged)
+                        Tasks.Add(t);
+                    SyncStatus = "Sync completed: " + DateTime.Now.ToShortTimeString();
+                });
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Sync failed: {ex.Message}";
-                SyncStatus = "Sync error";
+                var msg = $"Sync failed: {ex.Message}";
+                Dispatch(() => { ErrorMessage = msg; SyncStatus = "Sync error"; });
             }
             finally
             {
-                IsSyncing = false;
+                Dispatch(() => { IsSyncing = false; });
             }
         }
 
@@ -351,29 +312,20 @@ namespace Palisades.ViewModel
         
         private void SaveAsync()
         {
-            while (true)
+            if (!_shouldSave) return;
+            lock (_saveLock)
             {
-                if (_shouldSave)
+                if (!_shouldSave) return;
+                try
                 {
-                    try
-                    {
-                        string saveDirectory = PDirectory.GetPalisadeDirectory(Identifier);
-                        PDirectory.EnsureExists(saveDirectory);
-                        
-                        using (var writer = new System.IO.StreamWriter(System.IO.Path.Combine(saveDirectory, "state.xml")))
-                        {
-                            XmlSerializer serializer = new XmlSerializer(typeof(PalisadeModel), new Type[] { typeof(Shortcut), typeof(LnkShortcut), typeof(UrlShortcut), typeof(CalDAVTask), typeof(CalDAVTaskList) });
-                            serializer.Serialize(writer, _model);
-                        }
-                        
-                        _shouldSave = false;
-                    }
-                    catch
-                    {
-                        // Réessayer au prochain cycle
-                    }
+                    string saveDirectory = PDirectory.GetPalisadeDirectory(Identifier);
+                    PDirectory.EnsureExists(saveDirectory);
+                    using var writer = new System.IO.StreamWriter(System.IO.Path.Combine(saveDirectory, "state.xml"));
+                    XmlSerializer serializer = new XmlSerializer(typeof(TaskPalisadeModel));
+                    serializer.Serialize(writer, _model);
                 }
-                Thread.Sleep(1000);
+                catch { /* réessayer au prochain cycle */ }
+                finally { _shouldSave = false; }
             }
         }
         #endregion
@@ -392,6 +344,16 @@ namespace Palisades.ViewModel
         public ICommand NewTaskPalisadeCommand { get; private set; } = new RelayCommand(() =>
         {
             PalisadesManager.ShowCreateTaskPalisadeDialog();
+        });
+
+        public ICommand NewCalendarPalisadeCommand { get; private set; } = new RelayCommand(() =>
+        {
+            PalisadesManager.ShowCreateCalendarPalisadeDialog();
+        });
+
+        public ICommand NewMailPalisadeCommand { get; private set; } = new RelayCommand(() =>
+        {
+            PalisadesManager.ShowCreateMailPalisadeDialog();
         });
 
         public ICommand DeletePalisadeCommand { get; private set; } = new RelayCommand<string>((identifier) => PalisadesManager.DeletePalisade(identifier));

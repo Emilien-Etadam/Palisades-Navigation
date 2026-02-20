@@ -1,4 +1,4 @@
-﻿using Palisades.Helpers;
+using Palisades.Helpers;
 using Palisades.Model;
 using Palisades.View;
 using System;
@@ -18,10 +18,12 @@ namespace Palisades.ViewModel
     public class PalisadeViewModel : INotifyPropertyChanged
     {
         #region Attributs
-        private readonly PalisadeModel model;
+        private readonly StandardPalisadeModel model;
 
         private volatile bool shouldSave;
         private Shortcut? selectedShortcut;
+        private readonly object _saveLock = new object();
+        private readonly System.Threading.Timer _saveTimer;
         #endregion
 
         #region Accessors
@@ -93,13 +95,13 @@ namespace Palisades.ViewModel
         public Shortcut? SelectedShortcut
         {
             get => selectedShortcut;
-            set { selectedShortcut = value; OnPropertyChanged(); Save(); }
+            set { selectedShortcut = value; OnPropertyChanged(); }
         }
         #endregion
 
-        public PalisadeViewModel() : this(new PalisadeModel()) { }
+        public PalisadeViewModel() : this(new StandardPalisadeModel()) { }
 
-        public PalisadeViewModel(PalisadeModel model)
+        public PalisadeViewModel(StandardPalisadeModel model)
         {
             this.model = model;
 
@@ -109,9 +111,7 @@ namespace Palisades.ViewModel
                 Save();
             };
 
-            Thread saveThread = new(SaveAsync);
-            saveThread.IsBackground = true;
-            saveThread.Start();
+            _saveTimer = new System.Threading.Timer(_ => SaveAsync(), null, 1000, 1000);
         }
 
         #region Methods
@@ -139,6 +139,10 @@ namespace Palisades.ViewModel
         {
             PalisadesManager.ShowCreateFolderPortalDialog();
         });
+
+        public ICommand NewTaskPalisadeCommand { get; private set; } = new RelayCommand(() => PalisadesManager.ShowCreateTaskPalisadeDialog());
+        public ICommand NewCalendarPalisadeCommand { get; private set; } = new RelayCommand(() => PalisadesManager.ShowCreateCalendarPalisadeDialog());
+        public ICommand NewMailPalisadeCommand { get; private set; } = new RelayCommand(() => PalisadesManager.ShowCreateMailPalisadeDialog());
 
         public ICommand DeletePalisadeCommand { get; private set; } = new RelayCommand<string>((identifier) => PalisadesManager.DeletePalisade(identifier));
 
@@ -247,22 +251,24 @@ namespace Palisades.ViewModel
         }
 
         /// <summary>
-        /// Save asynchronously every 1s if needed.
+        /// Callback du timer : sauvegarde toutes les 1 s si nécessaire.
         /// </summary>
         private void SaveAsync()
         {
-            while (true)
+            if (!shouldSave) return;
+            lock (_saveLock)
             {
-                if (shouldSave)
+                if (!shouldSave) return;
+                try
                 {
                     string saveDirectory = PDirectory.GetPalisadeDirectory(Identifier);
                     PDirectory.EnsureExists(saveDirectory);
                     using StreamWriter writer = new(Path.Combine(saveDirectory, "state.xml"));
-                    XmlSerializer serializer = new(typeof(PalisadeModel), new Type[] { typeof(Shortcut), typeof(LnkShortcut), typeof(UrlShortcut) });
+                    XmlSerializer serializer = new(typeof(StandardPalisadeModel), new Type[] { typeof(Shortcut), typeof(LnkShortcut), typeof(UrlShortcut) });
                     serializer.Serialize(writer, this.model);
-                    shouldSave = false;
                 }
-                Thread.Sleep(1000);
+                catch { /* réessayer au prochain cycle */ }
+                finally { shouldSave = false; }
             }
         }
         #endregion

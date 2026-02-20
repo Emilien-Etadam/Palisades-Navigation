@@ -1,90 +1,59 @@
 using System;
-using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
 namespace Palisades.Helpers
 {
+    /// <summary>
+    /// Chiffrement des secrets (mots de passe) via DPAPI (Phase 3.2).
+    /// Déchiffrable uniquement par la session Windows du même utilisateur.
+    /// </summary>
     public static class CredentialEncryptor
     {
-        private static readonly byte[] Salt = Encoding.ASCII.GetBytes("PalisadesSalt2024");
-        private static readonly int Iterations = 10000;
-        private static readonly int KeySize = 256;
-        
-        public static string Encrypt(string plainText, string password)
+        private static readonly byte[] OptionalEntropy = Encoding.UTF8.GetBytes("Palisades.v1");
+
+        public static string Encrypt(string plainText)
         {
             if (string.IsNullOrEmpty(plainText))
                 return string.Empty;
-                
-            using (var deriveBytes = new Rfc2898DeriveBytes(password, Salt, Iterations))
-            {
-                var key = deriveBytes.GetBytes(KeySize / 8);
-                var iv = deriveBytes.GetBytes(16);
-                
-                using (var aes = Aes.Create())
-                {
-                    aes.Key = key;
-                    aes.IV = iv;
-                    
-                    using (var encryptor = aes.CreateEncryptor(aes.Key, aes.IV))
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        using (var cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write))
-                        using (var streamWriter = new StreamWriter(cryptoStream))
-                        {
-                            streamWriter.Write(plainText);
-                        }
-                        
-                        return Convert.ToBase64String(memoryStream.ToArray());
-                    }
-                }
-            }
-        }
-        
-        public static string Decrypt(string cipherText, string password)
-        {
-            if (string.IsNullOrEmpty(cipherText))
-                return string.Empty;
-                
             try
             {
-                var cipherBytes = Convert.FromBase64String(cipherText);
-                
-                using (var deriveBytes = new Rfc2898DeriveBytes(password, Salt, Iterations))
-                {
-                    var key = deriveBytes.GetBytes(KeySize / 8);
-                    var iv = deriveBytes.GetBytes(16);
-                    
-                    using (var aes = Aes.Create())
-                    {
-                        aes.Key = key;
-                        aes.IV = iv;
-                        
-                        using (var memoryStream = new MemoryStream(cipherBytes))
-                        using (var cryptoStream = new CryptoStream(memoryStream, aes.CreateDecryptor(aes.Key, aes.IV), CryptoStreamMode.Read))
-                        using (var streamReader = new StreamReader(cryptoStream))
-                        {
-                            return streamReader.ReadToEnd();
-                        }
-                    }
-                }
+                var bytes = Encoding.UTF8.GetBytes(plainText);
+                var protectedBytes = ProtectedData.Protect(bytes, OptionalEntropy, DataProtectionScope.CurrentUser);
+                return Convert.ToBase64String(protectedBytes);
             }
             catch
             {
-                // En cas d'échec du déchiffrement, retourner une chaîne vide
                 return string.Empty;
             }
         }
-        
-        public static string GenerateEncryptionKey()
+
+        public static string Decrypt(string cipherText)
         {
-            // Générer une clé de chiffrement aléatoire pour l'utilisateur
-            using (var rng = RandomNumberGenerator.Create())
+            if (string.IsNullOrEmpty(cipherText))
+                return string.Empty;
+            try
             {
-                var keyBytes = new byte[32]; // 256 bits
-                rng.GetBytes(keyBytes);
-                return Convert.ToBase64String(keyBytes);
+                var protectedBytes = Convert.FromBase64String(cipherText);
+                var bytes = ProtectedData.Unprotect(protectedBytes, OptionalEntropy, DataProtectionScope.CurrentUser);
+                return Encoding.UTF8.GetString(bytes);
+            }
+            catch
+            {
+                return string.Empty;
             }
         }
+
+        /// <summary>
+        /// Conservé pour compatibilité des signatures ; le second paramètre est ignoré (DPAPI n'utilise pas de clé utilisateur).
+        /// </summary>
+        [Obsolete("Utiliser Encrypt(string) avec DPAPI.")]
+        public static string Encrypt(string plainText, string _) => Encrypt(plainText);
+
+        /// <summary>
+        /// Conservé pour compatibilité des signatures ; le second paramètre est ignoré.
+        /// </summary>
+        [Obsolete("Utiliser Decrypt(string) avec DPAPI.")]
+        public static string Decrypt(string cipherText, string _) => Decrypt(cipherText);
     }
 }

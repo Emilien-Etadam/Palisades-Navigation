@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows.Input;
 
 namespace Palisades.ViewModel
@@ -121,7 +121,8 @@ namespace Palisades.ViewModel
         /// </param>
         public void Execute(object? parameter)
         {
-            _execute((T)parameter);
+            if (parameter is T typed)
+                _execute(typed);
         }
 
         /// <summary>

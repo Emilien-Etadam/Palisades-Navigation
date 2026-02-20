@@ -1,3 +1,4 @@
+using Palisades.Helpers;
 using Palisades.ViewModel;
 using System.Windows;
 using System.Windows.Media;
@@ -6,7 +7,7 @@ namespace Palisades.View
 {
     public partial class EditTaskPalisade : Window
     {
-        private readonly TaskPalisadeViewModel _viewModel;
+        private readonly TaskPalisadeViewModel? _viewModel;
 
         public EditTaskPalisade()
         {
@@ -21,33 +22,30 @@ namespace Palisades.View
 
         private void ChangeHeaderColor_Click(object sender, RoutedEventArgs e)
         {
-            var colorPicker = new PixiEditor.ColorPicker.ColorPickerDialog();
-            colorPicker.StartingColor = _viewModel.HeaderColor;
-            
-            if (colorPicker.ShowDialog() == true)
-            {
-                _viewModel.HeaderColor = colorPicker.SelectedColor;
-            }
+            var vm = _viewModel ?? (TaskPalisadeViewModel)DataContext;
+            using var dlg = new System.Windows.Forms.ColorDialog
+                { Color = ColorConversion.ToDrawingColor(vm.HeaderColor), FullOpen = true };
+            if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                vm.HeaderColor = ColorConversion.ToMediaColor(dlg.Color);
         }
 
         private void ChangeBodyColor_Click(object sender, RoutedEventArgs e)
         {
-            var colorPicker = new PixiEditor.ColorPicker.ColorPickerDialog();
-            colorPicker.StartingColor = _viewModel.BodyColor;
-            
-            if (colorPicker.ShowDialog() == true)
-            {
-                _viewModel.BodyColor = colorPicker.SelectedColor;
-            }
+            var vm = _viewModel ?? (TaskPalisadeViewModel)DataContext;
+            using var dlg = new System.Windows.Forms.ColorDialog
+                { Color = ColorConversion.ToDrawingColor(vm.BodyColor), FullOpen = true };
+            if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                vm.BodyColor = ColorConversion.ToMediaColor(dlg.Color);
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
+            var vm = _viewModel ?? (TaskPalisadeViewModel)DataContext;
             // Mettre à jour le mot de passe depuis le PasswordBox
             // Le setter de CalDAVPassword gère automatiquement le chiffrement
-            _viewModel.CalDAVPassword = PasswordBox.Password;
+            vm.CalDAVPassword = PasswordBox.Password;
             
-            _viewModel.Save();
+            vm.Save();
             DialogResult = true;
             Close();
         }

@@ -4,6 +4,8 @@ namespace Palisades.Model
     {
         Standard = 0,
         FolderPortal = 1,
-        TaskPalisade = 2
+        TaskPalisade = 2,
+        CalendarPalisade = 3,
+        MailPalisade = 4
     }
 }

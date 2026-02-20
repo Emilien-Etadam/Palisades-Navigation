@@ -49,6 +49,9 @@
                         <Separator />
                         <MenuItem Header="New fence" Command="{Binding Path=Data.NewPalisadeCommand, Source={StaticResource proxy}}" />
                         <MenuItem Header="New Folder Portal" Command="{Binding Path=Data.NewFolderPortalCommand, Source={StaticResource proxy}}" />
+                        <MenuItem Header="New Task Palisade" Command="{Binding Path=Data.NewTaskPalisadeCommand, Source={StaticResource proxy}}" />
+                        <MenuItem Header="New Calendar Palisade" Command="{Binding Path=Data.NewCalendarPalisadeCommand, Source={StaticResource proxy}}" />
+                        <MenuItem Header="New Mail Palisade" Command="{Binding Path=Data.NewMailPalisadeCommand, Source={StaticResource proxy}}" />
                         <Separator />
                         <MenuItem Header="About" Command="{Binding Path=Data.OpenAboutCommand, Source={StaticResource proxy}}" CommandParameter="{Binding}" />
                     </ContextMenu>

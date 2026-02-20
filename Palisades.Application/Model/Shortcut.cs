@@ -1,4 +1,4 @@
-﻿using Palisades.Helpers;
+using Palisades.Helpers;
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -40,7 +40,9 @@ namespace Palisades.Model
 
         public static string GetIcon(string filename, string palisadeIdentifier)
         {
-            using Bitmap icon = IconExtractor.GetFileImageFromPath(filename, Helpers.Native.IconSizeEnum.LargeIcon48);
+            using Bitmap? icon = IconExtractor.GetFileImageFromPath(filename, Helpers.Native.IconSizeEnum.LargeIcon48);
+            if (icon == null)
+                return string.Empty;
 
             string iconDir = PDirectory.GetPalisadeIconsDirectory(palisadeIdentifier);
             PDirectory.EnsureExists(iconDir);

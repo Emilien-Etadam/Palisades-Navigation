@@ -8,7 +8,8 @@ namespace Palisades.View
         public string CalDAVUrl { get; set; } = string.Empty;
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
-        public string TaskListId { get; set; } = string.Empty;
+        /// <summary>Pour Zimbra OVH : typiquement "Tasks".</summary>
+        public string TaskListId { get; set; } = "Tasks";
 
         public CreateTaskPalisadeDialog()
         {

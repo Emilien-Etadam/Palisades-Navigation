@@ -1,5 +1,6 @@
 using Palisades.Helpers;
 using Palisades.Model;
+using Palisades.Services;
 using Palisades.View;
 using Palisades.ViewModel;
 using System;
@@ -19,7 +20,16 @@ namespace Palisades
             string saveDirectory = PDirectory.GetPalisadesDirectory();
             PDirectory.EnsureExists(saveDirectory);
 
-            List<PalisadeModel> loadedModels = new();
+            var loadedConcrete = new List<PalisadeModelBase>();
+            var baseSerializer = new XmlSerializer(typeof(PalisadeModelBase), new[]
+            {
+                typeof(PalisadeModel),
+                typeof(StandardPalisadeModel),
+                typeof(FolderPortalModel),
+                typeof(TaskPalisadeModel),
+                typeof(CalendarPalisadeModel),
+                typeof(MailPalisadeModel)
+            });
 
             foreach (string identifierDirname in Directory.GetDirectories(saveDirectory))
             {
@@ -29,13 +39,16 @@ namespace Palisades
 
                 try
                 {
-                    XmlSerializer deserializer = new(typeof(PalisadeModel));
-                    using StreamReader reader = new(stateFile);
-                    if (deserializer.Deserialize(reader) is PalisadeModel model)
+                    using var reader = new StreamReader(stateFile);
+                    var obj = baseSerializer.Deserialize(reader);
+                    if (obj is PalisadeModel legacy)
                     {
-                        loadedModels.Add(model);
+                        loadedConcrete.Add(PalisadeModelMigration.ToConcreteModel(legacy));
                     }
-                    reader.Close();
+                    else if (obj is PalisadeModelBase concrete)
+                    {
+                        loadedConcrete.Add(concrete);
+                    }
                 }
                 catch
                 {
@@ -43,60 +56,98 @@ namespace Palisades
                 }
             }
 
-            foreach (PalisadeModel loadedModel in loadedModels)
+            foreach (PalisadeModelBase concrete in loadedConcrete)
             {
-                if (loadedModel.Type == PalisadeType.FolderPortal)
+                if (concrete is FolderPortalModel folderModel)
                 {
-                    var viewModel = new FolderPortalViewModel(loadedModel);
-                    palisades.Add(loadedModel.Identifier, new FolderPortal(viewModel));
+                    var viewModel = new FolderPortalViewModel(folderModel);
+                    palisades.Add(concrete.Identifier, new FolderPortal(viewModel));
                 }
-                else if (loadedModel.Type == PalisadeType.TaskPalisade)
+                else if (concrete is TaskPalisadeModel taskModel)
                 {
-                    var caldavService = new Services.CalDAVService(
-                        loadedModel.CalDAVUrl ?? string.Empty,
-                        loadedModel.CalDAVUsername ?? string.Empty,
-                        loadedModel.CalDAVPassword ?? string.Empty);
-                    var viewModel = new TaskPalisadeViewModel(loadedModel, caldavService);
-                    palisades.Add(loadedModel.Identifier, new TaskPalisade(viewModel));
+                    string caldavUrl;
+                    string username;
+                    string password;
+                    if (taskModel.ZimbraAccountId is Guid accountId && ZimbraAccountStore.GetById(accountId) is ZimbraAccount account)
+                    {
+                        caldavUrl = account.CalDAVBaseUrl ?? string.Empty;
+                        username = account.Email ?? string.Empty;
+                        password = CredentialEncryptor.Decrypt(account.EncryptedPassword ?? "");
+                    }
+                    else
+                    {
+                        caldavUrl = taskModel.CalDAVUrl ?? string.Empty;
+                        username = taskModel.CalDAVUsername ?? string.Empty;
+                        password = CredentialEncryptor.Decrypt(taskModel.CalDAVPassword ?? "");
+                    }
+                    var caldavService = new Services.CalDAVService(caldavUrl, username, password);
+                    var viewModel = new TaskPalisadeViewModel(taskModel, caldavService);
+                    palisades.Add(concrete.Identifier, new TaskPalisade(viewModel));
+                }
+                else if (concrete is CalendarPalisadeModel calendarModel)
+                {
+                    string caldavUrl;
+                    string username;
+                    string password;
+                    if (calendarModel.ZimbraAccountId is Guid accountId && ZimbraAccountStore.GetById(accountId) is ZimbraAccount account)
+                    {
+                        caldavUrl = account.CalDAVBaseUrl ?? string.Empty;
+                        username = account.Email ?? string.Empty;
+                        password = CredentialEncryptor.Decrypt(account.EncryptedPassword ?? "");
+                    }
+                    else
+                    {
+                        caldavUrl = calendarModel.CalDAVBaseUrl ?? string.Empty;
+                        username = calendarModel.CalDAVUsername ?? string.Empty;
+                        password = CredentialEncryptor.Decrypt(calendarModel.CalDAVPassword ?? "");
+                    }
+                    var calendarService = new CalendarCalDAVService(caldavUrl, username, password);
+                    var viewModel = new CalendarPalisadeViewModel(calendarModel, calendarService);
+                    palisades.Add(concrete.Identifier, new CalendarPalisade(viewModel));
+                }
+                else if (concrete is MailPalisadeModel mailModel)
+                {
+                    var viewModel = new MailPalisadeViewModel(mailModel);
+                    palisades.Add(concrete.Identifier, new MailPalisade(viewModel));
                 }
                 else
                 {
-                    palisades.Add(loadedModel.Identifier, new Palisade(new PalisadeViewModel(loadedModel)));
+                    var standardModel = (StandardPalisadeModel)concrete;
+                    palisades.Add(concrete.Identifier, new Palisade(new PalisadeViewModel(standardModel)));
                 }
             }
         }
 
         public static void CreatePalisade()
         {
-            PalisadeViewModel viewModel = new();
+            var model = new StandardPalisadeModel();
+            var viewModel = new PalisadeViewModel(model);
             palisades.Add(viewModel.Identifier, new Palisade(viewModel));
             viewModel.Save();
         }
 
         public static void CreateFolderPortal(string rootPath, string title)
         {
-            PalisadeModel model = new()
+            var model = new FolderPortalModel
             {
-                Type = PalisadeType.FolderPortal,
                 Name = title,
                 RootPath = rootPath,
                 CurrentPath = rootPath
             };
 
-            FolderPortalViewModel viewModel = new(model);
+            var viewModel = new FolderPortalViewModel(model);
             palisades.Add(viewModel.Identifier, new FolderPortal(viewModel));
             viewModel.Save();
         }
 
         public static void CreateTaskPalisade(string caldavUrl, string username, string password, string taskListId, string title)
         {
-            PalisadeModel model = new()
+            var model = new TaskPalisadeModel
             {
-                Type = PalisadeType.TaskPalisade,
                 Name = title,
                 CalDAVUrl = caldavUrl,
                 CalDAVUsername = username,
-                CalDAVPassword = password,
+                CalDAVPassword = CredentialEncryptor.Encrypt(password),
                 TaskListId = taskListId,
                 Width = 600,
                 Height = 400
@@ -126,6 +177,65 @@ namespace Palisades
             }
         }
 
+        public static void CreateCalendarPalisade(string caldavUrl, string username, string password, List<string> calendarIds, string title, CalendarViewMode viewMode, int daysToShow)
+        {
+            var model = new CalendarPalisadeModel
+            {
+                Name = title,
+                CalDAVBaseUrl = caldavUrl,
+                CalDAVUsername = username,
+                CalDAVPassword = CredentialEncryptor.Encrypt(password),
+                CalendarIds = calendarIds ?? new List<string>(),
+                ViewMode = viewMode,
+                DaysToShow = daysToShow,
+                Width = 500,
+                Height = 400
+            };
+            var calendarService = new CalendarCalDAVService(caldavUrl, username, password);
+            var viewModel = new CalendarPalisadeViewModel(model, calendarService);
+            palisades.Add(viewModel.Identifier, new CalendarPalisade(viewModel));
+            viewModel.Save();
+        }
+
+        public static void ShowCreateCalendarPalisadeDialog()
+        {
+            var dialog = new CreateCalendarPalisadeDialog();
+            if (dialog.ShowDialog() == true)
+            {
+                CreateCalendarPalisade(dialog.CalDAVUrl, dialog.Username, dialog.Password, dialog.SelectedCalendarIds, dialog.PalisadeTitle, dialog.ViewMode, dialog.DaysToShow);
+            }
+        }
+
+        public static void CreateMailPalisade(string imapHost, int imapPort, string username, string password, List<string> monitoredFolders, string title, MailDisplayMode displayMode, int pollIntervalMinutes, string? webmailUrl = null)
+        {
+            var model = new MailPalisadeModel
+            {
+                Name = title,
+                ImapHost = imapHost,
+                ImapPort = imapPort,
+                ImapUsername = username,
+                ImapPassword = CredentialEncryptor.Encrypt(password),
+                MonitoredFolders = monitoredFolders ?? new List<string> { "INBOX" },
+                DisplayMode = displayMode,
+                PollIntervalMinutes = pollIntervalMinutes,
+                WebmailUrl = webmailUrl,
+                Width = 320,
+                Height = 240
+            };
+            var viewModel = new MailPalisadeViewModel(model);
+            palisades.Add(viewModel.Identifier, new MailPalisade(viewModel));
+            viewModel.Save();
+        }
+
+        public static void ShowCreateMailPalisadeDialog()
+        {
+            var dialog = new CreateMailPalisadeDialog();
+            if (dialog.ShowDialog() == true)
+            {
+                CreateMailPalisade(dialog.ImapHost, dialog.ImapPort, dialog.Username, dialog.Password, dialog.SelectedFolders, dialog.PalisadeTitle, dialog.DisplayMode, dialog.PollIntervalMinutes, dialog.WebmailUrl);
+            }
+        }
+
         public static void DeletePalisade(string identifier)
         {
             palisades.TryGetValue(identifier, out Window? window);
@@ -135,13 +245,15 @@ namespace Palisades
             }
 
             if (window.DataContext is PalisadeViewModel palisadeVm)
-            {
                 palisadeVm.Delete();
-            }
             else if (window.DataContext is FolderPortalViewModel folderPortalVm)
-            {
                 folderPortalVm.Delete();
-            }
+            else if (window.DataContext is TaskPalisadeViewModel taskPalisadeVm)
+                taskPalisadeVm.Delete();
+            else if (window.DataContext is CalendarPalisadeViewModel calendarPalisadeVm)
+                calendarPalisadeVm.Delete();
+            else if (window.DataContext is MailPalisadeViewModel mailPalisadeVm)
+                mailPalisadeVm.Delete();
 
             window.Close();
             palisades.Remove(identifier);

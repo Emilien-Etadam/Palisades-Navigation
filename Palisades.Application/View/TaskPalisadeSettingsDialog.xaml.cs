@@ -5,7 +5,7 @@ namespace Palisades.View
 {
     public partial class TaskPalisadeSettingsDialog : Window
     {
-        private readonly TaskPalisadeViewModel _viewModel;
+        private readonly TaskPalisadeViewModel? _viewModel;
 
         public TaskPalisadeSettingsDialog()
         {

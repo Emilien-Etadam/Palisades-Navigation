@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:colorpicker="clr-namespace:ColorPicker;assembly=ColorPicker"
         xmlns:local="clr-namespace:Palisades.View"
         xmlns:viewModel="clr-namespace:Palisades.ViewModel"
         xmlns:converters="clr-namespace:Palisades.Converters"
@@ -24,21 +23,12 @@
     </Window.DataContext>
     <Window.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/ColorPicker;component/Styles/DefaultColorPickerStyle.xaml" />
-                <ResourceDictionary>
-                    <Style TargetType="TextBox">
-                        <Setter Property="VerticalAlignment" Value="Center" />
-                        <Setter Property="HorizontalAlignment" Value="Left" />
-                        <Setter Property="Margin" Value="0,5,0,5" />
-                    </Style>
-
-                    <Style TargetType="colorpicker:PortableColorPicker">
-                        <Setter Property="FontSize" Value="18" />
-                    </Style>
-                    <converters:SolidBrushToColor x:Key="brushConverter" />
-                </ResourceDictionary>
-            </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="TextBox">
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="Margin" Value="0,5,0,5" />
+            </Style>
+            <converters:SolidBrushToColor x:Key="brushConverter" />
         </ResourceDictionary>
     </Window.Resources>
     <Grid Margin="10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
@@ -71,16 +61,16 @@
         <TextBox Style="{StaticResource MaterialDesignTextBox}" FontSize="14" Grid.Row="2" Grid.Column="2" Text="{Binding RootPath, Mode=OneWay}" IsReadOnly="True" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
 
         <Label Grid.Row="4" Style="{StaticResource MaterialDesignLabel}" FontSize="24">Header Color</Label>
-        <colorpicker:PortableColorPicker Grid.Row="4" Grid.Column="2" SelectedColor="{Binding HeaderColor, Mode=TwoWay}" Width="80" HorizontalAlignment="Center" Style="{StaticResource DefaultColorPickerStyle}" />
+        <local:ColorPickerButton Grid.Row="4" Grid.Column="2" SelectedColor="{Binding HeaderColor, Mode=TwoWay}" HorizontalAlignment="Center" />
 
         <Label Grid.Row="6" Style="{StaticResource MaterialDesignLabel}" FontSize="24">Body Color</Label>
-        <colorpicker:PortableColorPicker Grid.Row="6" Grid.Column="2" SelectedColor="{Binding BodyColor, Mode=TwoWay}" Width="80" HorizontalAlignment="Center" Style="{StaticResource DefaultColorPickerStyle}" />
+        <local:ColorPickerButton Grid.Row="6" Grid.Column="2" SelectedColor="{Binding BodyColor, Mode=TwoWay}" HorizontalAlignment="Center" />
 
         <Label Grid.Row="8" Style="{StaticResource MaterialDesignLabel}" FontSize="24">Title Color</Label>
-        <colorpicker:PortableColorPicker Grid.Row="8" Grid.Column="2" SelectedColor="{Binding TitleColor, Converter={StaticResource brushConverter}, Mode=TwoWay}" Width="80" HorizontalAlignment="Center" Style="{StaticResource DefaultColorPickerStyle}" />
+        <local:ColorPickerButton Grid.Row="8" Grid.Column="2" SelectedColor="{Binding TitleColor, Converter={StaticResource brushConverter}, Mode=TwoWay}" HorizontalAlignment="Center" />
 
         <Label Grid.Row="10" Style="{StaticResource MaterialDesignLabel}" FontSize="24">Labels Color</Label>
-        <colorpicker:PortableColorPicker Grid.Row="10" Grid.Column="2" SelectedColor="{Binding LabelsColor, Converter={StaticResource brushConverter}, Mode=TwoWay}" Width="80" HorizontalAlignment="Center" Style="{StaticResource DefaultColorPickerStyle}" />
+        <local:ColorPickerButton Grid.Row="10" Grid.Column="2" SelectedColor="{Binding LabelsColor, Converter={StaticResource brushConverter}, Mode=TwoWay}" HorizontalAlignment="Center" />
 
     </Grid>
 </Window>

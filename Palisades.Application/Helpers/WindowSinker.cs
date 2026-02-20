@@ -1,4 +1,4 @@
-﻿using Palisades.Helpers.Native;
+using Palisades.Helpers.Native;
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
@@ -118,12 +118,12 @@ namespace Palisades.Helpers
             typeof(WindowSinker),
             new UIPropertyMetadata(false, OnAlwaysOnBottomChanged));
 
-        public static WindowSinker GetSinker(DependencyObject d)
+        public static WindowSinker? GetSinker(DependencyObject d)
         {
-            return (WindowSinker)d.GetValue(SinkerProperty);
+            return (WindowSinker?)d.GetValue(SinkerProperty);
         }
 
-        private static void SetSinker(DependencyObject d, WindowSinker value)
+        private static void SetSinker(DependencyObject d, WindowSinker? value)
         {
             d.SetValue(SinkerProperty, value);
         }

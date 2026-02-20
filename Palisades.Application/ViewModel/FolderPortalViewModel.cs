@@ -22,8 +22,10 @@ namespace Palisades.ViewModel
     public class FolderPortalViewModel : INotifyPropertyChanged
     {
         #region Attributes
-        private readonly PalisadeModel model;
+        private readonly FolderPortalModel model;
         private volatile bool shouldSave;
+        private readonly object _saveLock = new object();
+        private readonly System.Threading.Timer _saveTimer;
         private ObservableCollection<FolderPortalItem> items;
         private string breadcrumb;
         private string currentFolderName;
@@ -147,14 +149,10 @@ namespace Palisades.ViewModel
         }
         #endregion
 
-        public FolderPortalViewModel() : this(new PalisadeModel
-        {
-            Type = PalisadeType.FolderPortal,
-            Name = "Folder Portal"
-        })
+        public FolderPortalViewModel() : this(new FolderPortalModel { Name = "Folder Portal" })
         { }
 
-        public FolderPortalViewModel(PalisadeModel model)
+        public FolderPortalViewModel(FolderPortalModel model)
         {
             this.model = model;
             items = new ObservableCollection<FolderPortalItem>();
@@ -174,9 +172,7 @@ namespace Palisades.ViewModel
 
             UpdateBreadcrumb();
 
-            Thread saveThread = new(SaveAsync);
-            saveThread.IsBackground = true;
-            saveThread.Start();
+            _saveTimer = new System.Threading.Timer(_ => SaveAsync(), null, 1000, 1000);
         }
 
         #region Methods
@@ -474,6 +470,10 @@ namespace Palisades.ViewModel
             PalisadesManager.ShowCreateFolderPortalDialog();
         });
 
+        public ICommand NewTaskPalisadeCommand { get; private set; } = new RelayCommand(() => PalisadesManager.ShowCreateTaskPalisadeDialog());
+        public ICommand NewCalendarPalisadeCommand { get; private set; } = new RelayCommand(() => PalisadesManager.ShowCreateCalendarPalisadeDialog());
+        public ICommand NewMailPalisadeCommand { get; private set; } = new RelayCommand(() => PalisadesManager.ShowCreateMailPalisadeDialog());
+
         public ICommand DeletePalisadeCommand { get; private set; } = new RelayCommand<string>((identifier) => PalisadesManager.DeletePalisade(identifier));
 
         public ICommand EditFolderPortalCommand { get; private set; } = new RelayCommand<FolderPortalViewModel>((viewModel) =>
@@ -506,25 +506,20 @@ namespace Palisades.ViewModel
 
         private void SaveAsync()
         {
-            while (true)
+            if (!shouldSave) return;
+            lock (_saveLock)
             {
-                if (shouldSave)
+                if (!shouldSave) return;
+                try
                 {
                     string saveDirectory = PDirectory.GetPalisadeDirectory(Identifier);
                     PDirectory.EnsureExists(saveDirectory);
-                    try
-                    {
-                        using StreamWriter writer = new(Path.Combine(saveDirectory, "state.xml"));
-                        System.Xml.Serialization.XmlSerializer serializer = new(typeof(PalisadeModel), new Type[] { typeof(Shortcut), typeof(LnkShortcut), typeof(UrlShortcut) });
-                        serializer.Serialize(writer, this.model);
-                    }
-                    catch
-                    {
-                        // Retry on next cycle
-                    }
-                    shouldSave = false;
+                    using StreamWriter writer = new(Path.Combine(saveDirectory, "state.xml"));
+                    System.Xml.Serialization.XmlSerializer serializer = new(typeof(FolderPortalModel));
+                    serializer.Serialize(writer, this.model);
                 }
-                Thread.Sleep(1000);
+                catch { /* réessayer au prochain cycle */ }
+                finally { shouldSave = false; }
             }
         }
         #endregion

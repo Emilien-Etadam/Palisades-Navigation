@@ -1,4 +1,4 @@
-﻿<Window x:Class="Palisades.View.About"
+<Window x:Class="Palisades.View.About"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -46,9 +46,6 @@
                 </TextBlock>
                 <Label Padding="20,0,20,0">
                     <helpers:HyperlinkCommander Foreground="{StaticResource MaterialDesignDarkForeground}" Command="{Binding NavigateCommand}" CommandParameter="http://materialdesigninxaml.net/">MaterialDesignThemes</helpers:HyperlinkCommander>
-                </Label>
-                <Label Padding="20,0,20,0">
-                    <helpers:HyperlinkCommander Foreground="{StaticResource MaterialDesignDarkForeground}" Command="{Binding NavigateCommand}" CommandParameter="https://pixieditor.net/colorpicker">PixiEditor's ColorPicker</helpers:HyperlinkCommander>
                 </Label>
                 <Label Padding="20,0,20,0">
                     <helpers:HyperlinkCommander Foreground="{StaticResource MaterialDesignDarkForeground}" Command="{Binding NavigateCommand}" CommandParameter="https://github.com/punker76/gong-wpf-dragdrop">GongSolutions.WPF.DragDrop</helpers:HyperlinkCommander>
