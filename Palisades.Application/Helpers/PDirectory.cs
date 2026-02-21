@@ -35,6 +35,11 @@ namespace Palisades.Helpers
             return Path.Combine(GetAppDirectory(), "snapshots");
         }
 
+        internal static string GetSettingsFilePath()
+        {
+            return Path.Combine(GetAppDirectory(), "settings.xml");
+        }
+
         internal static void EnsureExists(string directory)
         {
             DirectoryInfo infos = new(directory);

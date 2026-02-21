@@ -10,7 +10,7 @@ using System.Windows.Media;
 
 namespace Palisades.ViewModel
 {
-    public abstract class ViewModelBase : INotifyPropertyChanged
+    public abstract class ViewModelBase : INotifyPropertyChanged, IPalisadeViewModel
     {
         protected readonly PalisadeModelBase Model;
         protected volatile bool ShouldSave;
@@ -97,6 +97,10 @@ namespace Palisades.ViewModel
             }
             set { Model.LabelsColor = value.Color; _labelsColorBrush = value; OnPropertyChanged(); Save(); }
         }
+
+        public string? GroupId { get => Model.GroupId; set { Model.GroupId = value; OnPropertyChanged(); Save(); } }
+        public int TabOrder { get => Model.TabOrder; set { Model.TabOrder = value; OnPropertyChanged(); Save(); } }
+        public PalisadeModelBase ModelBase => Model;
 
         #endregion
 

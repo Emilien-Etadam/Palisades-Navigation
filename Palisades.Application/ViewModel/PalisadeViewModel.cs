@@ -15,7 +15,7 @@ using System.Xml.Serialization;
 
 namespace Palisades.ViewModel
 {
-    public class PalisadeViewModel : INotifyPropertyChanged
+    public class PalisadeViewModel : INotifyPropertyChanged, IPalisadeViewModel
     {
         #region Attributs
         private readonly StandardPalisadeModel model;
@@ -85,6 +85,9 @@ namespace Palisades.ViewModel
             get => new(model.LabelsColor);
             set { model.LabelsColor = value.Color; OnPropertyChanged(); Save(); }
         }
+
+        public string? GroupId { get => model.GroupId; set { model.GroupId = value; OnPropertyChanged(); Save(); } }
+        public int TabOrder { get => model.TabOrder; set { model.TabOrder = value; OnPropertyChanged(); Save(); } }
 
         public ObservableCollection<Shortcut> Shortcuts
         {

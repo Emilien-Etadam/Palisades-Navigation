@@ -17,7 +17,7 @@ using System.Xml.Serialization;
 
 namespace Palisades.ViewModel
 {
-    public class TaskPalisadeViewModel : INotifyPropertyChanged
+    public class TaskPalisadeViewModel : INotifyPropertyChanged, IPalisadeViewModel
     {
         #region Attributes
         private readonly TaskPalisadeModel _model;
@@ -93,6 +93,9 @@ namespace Palisades.ViewModel
             get => new(_model.LabelsColor);
             set { _model.LabelsColor = value.Color; OnPropertyChanged(); Save(); }
         }
+
+        public string? GroupId { get => _model.GroupId; set { _model.GroupId = value; OnPropertyChanged(); Save(); } }
+        public int TabOrder { get => _model.TabOrder; set { _model.TabOrder = value; OnPropertyChanged(); Save(); } }
 
         public string CalDAVUrl
         {

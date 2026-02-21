@@ -19,7 +19,7 @@ using Color = System.Windows.Media.Color;
 
 namespace Palisades.ViewModel
 {
-    public class FolderPortalViewModel : INotifyPropertyChanged
+    public class FolderPortalViewModel : INotifyPropertyChanged, IPalisadeViewModel
     {
         #region Attributes
         private readonly FolderPortalModel model;
@@ -92,6 +92,9 @@ namespace Palisades.ViewModel
             get => new(model.LabelsColor);
             set { model.LabelsColor = value.Color; OnPropertyChanged(); Save(); }
         }
+
+        public string? GroupId { get => model.GroupId; set { model.GroupId = value; OnPropertyChanged(); Save(); } }
+        public int TabOrder { get => model.TabOrder; set { model.TabOrder = value; OnPropertyChanged(); Save(); } }
 
         public string RootPath
         {

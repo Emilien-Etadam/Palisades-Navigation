@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows;
 using Microsoft.Extensions.Configuration;
 using Palisades.Helpers;
+using Palisades.View;
 using Sentry;
 using System.Windows.Threading;
 
@@ -45,6 +46,16 @@ namespace Palisades
                     PalisadesManager.CreatePalisade();
                     WriteStartupLog("CreatePalisade() ok");
                 }
+
+                var overlay = new DesktopDrawingOverlay();
+                overlay.Show();
+                overlay.ShowActivated = false;
+                foreach (var kv in PalisadesManager.palisades)
+                {
+                    if (kv.Value is Window w)
+                    { w.Activate(); break; }
+                }
+                WriteStartupLog("DesktopDrawingOverlay shown");
             }
             catch (Exception ex)
             {
