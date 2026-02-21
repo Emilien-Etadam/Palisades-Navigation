@@ -30,6 +30,22 @@
                     <MenuItem Header="New Calendar Palisade" Command="{Binding NewCalendarPalisadeCommand}"/>
                     <MenuItem Header="New Mail Palisade" Command="{Binding NewMailPalisadeCommand}"/>
                     <Separator/>
+                    <MenuItem Header="Layouts" SubmenuOpened="LayoutsSubmenu_SubmenuOpened">
+                        <MenuItem Header="Save current layout..." Command="{Binding SaveSnapshotCommand}"/>
+                        <Separator/>
+                        <MenuItem ItemsSource="{Binding RecentSnapshots}">
+                            <MenuItem.ItemContainerStyle>
+                                <Style TargetType="MenuItem">
+                                    <Setter Property="Header" Value="{Binding Name}"/>
+                                    <Setter Property="Command" Value="{Binding DataContext.RestoreSnapshotCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                    <Setter Property="CommandParameter" Value="{Binding Id}"/>
+                                </Style>
+                            </MenuItem.ItemContainerStyle>
+                        </MenuItem>
+                        <Separator/>
+                        <MenuItem Header="Manage layouts..." Command="{Binding ManageSnapshotsCommand}"/>
+                    </MenuItem>
+                    <Separator/>
                     <MenuItem Header="Manage Zimbra Accounts" Command="{Binding ManageZimbraAccountsCommand}"/>
                 </ContextMenu>
             </Border.ContextMenu>

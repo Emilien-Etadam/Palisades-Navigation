@@ -20,5 +20,10 @@ namespace Palisades.View
             base.OnMouseLeftButtonDown(e);
             DragMove();
         }
+
+        private void LayoutsSubmenu_SubmenuOpened(object sender, RoutedEventArgs e)
+        {
+            _viewModel?.RefreshRecentSnapshots();
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Palisades.ViewModel;
+using Palisades.ViewModel;
 using System.Windows;
 
 namespace Palisades.View
@@ -20,5 +20,10 @@ namespace Palisades.View
             DragMove();
         }
 
+        private void LayoutsSubmenu_SubmenuOpened(object sender, RoutedEventArgs e)
+        {
+            if (viewModel != null)
+                viewModel.RefreshRecentSnapshots();
+        }
     }
 }

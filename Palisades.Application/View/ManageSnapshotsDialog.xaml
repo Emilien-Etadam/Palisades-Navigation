@@ -1,0 +1,52 @@
+<Window x:Class="Palisades.View.ManageSnapshotsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Manage layouts"
+        Height="420" Width="640"
+        WindowStartupLocation="CenterOwner" ResizeMode="CanResize">
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Text="Saved layouts" FontWeight="SemiBold" Margin="0,0,0,8"/>
+        <ListBox x:Name="SnapshotsListBox" Grid.Row="1" Margin="0,0,0,10" SelectionChanged="SnapshotsListBox_SelectionChanged">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="4,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Orientation="Horizontal">
+                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Margin="0,0,12,0"/>
+                            <TextBlock Foreground="Gray" Margin="0,0,12,0">
+                                <Run Text="{Binding CreatedAt, StringFormat=\{0:g\}}"/>
+                            </TextBlock>
+                            <TextBlock Foreground="Gray" Margin="0,0,12,0">
+                                <Run Text="{Binding ScreenWidth}"/>
+                                <Run Text="×"/>
+                                <Run Text="{Binding ScreenHeight}"/>
+                            </TextBlock>
+                            <TextBlock Foreground="Gray" Text="{Binding Entries.Count, StringFormat={}{0} palisades}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <Button Content="Restore" Tag="{Binding Id}" Click="RestoreButton_Click" Margin="0,0,4,0" Padding="8,4"/>
+                            <Button Content="Rename" Tag="{Binding Id}" Click="RenameButton_Click" Margin="0,0,4,0" Padding="8,4"/>
+                            <Button Content="Delete" Tag="{Binding Id}" Click="DeleteButton_Click" Padding="8,4"/>
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Export..." Click="ExportButton_Click" Margin="0,0,8,0" Padding="12,6"/>
+            <Button Content="Import..." Click="ImportButton_Click" Margin="0,0,8,0" Padding="12,6"/>
+            <Button Content="Close" Click="CloseButton_Click" Padding="12,6"/>
+        </StackPanel>
+    </Grid>
+</Window>

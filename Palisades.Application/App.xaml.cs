@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows;
 using Microsoft.Extensions.Configuration;
 using Palisades.Helpers;
+using Palisades.Services;
 using Palisades.View;
 using Sentry;
 using System.Windows.Threading;
@@ -56,6 +57,8 @@ namespace Palisades
                     { w.Activate(); break; }
                 }
                 WriteStartupLog("DesktopDrawingOverlay shown");
+
+                Exit += (_, _) => LayoutSnapshotService.SaveAutoSnapshotAndPrune(3);
             }
             catch (Exception ex)
             {

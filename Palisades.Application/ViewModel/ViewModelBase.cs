@@ -1,5 +1,8 @@
+using System.Collections.ObjectModel;
+using System.Linq;
 using Palisades.Helpers;
 using Palisades.Model;
+using Palisades.Services;
 using Palisades.View;
 using System.ComponentModel;
 using System.IO;
@@ -178,6 +181,39 @@ namespace Palisades.ViewModel
             try { about.Owner = PalisadesManager.GetWindow(viewModel.Identifier); } catch { }
             about.ShowDialog();
         });
+
+        public ICommand SaveSnapshotCommand { get; } = new RelayCommand(() =>
+        {
+            var dialog = new SaveSnapshotDialog();
+            try { dialog.Owner = System.Windows.Application.Current.MainWindow; } catch { }
+            if (dialog.ShowDialog() == true && !string.IsNullOrWhiteSpace(dialog.SnapshotName))
+                LayoutSnapshotService.SaveSnapshot(dialog.SnapshotName.Trim());
+        });
+
+        public ICommand ManageSnapshotsCommand { get; } = new RelayCommand(() =>
+        {
+            var dialog = new ManageSnapshotsDialog();
+            try { dialog.Owner = System.Windows.Application.Current.MainWindow; } catch { }
+            dialog.ShowDialog();
+        });
+
+        public ICommand RestoreSnapshotCommand { get; } = new RelayCommand<string>(id =>
+        {
+            if (string.IsNullOrEmpty(id)) return;
+            if (System.Windows.MessageBox.Show("This will replace your current layout. Continue?", "Restore layout",
+                    System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Question) != System.Windows.MessageBoxResult.Yes)
+                return;
+            LayoutSnapshotService.RestoreSnapshot(id);
+        });
+
+        public ObservableCollection<LayoutSnapshot> RecentSnapshots { get; } = new();
+
+        public void RefreshRecentSnapshots()
+        {
+            RecentSnapshots.Clear();
+            foreach (var s in LayoutSnapshotService.ListSnapshots().Take(5))
+                RecentSnapshots.Add(s);
+        }
 
         #endregion
 

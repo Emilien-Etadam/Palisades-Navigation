@@ -368,5 +368,53 @@ namespace Palisades
             }
             throw new KeyNotFoundException(identifier);
         }
+
+        /// <summary>Ferme toutes les palisades et vide le dictionnaire (pour RestoreSnapshot).</summary>
+        public static void CloseAllPalisades()
+        {
+            var windows = palisades.Values.ToList();
+            palisades.Clear();
+            foreach (var w in windows)
+            {
+                try { w.Close(); } catch { }
+            }
+        }
+
+        /// <summary>Recalcule position/taille de toutes les palisades (résolution changée).</summary>
+        public static void ApplyRescale(int oldWidth, int oldHeight, int newWidth, int newHeight)
+        {
+            const int minW = 200, minH = 100;
+            var seen = new HashSet<string>();
+            foreach (var kv in palisades.ToList())
+            {
+                var window = kv.Value;
+                if (window is View.TabbedPalisade tabbed && tabbed.DataContext is PalisadeGroup group)
+                {
+                    foreach (var vm in group.Members)
+                    {
+                        if (seen.Add(vm.Identifier))
+                            RescaleVm(vm, oldWidth, oldHeight, newWidth, newHeight, minW, minH);
+                    }
+                }
+                else if (window.DataContext is IPalisadeViewModel vm && seen.Add(vm.Identifier))
+                {
+                    RescaleVm(vm, oldWidth, oldHeight, newWidth, newHeight, minW, minH);
+                }
+            }
+        }
+
+        private static void RescaleVm(IPalisadeViewModel vm, int oldW, int oldH, int newW, int newH, int minW, int minH)
+        {
+            int x = (vm.FenceX * newW) / oldW;
+            int y = (vm.FenceY * newH) / oldH;
+            int w = Math.Max(minW, (vm.Width * newW) / oldW);
+            int h = Math.Max(minH, (vm.Height * newH) / oldH);
+            if (x + w > newW) x = Math.Max(0, newW - w);
+            if (y + h > newH) y = Math.Max(0, newH - h);
+            vm.FenceX = x;
+            vm.FenceY = y;
+            vm.Width = w;
+            vm.Height = h;
+        }
     }
 }

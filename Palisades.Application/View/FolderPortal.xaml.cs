@@ -34,5 +34,10 @@ namespace Palisades.View
                 viewModel.RefreshCommand.Execute(null);
             }
         }
+
+        private void LayoutsSubmenu_SubmenuOpened(object sender, RoutedEventArgs e)
+        {
+            viewModel?.RefreshRecentSnapshots();
+        }
     }
 }

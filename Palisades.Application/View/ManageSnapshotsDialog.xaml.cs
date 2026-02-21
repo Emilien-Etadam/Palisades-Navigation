@@ -1,0 +1,109 @@
+using Palisades.Model;
+using Palisades.Services;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+
+namespace Palisades.View
+{
+    public partial class ManageSnapshotsDialog : Window
+    {
+        private List<LayoutSnapshot> _snapshots = new();
+
+        public ManageSnapshotsDialog()
+        {
+            InitializeComponent();
+            Loaded += (_, _) => RefreshList();
+        }
+
+        private void RefreshList()
+        {
+            _snapshots = LayoutSnapshotService.ListSnapshots();
+            SnapshotsListBox.ItemsSource = _snapshots.ToList();
+        }
+
+        private void SnapshotsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Optional: enable/disable row buttons based on selection
+        }
+
+        private void RestoreButton_Click(object sender, RoutedEventArgs e)
+        {
+            var id = (string)((Button)sender).Tag;
+            if (string.IsNullOrEmpty(id)) return;
+            if (MessageBox.Show("This will replace your current layout. Continue?", "Restore layout", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                return;
+            LayoutSnapshotService.RestoreSnapshot(id);
+            DialogResult = true;
+            Close();
+        }
+
+        private void RenameButton_Click(object sender, RoutedEventArgs e)
+        {
+            var id = (string)((Button)sender).Tag;
+            if (string.IsNullOrEmpty(id)) return;
+            var snap = _snapshots.FirstOrDefault(s => s.Id == id);
+            if (snap == null) return;
+            var input = new RenameSnapshotInputDialog { CurrentName = snap.Name };
+            if (input.ShowDialog() != true) return;
+            var newName = input.NewName?.Trim();
+            if (string.IsNullOrEmpty(newName)) return;
+            LayoutSnapshotService.RenameSnapshot(id, newName);
+            RefreshList();
+        }
+
+        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            var id = (string)((Button)sender).Tag;
+            if (string.IsNullOrEmpty(id)) return;
+            if (MessageBox.Show("Delete this layout?", "Delete layout", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
+                return;
+            LayoutSnapshotService.DeleteSnapshot(id);
+            RefreshList();
+        }
+
+        private void ExportButton_Click(object sender, RoutedEventArgs e)
+        {
+            var selected = SnapshotsListBox.SelectedItem as LayoutSnapshot;
+            if (selected == null)
+            {
+                MessageBox.Show("Select a layout to export.", "Export", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            using var dlg = new System.Windows.Forms.FolderBrowserDialog
+            {
+                Description = "Choose destination folder for the exported layout",
+                ShowNewFolderButton = true
+            };
+            if (dlg.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
+            if (LayoutSnapshotService.ExportSnapshot(selected.Id, dlg.SelectedPath))
+                MessageBox.Show("Layout exported successfully.", "Export", MessageBoxButton.OK, MessageBoxImage.Information);
+            else
+                MessageBox.Show("Export failed (folder may already exist).", "Export", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+
+        private void ImportButton_Click(object sender, RoutedEventArgs e)
+        {
+            using var dlg = new System.Windows.Forms.FolderBrowserDialog
+            {
+                Description = "Select folder containing a snapshot (snapshot.xml)",
+                ShowNewFolderButton = false
+            };
+            if (dlg.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
+            var newId = LayoutSnapshotService.ImportSnapshot(dlg.SelectedPath);
+            if (newId != null)
+            {
+                RefreshList();
+                MessageBox.Show("Layout imported successfully.", "Import", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+                MessageBox.Show("No valid snapshot found in the selected folder.", "Import", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+    }
+}

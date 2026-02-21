@@ -53,6 +53,22 @@
                         <Separator />
                         <MenuItem Header="Manage Zimbra Accounts" Command="{Binding Path=Data.ManageZimbraAccountsCommand, Source={StaticResource proxy}}" />
                         <Separator />
+                        <MenuItem Header="Layouts" SubmenuOpened="LayoutsSubmenu_SubmenuOpened">
+                            <MenuItem Header="Save current layout..." Command="{Binding Path=Data.SaveSnapshotCommand, Source={StaticResource proxy}}" />
+                            <Separator />
+                            <MenuItem ItemsSource="{Binding Path=Data.RecentSnapshots, Source={StaticResource proxy}}">
+                                <MenuItem.ItemContainerStyle>
+                                    <Style TargetType="MenuItem">
+                                        <Setter Property="Header" Value="{Binding Name}" />
+                                        <Setter Property="Command" Value="{Binding Path=Data.RestoreSnapshotCommand, Source={StaticResource proxy}}" />
+                                        <Setter Property="CommandParameter" Value="{Binding Id}" />
+                                    </Style>
+                                </MenuItem.ItemContainerStyle>
+                            </MenuItem>
+                            <Separator />
+                            <MenuItem Header="Manage layouts..." Command="{Binding Path=Data.ManageSnapshotsCommand, Source={StaticResource proxy}}" />
+                        </MenuItem>
+                        <Separator />
                         <MenuItem Header="About" Command="{Binding Path=Data.OpenAboutCommand, Source={StaticResource proxy}}" CommandParameter="{Binding}" />
                     </ContextMenu>
                 </Grid.ContextMenu>
