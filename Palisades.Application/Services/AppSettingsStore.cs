@@ -35,3 +35,4 @@ namespace Palisades.Services
             Serializer.Serialize(writer, settings ?? new AppSettings());
         }
     }
+}

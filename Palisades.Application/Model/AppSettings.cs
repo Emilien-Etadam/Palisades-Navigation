@@ -9,3 +9,4 @@ namespace Palisades.Model
     {
         public TabStyle DefaultTabStyle { get; set; } = TabStyle.Flat;
     }
+}

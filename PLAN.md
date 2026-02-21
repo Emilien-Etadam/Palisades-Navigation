@@ -184,35 +184,35 @@ Zimbra OVH expose : CalDAV sur `https://<serveur>/dav/<email>/Calendar` (calendr
 
 **10.2.9 — Menu contextuel d'onglet.** Clic-droit sur un header d'onglet : "Move Left", "Move Right", "Detach", "Close Tab" (supprime la palisade du groupe et la supprime définitivement après confirmation), "Edit" (ouvre le dialogue d'édition spécifique au type de la palisade de cet onglet).
 
-**10.2.10 — Chargement des groupes dans `PalisadesManager.LoadPalisades()`.** (À faire : regrouper par GroupId, créer TabbedPalisade par groupe.)
+**10.2.10 — Chargement des groupes dans `PalisadesManager.LoadPalisades()`.** ✅ Fait. Regroupement par `GroupId`, tri par `TabOrder`, création d’une `TabbedPalisade` par groupe, enregistrement de chaque membre dans `palisades` par identifiant. Suppression d’un onglet (DeletePalisade) : détachement du groupe, dissolution si un seul membre restant.
 
 ---
 
 ### 10.3 — Snapshots de layout
 
-**10.3.1 — Modèle `LayoutSnapshot`.** Créer `Model/LayoutSnapshot.cs`. Propriétés : `string Id` (GUID), `string Name` (saisi par l'utilisateur), `DateTime CreatedAt`, `int ScreenWidth`, `int ScreenHeight`, `int ScreenCount` (nombre de moniteurs), `List<SnapshotEntry> Entries`. Créer `Model/SnapshotEntry.cs` : `string PalisadeIdentifier`, `string? GroupId`, `int TabOrder`, `string StateXmlContent` (le contenu intégral du `state.xml` de cette palisade, stocké comme string). `LayoutSnapshot` est sérialisable en XML.
+**10.3.1 — Modèle `LayoutSnapshot`.** ✅ Fait. `Model/LayoutSnapshot.cs` et `SnapshotEntry` dans le même fichier. Sérialisation XML.
 
-**10.3.2 — Service `LayoutSnapshotService`.** Créer `Services/LayoutSnapshotService.cs`. Méthodes : `SaveSnapshot(string name)` — itère toutes les palisades actives, lit chaque `state.xml`, capture la résolution d'écran courante via `SystemParameters.PrimaryScreenWidth/Height` et `Screen.AllScreens.Length`, construit un `LayoutSnapshot`, le sérialise dans `%LOCALAPPDATA%\Palisades\snapshots\{GUID}\snapshot.xml`. `List<LayoutSnapshot> ListSnapshots()` — scanne le dossier snapshots, désérialise les manifests, retourne la liste triée par date décroissante. `RestoreSnapshot(string snapshotId)` — ferme toutes les palisades actives, vide le dossier `saved`, écrit chaque `SnapshotEntry.StateXmlContent` dans `saved\{PalisadeIdentifier}\state.xml`, appelle `PalisadesManager.LoadPalisades()`, applique le recalcul de positions si la résolution a changé. `DeleteSnapshot(string snapshotId)` — supprime le dossier du snapshot.
+**10.3.2 — Service `LayoutSnapshotService`.** ✅ Fait. `SaveSnapshot(name)` (avec GroupId/TabOrder par state.xml), `ListSnapshots()`, `RestoreSnapshot(id)` (CloseAllPalisades, vide saved, écrit entries, LoadPalisades, ApplyRescaleIfNeeded), `DeleteSnapshot(id)`, `RenameSnapshot`, `ExportSnapshot`, `ImportSnapshot`, `SaveAutoSnapshotAndPrune(3)`.
 
-**10.3.3 — Recalcul de positions au restore.** Comparer `snapshot.ScreenWidth/ScreenHeight` avec la résolution courante. Si elles diffèrent, pour chaque palisade : `newX = (oldX * currentWidth) / snapshotWidth`, `newY = (oldY * currentHeight) / snapshotHeight`, `newWidth = (oldWidth * currentWidth) / snapshotWidth`, `newHeight = (oldHeight * currentHeight) / snapshotHeight`. Clamper ensuite les valeurs pour que la palisade reste entièrement visible (bord droit ≤ screenWidth, bord bas ≤ screenHeight, minimum 200x100).
+**10.3.3 — Recalcul de positions au restore.** ✅ Fait. `ApplyRescaleIfNeeded` + `PalisadesManager.ApplyRescale(oldW, oldH, newW, newH)` : scale et clamp (min 200×100, visible à l’écran).
 
-**10.3.4 — Dialogue de sauvegarde `SaveSnapshotDialog.xaml`.** Un champ texte pour le nom du snapshot (pré-rempli avec "Layout — {date}"). Bouton "Save". Pas d'options supplémentaires.
+**10.3.4 — Dialogue de sauvegarde `SaveSnapshotDialog.xaml`.** ✅ Fait. Nom pré-rempli "Layout - {date}", bouton Save.
 
-**10.3.5 — Dialogue de gestion `ManageSnapshotsDialog.xaml`.** Liste des snapshots existants. Chaque ligne affiche : nom, date de création, résolution d'écran au moment de la capture, nombre de palisades. Boutons par ligne : "Restore" (avec dialogue de confirmation "This will replace your current layout. Continue?"), "Rename", "Delete". Boutons globaux : "Export..." (copie le dossier du snapshot sélectionné dans un emplacement choisi par l'utilisateur), "Import..." (charge un dossier snapshot externe dans le dossier snapshots de l'application).
+**10.3.5 — Dialogue de gestion `ManageSnapshotsDialog.xaml`.** ✅ Fait. Liste (nom, date, résolution, nb palisades), Restore / Rename / Delete par ligne, Export… / Import… globaux. `RenameSnapshotInputDialog` pour renommer.
 
-**10.3.6 — Intégration dans les menus contextuels.** Ajouter dans `ViewModelBase` les commandes `SaveSnapshotCommand` et `ManageSnapshotsCommand`. Dans le menu contextuel du header de chaque palisade, ajouter un sous-menu "Layouts" contenant : "Save current layout...", un séparateur, la liste des 5 derniers snapshots (clic = restauration directe après confirmation), un séparateur, "Manage layouts...".
+**10.3.6 — Intégration dans les menus contextuels.** ✅ Fait. Sous-menu "Layouts" (Save current layout…, 5 derniers snapshots, Manage layouts…) dans Palisade, FolderPortal, TaskPalisade, CalendarPalisade, MailPalisade. Commandes dans ViewModelBase et PalisadeViewModel.
 
-**10.3.7 — Snapshot automatique.** (Optionnel : auto-save au exit, garder les 3 derniers.)
+**10.3.7 — Snapshot automatique.** ✅ Fait. Au exit : `SaveAutoSnapshotAndPrune(3)` (nom "Auto-save - {date}", garde les 3 derniers).
 
 ---
 
-## Phase 10 — Implémentation partielle (commit actuel)
+## Phase 10 — État actuel (implémenté)
 
-**10.1 — Création positionnée.** ✅ Surcharges dans `PalisadesManager` : `CreatePalisade`, `CreateFolderPortal`, `CreateTaskPalisade`, `CreateCalendarPalisade`, `CreateMailPalisade` acceptent des paramètres optionnels `(int? x, int? y, int? width, int? height)` pour position et dimensions. Pas encore d’overlay clic-droit glissé (DesktopDrawingOverlay à faire).
+**10.1 — Création par clic-droit glissé.** ✅ `DesktopDrawingOverlay` : rectangle de sélection au clic-droit + glisser (seuil 5 px, min 100×80), menu "Standard Palisade", "Folder Portal", "Task Palisade", "Calendar Palisade", "Mail Palisade" avec création positionnée. Surcharges `(x, y, width, height)` dans `PalisadesManager`.
 
-**10.2 — Modèle de données pour onglets.** ✅ `PalisadeModelBase` : propriétés `GroupId` (string?), `TabOrder` (int). Enum `TabStyle` (Flat, Rounded) dans `Model/TabStyle.cs`. Fenêtre TabbedPalisade et drag/drop à implémenter ultérieurement.
+**10.2 — Onglets (groupes).** ✅ `PalisadeModelBase` : `GroupId`, `TabOrder`. `TabStyle` (Flat, Rounded), `AppSettings` / `AppSettingsStore` (settings.xml). `PalisadeGroup`, `IPalisadeViewModel`. Fenêtre `TabbedPalisade.xaml` (header + TabControl, DataTemplates par type, styles Flat/Rounded). `LoadPalisades()` : regroupement par `GroupId`, création d’une `TabbedPalisade` par groupe. `DeletePalisade` : détachement d’onglet, dissolution si un seul membre. Drag-to-group, détacher onglet, réordonner, menu contextuel d’onglet : à compléter ultérieurement.
 
-**10.3 — Snapshots.** ✅ `LayoutSnapshot` et `SnapshotEntry` dans `Model/`. `LayoutSnapshotService` : `SaveSnapshot(name)`, `ListSnapshots()`, `RestoreSnapshot(id)`, `DeleteSnapshot(id)`. Dossier `%LOCALAPPDATA%\Palisades\snapshots\{Guid}\snapshot.xml`. Pas encore de dialogues Save/Manage ni d’intégration menu / auto-save.
+**10.3 — Snapshots de layout.** ✅ Modèle, service (Save, List, Restore, Delete, Rename, Export, Import, rescale), dialogues Save / Manage / Rename, sous-menu Layouts dans tous les menus contextuels, auto-save au exit (3 derniers).
 
 ---
 
