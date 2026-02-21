@@ -95,7 +95,10 @@ namespace Palisades.Services
             EnsureConnected();
             IMailFolder folder;
             if (string.Equals(folderName, "INBOX", StringComparison.OrdinalIgnoreCase))
-                folder = await _client!.Inbox.OpenAsync(FolderAccess.ReadOnly).ConfigureAwait(false);
+            {
+                folder = _client!.Inbox;
+                await folder.OpenAsync(FolderAccess.ReadOnly).ConfigureAwait(false);
+            }
             else
             {
                 folder = await _client!.Inbox.GetSubfolderAsync(folderName).ConfigureAwait(false);
@@ -117,7 +120,7 @@ namespace Palisades.Services
                 {
                     Sender = from,
                     Subject = env?.Subject ?? "",
-                    Date = s.InternalDate.DateTime
+                    Date = s.InternalDate?.DateTime ?? default
                 });
             }
             return result;
