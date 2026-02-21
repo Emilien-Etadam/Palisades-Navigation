@@ -204,13 +204,13 @@ namespace Palisades.ViewModel
 
         #region Commands
 
-        public ICommand NewPalisadeCommand { get; } = new RelayCommand(() => PalisadesManager.CreatePalisade());
-        public ICommand NewFolderPortalCommand { get; } = new RelayCommand(() => PalisadesManager.ShowCreateFolderPortalDialog());
-        public ICommand NewTaskPalisadeCommand { get; } = new RelayCommand(() => PalisadesManager.ShowCreateTaskPalisadeDialog());
-        public ICommand NewCalendarPalisadeCommand { get; } = new RelayCommand(() => PalisadesManager.ShowCreateCalendarPalisadeDialog());
-        public ICommand NewMailPalisadeCommand { get; } = new RelayCommand(() => PalisadesManager.ShowCreateMailPalisadeDialog());
-        public ICommand DeletePalisadeCommand { get; } = new RelayCommand<string>(id => PalisadesManager.DeletePalisade(id));
-        public ICommand OpenAboutCommand { get; } = new RelayCommand<ViewModelBase>(vm =>
+        public new ICommand NewPalisadeCommand { get; } = new RelayCommand(() => PalisadesManager.CreatePalisade());
+        public new ICommand NewFolderPortalCommand { get; } = new RelayCommand(() => PalisadesManager.ShowCreateFolderPortalDialog());
+        public new ICommand NewTaskPalisadeCommand { get; } = new RelayCommand(() => PalisadesManager.ShowCreateTaskPalisadeDialog());
+        public new ICommand NewCalendarPalisadeCommand { get; } = new RelayCommand(() => PalisadesManager.ShowCreateCalendarPalisadeDialog());
+        public new ICommand NewMailPalisadeCommand { get; } = new RelayCommand(() => PalisadesManager.ShowCreateMailPalisadeDialog());
+        public new ICommand DeletePalisadeCommand { get; } = new RelayCommand<string>(id => PalisadesManager.DeletePalisade(id));
+        public new ICommand OpenAboutCommand { get; } = new RelayCommand<ViewModelBase>(vm =>
         {
             if (vm == null) return;
             var about = new About { DataContext = new AboutViewModel() };
