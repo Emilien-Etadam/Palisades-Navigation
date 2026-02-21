@@ -97,9 +97,9 @@ namespace Palisades.Services
         /// Récupère les événements (VEVENT) dans la plage [start, end] pour un calendrier.
         /// calendarIdOrHref : id court (nom de collection) ou URL complète.
         /// </summary>
-        public async Task<List<CalendarEvent>> GetEventsAsync(string calendarIdOrHref, DateTime start, DateTime end)
+        public async Task<List<Palisades.Model.CalendarEvent>> GetEventsAsync(string calendarIdOrHref, DateTime start, DateTime end)
         {
-            var events = new List<CalendarEvent>();
+            var events = new List<Palisades.Model.CalendarEvent>();
             string calendarUrl = calendarIdOrHref.Contains("http") ? calendarIdOrHref : $"{_caldavBaseUrl}/{calendarIdOrHref}";
             try
             {
@@ -133,7 +133,7 @@ namespace Palisades.Services
         /// <summary>
         /// Parse une réponse multistatus CalDAV et remplit la liste d'événements.
         /// </summary>
-        private static void ParseEventsFromMultistatus(string multistatusXml, string calendarId, string calendarName, System.Windows.Media.Color defaultColor, List<CalendarEvent> events)
+        private static void ParseEventsFromMultistatus(string multistatusXml, string calendarId, string calendarName, System.Windows.Media.Color defaultColor, List<Palisades.Model.CalendarEvent> events)
         {
             var dav = XNamespace.Get("DAV:");
             var caldav = XNamespace.Get("urn:ietf:params:xml:ns:caldav");
@@ -165,11 +165,11 @@ namespace Palisades.Services
             catch { }
         }
 
-        private static CalendarEvent MapIcalEventToCalendarEvent(Ical.Net.CalendarComponents.CalendarEvent evt, string caldavHref, string etag, string calendarName, System.Windows.Media.Color color)
+        private static Palisades.Model.CalendarEvent MapIcalEventToCalendarEvent(Ical.Net.CalendarComponents.CalendarEvent evt, string caldavHref, string etag, string calendarName, System.Windows.Media.Color color)
         {
             var start = evt.Start?.Value ?? DateTime.MinValue;
             var end = evt.End?.Value ?? evt.Start?.Value ?? DateTime.MinValue;
-            return new CalendarEvent
+            return new Palisades.Model.CalendarEvent
             {
                 Uid = evt.Uid ?? "",
                 Summary = evt.Summary ?? "",
