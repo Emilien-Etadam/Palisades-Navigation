@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace Palisades.Model
@@ -18,6 +19,7 @@ namespace Palisades.Model
         public string CalDAVUsername { get; set; } = string.Empty;
         public string CalDAVPassword { get; set; } = string.Empty;
         public string TaskListId { get; set; } = string.Empty;
+        public List<string> TaskListIds { get; set; } = new();
         public int SyncIntervalMinutes { get; set; } = 5;
         public bool EnableLogging { get; set; }
         public bool ShowCompletedTasks { get; set; } = true;

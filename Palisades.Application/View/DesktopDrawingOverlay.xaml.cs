@@ -68,7 +68,7 @@ namespace Palisades.View
             {
                 var d = new CreateTaskPalisadeDialog();
                 if (d.ShowDialog() == true)
-                    PalisadesManager.CreateTaskPalisade(d.CalDAVUrl, d.Username, d.Password, d.TaskListId, d.PalisadeTitle, x, y, w, h);
+                    PalisadesManager.CreateTaskPalisade(d.CalDAVUrl, d.Username, d.Password, d.SelectedTaskListIds, d.PalisadeTitle, x, y, w, h);
             });
             AddItem("Calendar Palisade", (x, y, w, h) =>
             {

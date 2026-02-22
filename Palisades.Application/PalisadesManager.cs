@@ -178,15 +178,17 @@ namespace Palisades
             viewModel.Save();
         }
 
-        public static void CreateTaskPalisade(string caldavUrl, string username, string password, string taskListId, string title, int? x = null, int? y = null, int? width = null, int? height = null)
+        public static void CreateTaskPalisade(string caldavUrl, string username, string password, List<string> taskListIds, string title, int? x = null, int? y = null, int? width = null, int? height = null)
         {
+            taskListIds = taskListIds ?? new List<string>();
             var model = new TaskPalisadeModel
             {
                 Name = title,
                 CalDAVUrl = caldavUrl,
                 CalDAVUsername = username,
                 CalDAVPassword = CredentialEncryptor.Encrypt(password),
-                TaskListId = taskListId,
+                TaskListIds = taskListIds,
+                TaskListId = taskListIds.Count > 0 ? taskListIds[0] : string.Empty,
                 Width = width ?? 600,
                 Height = height ?? 400
             };
@@ -213,7 +215,8 @@ namespace Palisades
             CreateTaskPalisadeDialog dialog = new();
             if (dialog.ShowDialog() == true)
             {
-                CreateTaskPalisade(dialog.CalDAVUrl, dialog.Username, dialog.Password, dialog.TaskListId, dialog.PalisadeTitle);
+                var listIds = dialog.SelectedTaskListIds ?? new List<string>();
+                CreateTaskPalisade(dialog.CalDAVUrl, dialog.Username, dialog.Password, listIds, dialog.PalisadeTitle);
             }
         }
 

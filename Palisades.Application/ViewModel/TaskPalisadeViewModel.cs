@@ -81,6 +81,16 @@ namespace Palisades.ViewModel
 
         public ObservableCollection<CalDAVTask> Tasks { get; set; } = new ObservableCollection<CalDAVTask>();
 
+        public ObservableCollection<TaskTabItem> TaskTabs { get; } = new ObservableCollection<TaskTabItem>();
+        public bool HasMultipleLists => TaskTabs.Count > 1;
+
+        private TaskTabItem? _selectedTaskTab;
+        public TaskTabItem? SelectedTaskTab
+        {
+            get => _selectedTaskTab;
+            set { _selectedTaskTab = value; OnPropertyChanged(); }
+        }
+
         public CalDAVTask? SelectedTask
         {
             get => _selectedTask;
@@ -121,7 +131,9 @@ namespace Palisades.ViewModel
 
             Tasks.CollectionChanged += Tasks_CollectionChanged;
 
-            if (!string.IsNullOrEmpty(_model.CalDAVUrl) && !string.IsNullOrEmpty(_model.TaskListId))
+            var hasListIds = _model.TaskListIds != null && _model.TaskListIds.Count > 0;
+            var hasLegacyId = !string.IsNullOrEmpty(_model.TaskListId);
+            if (!string.IsNullOrEmpty(_model.CalDAVUrl) && (hasListIds || hasLegacyId))
             {
                 _ = LoadTasksAsync();
             }
@@ -129,9 +141,26 @@ namespace Palisades.ViewModel
             StartSyncTimer();
         }
 
+        private IEnumerable<string> GetListIds()
+        {
+            if (_model.TaskListIds != null && _model.TaskListIds.Count > 0)
+                return _model.TaskListIds;
+            if (!string.IsNullOrEmpty(_model.TaskListId))
+                return new[] { _model.TaskListId };
+            return Array.Empty<string>();
+        }
+
+        private string GetDisplayNameForListId(string href)
+        {
+            if (string.IsNullOrEmpty(href)) return "Tasks";
+            var idx = href.TrimEnd('/').LastIndexOf('/');
+            return idx >= 0 ? href.Substring(idx + 1).TrimEnd('/') : href;
+        }
+
         public async Task LoadTasksAsync()
         {
-            if (string.IsNullOrEmpty(TaskListId) || string.IsNullOrEmpty(CalDAVUrl))
+            var listIds = GetListIds().ToList();
+            if (listIds.Count == 0 || string.IsNullOrEmpty(CalDAVUrl))
             {
                 Dispatch(() => { ErrorMessage = "CalDAV configuration incomplete"; });
                 return;
@@ -140,14 +169,40 @@ namespace Palisades.ViewModel
             try
             {
                 Dispatch(() => { IsLoading = true; ErrorMessage = string.Empty; SyncStatus = "Loading tasks..."; });
-                var tasks = await _caldavService.GetTasksAsync(TaskListId);
-                Dispatch(() =>
+
+                if (listIds.Count > 1)
                 {
-                    Tasks.Clear();
-                    foreach (var task in tasks)
-                        Tasks.Add(task);
-                    SyncStatus = "Tasks loaded successfully";
-                });
+                    Dispatch(() => TaskTabs.Clear());
+                    foreach (var listId in listIds)
+                    {
+                        var tasks = await _caldavService.GetTasksAsync(listId);
+                        var tab = new TaskTabItem
+                        {
+                            ListId = listId,
+                            DisplayName = GetDisplayNameForListId(listId)
+                        };
+                        foreach (var t in tasks)
+                            tab.Tasks.Add(t);
+                        Dispatch(() =>
+                        {
+                            TaskTabs.Add(tab);
+                            OnPropertyChanged(nameof(HasMultipleLists));
+                        });
+                    }
+                    Dispatch(() => { SyncStatus = "Tasks loaded successfully"; });
+                }
+                else
+                {
+                    var singleId = listIds[0];
+                    var tasks = await _caldavService.GetTasksAsync(singleId);
+                    Dispatch(() =>
+                    {
+                        Tasks.Clear();
+                        foreach (var task in tasks)
+                            Tasks.Add(task);
+                        SyncStatus = "Tasks loaded successfully";
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -186,23 +241,55 @@ namespace Palisades.ViewModel
             }, null, syncInterval, syncInterval);
         }
 
+        private string GetListIdForSelectedTask()
+        {
+            if (SelectedTask == null) return TaskListId;
+            if (TaskTabs.Count > 1)
+            {
+                foreach (var tab in TaskTabs)
+                    if (tab.Tasks.Contains(SelectedTask))
+                        return tab.ListId;
+            }
+            return TaskListId;
+        }
+
         public async Task SyncWithCalDAVAsync()
         {
-            if (string.IsNullOrEmpty(TaskListId) || string.IsNullOrEmpty(CalDAVUrl))
+            var listIds = GetListIds().ToList();
+            if (listIds.Count == 0 || string.IsNullOrEmpty(CalDAVUrl))
                 return;
 
             try
             {
                 Dispatch(() => { IsSyncing = true; SyncStatus = "Syncing with CalDAV..."; ErrorMessage = string.Empty; });
-                var tasksSnapshot = await Application.Current.Dispatcher.InvokeAsync(() => new List<CalDAVTask>(Tasks)).Task;
-                var merged = await _caldavService.SyncTasksAsync(TaskListId, tasksSnapshot);
-                Dispatch(() =>
+
+                if (TaskTabs.Count > 1)
                 {
-                    Tasks.Clear();
-                    foreach (var t in merged)
-                        Tasks.Add(t);
-                    SyncStatus = "Sync completed: " + DateTime.Now.ToShortTimeString();
-                });
+                    foreach (var tab in TaskTabs)
+                    {
+                        var snapshot = await Application.Current.Dispatcher.InvokeAsync(() => new List<CalDAVTask>(tab.Tasks)).Task;
+                        var merged = await _caldavService.SyncTasksAsync(tab.ListId, snapshot);
+                        Dispatch(() =>
+                        {
+                            tab.Tasks.Clear();
+                            foreach (var t in merged)
+                                tab.Tasks.Add(t);
+                        });
+                    }
+                    Dispatch(() => SyncStatus = "Sync completed: " + DateTime.Now.ToShortTimeString());
+                }
+                else
+                {
+                    var tasksSnapshot = await Application.Current.Dispatcher.InvokeAsync(() => new List<CalDAVTask>(Tasks)).Task;
+                    var merged = await _caldavService.SyncTasksAsync(TaskListId, tasksSnapshot);
+                    Dispatch(() =>
+                    {
+                        Tasks.Clear();
+                        foreach (var t in merged)
+                            Tasks.Add(t);
+                        SyncStatus = "Sync completed: " + DateTime.Now.ToShortTimeString();
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -243,18 +330,29 @@ namespace Palisades.ViewModel
                 Description = "Task description",
                 DueDate = DateTime.Today.AddDays(1)
             };
-            Tasks.Add(newTask);
+            if (HasMultipleLists && SelectedTaskTab != null)
+            {
+                SelectedTaskTab.Tasks.Add(newTask);
+            }
+            else
+            {
+                Tasks.Add(newTask);
+            }
             SelectedTask = newTask;
         });
 
         public ICommand DeleteTaskCommand => new RelayCommand(async () =>
         {
             if (SelectedTask == null) return;
+            var listId = GetListIdForSelectedTask();
             try
             {
                 if (!string.IsNullOrEmpty(SelectedTask.CalDAVId))
-                    await _caldavService.DeleteTaskAsync(TaskListId, SelectedTask.CalDAVId);
-                Tasks.Remove(SelectedTask);
+                    await _caldavService.DeleteTaskAsync(listId, SelectedTask.CalDAVId);
+                if (HasMultipleLists && SelectedTaskTab != null && SelectedTaskTab.Tasks.Contains(SelectedTask))
+                    SelectedTaskTab.Tasks.Remove(SelectedTask);
+                else
+                    Tasks.Remove(SelectedTask);
                 SelectedTask = null;
             }
             catch (Exception ex)
@@ -266,13 +364,14 @@ namespace Palisades.ViewModel
         public ICommand ToggleTaskCompletedCommand => new RelayCommand(async () =>
         {
             if (SelectedTask == null) return;
+            var listId = GetListIdForSelectedTask();
             SelectedTask.Completed = !SelectedTask.Completed;
             SelectedTask.CompletedDate = SelectedTask.Completed ? DateTime.Now : null;
             SelectedTask.LastModified = DateTime.Now;
             try
             {
                 if (!string.IsNullOrEmpty(SelectedTask.CalDAVId))
-                    await _caldavService.UpdateTaskAsync(TaskListId, SelectedTask);
+                    await _caldavService.UpdateTaskAsync(listId, SelectedTask);
             }
             catch (Exception ex)
             {
@@ -285,18 +384,19 @@ namespace Palisades.ViewModel
         public ICommand SaveTaskCommand => new RelayCommand(async () =>
         {
             if (SelectedTask == null) return;
+            var listId = GetListIdForSelectedTask();
             try
             {
                 SelectedTask.LastModified = DateTime.Now;
                 if (string.IsNullOrEmpty(SelectedTask.CalDAVId))
                 {
-                    var createdTask = await _caldavService.CreateTaskAsync(TaskListId, SelectedTask);
+                    var createdTask = await _caldavService.CreateTaskAsync(listId, SelectedTask);
                     SelectedTask.CalDAVId = createdTask.CalDAVId;
                     SelectedTask.CalDAVEtag = createdTask.CalDAVEtag;
                 }
                 else
                 {
-                    await _caldavService.UpdateTaskAsync(TaskListId, SelectedTask);
+                    await _caldavService.UpdateTaskAsync(listId, SelectedTask);
                 }
                 SyncStatus = "Task saved successfully";
             }

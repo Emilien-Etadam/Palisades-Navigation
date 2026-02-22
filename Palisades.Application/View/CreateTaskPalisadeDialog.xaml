@@ -1,26 +1,30 @@
 <Window x:Class="Palisades.View.CreateTaskPalisadeDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Create Task Palisade" MinHeight="450" Height="480" MinWidth="500" Width="500"
-        WindowStartupLocation="CenterOwner" ResizeMode="CanResize">
-    <Grid Margin="10" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
-        <TextBlock Text="Task Palisade Title" Grid.Row="0" Margin="0,0,0,5"/>
-        <TextBox x:Name="PalisadeTitleTextBox" Grid.Row="1" Margin="0,0,0,15" 
-                 Text="{Binding PalisadeTitle, UpdateSourceTrigger=PropertyChanged}"/>
-        <TextBlock Text="CalDAV Server URL" Grid.Row="2" Margin="0,0,0,5"/>
-        <TextBox x:Name="CalDAVUrlTextBox" Grid.Row="3" Margin="0,0,0,15" 
-                 Text="{Binding CalDAVUrl, UpdateSourceTrigger=PropertyChanged}" 
-                 ToolTip="Ex: https://zimbra1.mail.ovh.net/dav/user@domain/"/>
-        <TextBlock Text="Username" Grid.Row="4" Margin="0,0,0,5"/>
-        <TextBox x:Name="UsernameTextBox" Grid.Row="5" Margin="0,0,0,15" 
-                 Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"/>
-        <TextBlock Text="Password" Grid.Row="6" Margin="0,0,0,5"/>
-        <PasswordBox x:Name="PasswordBox" Grid.Row="7" Margin="0,0,0,15"/>
-        <TextBlock Text="Task List ID" Grid.Row="8" Margin="0,0,0,5"/>
-        <TextBox x:Name="TaskListIdTextBox" Grid.Row="9" Margin="0,0,0,15" 
-                 Text="{Binding TaskListId, UpdateSourceTrigger=PropertyChanged}" 
-                 ToolTip="Ex: Tasks (pour Zimbra OVH)"/>
-        <StackPanel Grid.Row="10" Orientation="Horizontal" HorizontalAlignment="Right">
+        Title="Create Task Palisade" Height="520" Width="500"
+        WindowStartupLocation="CenterOwner" ResizeMode="CanResize"
+        MinHeight="400" MinWidth="400">
+    <Grid Margin="12" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*,Auto">
+        <TextBlock Text="Palisade Title" Grid.Row="0" Margin="0,0,0,4"/>
+        <TextBox x:Name="PalisadeTitleTextBox" Grid.Row="1" Margin="0,0,0,10" Text="Task Palisade"/>
+
+        <TextBlock Text="CalDAV Server URL" Grid.Row="2" Margin="0,0,0,4"/>
+        <TextBox x:Name="CalDAVUrlTextBox" Grid.Row="3" Margin="0,0,0,10"
+                 ToolTip="Ex: https://zimbra1.mail.ovh.net/dav/user@domain.com/"/>
+
+        <TextBlock Text="Username" Grid.Row="4" Margin="0,0,0,4"/>
+        <TextBox x:Name="UsernameTextBox" Grid.Row="5" Margin="0,0,0,10"/>
+
+        <TextBlock Text="Password" Grid.Row="6" Margin="0,0,0,4"/>
+        <PasswordBox x:Name="PasswordBox" Grid.Row="7" Margin="0,0,0,10"/>
+
+        <Button x:Name="LoadListsButton" Content="Load task lists" Grid.Row="8"
+                VerticalAlignment="Top" HorizontalAlignment="Left"
+                Margin="0,0,0,8" Click="LoadListsButton_Click"/>
+        <ListBox x:Name="TaskListsListBox" Grid.Row="8" Margin="0,36,0,0"
+                 SelectionMode="Multiple" DisplayMemberPath="DisplayName"/>
+
+        <StackPanel Grid.Row="9" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
             <Button Content="Cancel" Width="80" Margin="0,0,10,0" Click="CancelButton_Click"/>
             <Button Content="Create" Width="80" IsDefault="True" Click="CreateButton_Click"/>
         </StackPanel>
