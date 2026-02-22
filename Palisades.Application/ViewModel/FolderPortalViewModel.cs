@@ -497,6 +497,21 @@ namespace Palisades.ViewModel
         public ICommand NewMailPalisadeCommand { get; private set; } = new RelayCommand(() => PalisadesManager.ShowCreateMailPalisadeDialog());
         public ICommand ManageZimbraAccountsCommand { get; private set; } = new RelayCommand(() => { var d = new View.ManageAccountsDialog(); d.ShowDialog(); });
 
+        public ICommand SaveSnapshotCommand { get; private set; } = new RelayCommand(() =>
+        {
+            var dialog = new View.SaveSnapshotDialog();
+            try { dialog.Owner = Application.Current.MainWindow; } catch { }
+            if (dialog.ShowDialog() == true && !string.IsNullOrWhiteSpace(dialog.SnapshotName))
+                LayoutSnapshotService.SaveSnapshot(dialog.SnapshotName.Trim());
+        });
+
+        public ICommand ManageSnapshotsCommand { get; private set; } = new RelayCommand(() =>
+        {
+            var dialog = new View.ManageSnapshotsDialog();
+            try { dialog.Owner = Application.Current.MainWindow; } catch { }
+            dialog.ShowDialog();
+        });
+
         public ICommand DeletePalisadeCommand { get; private set; } = new RelayCommand<string>((identifier) => PalisadesManager.DeletePalisade(identifier));
 
         public ICommand EditFolderPortalCommand { get; private set; } = new RelayCommand<FolderPortalViewModel>((viewModel) =>

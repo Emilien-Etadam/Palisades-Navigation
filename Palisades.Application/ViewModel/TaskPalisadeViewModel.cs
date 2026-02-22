@@ -342,6 +342,21 @@ namespace Palisades.ViewModel
                 RecentSnapshots.Add(s);
         }
 
+        public ICommand SaveSnapshotCommand { get; private set; } = new RelayCommand(() =>
+        {
+            var dialog = new View.SaveSnapshotDialog();
+            try { dialog.Owner = Application.Current.MainWindow; } catch { }
+            if (dialog.ShowDialog() == true && !string.IsNullOrWhiteSpace(dialog.SnapshotName))
+                LayoutSnapshotService.SaveSnapshot(dialog.SnapshotName.Trim());
+        });
+
+        public ICommand ManageSnapshotsCommand { get; private set; } = new RelayCommand(() =>
+        {
+            var dialog = new View.ManageSnapshotsDialog();
+            try { dialog.Owner = Application.Current.MainWindow; } catch { }
+            dialog.ShowDialog();
+        });
+
         public ICommand RestoreSnapshotCommand { get; } = new RelayCommand<string>(id =>
         {
             if (string.IsNullOrEmpty(id)) return;
