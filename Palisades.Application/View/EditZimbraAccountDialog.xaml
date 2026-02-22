@@ -3,16 +3,18 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Zimbra Account" MinHeight="480" Height="520" MinWidth="440" Width="440"
         WindowStartupLocation="CenterOwner" ResizeMode="CanResize">
-    <Grid Margin="12" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+    <Grid Margin="12" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
         <TextBlock Text="Email" Grid.Row="0" Margin="0,0,0,4"/>
         <TextBox x:Name="EmailTextBox" Grid.Row="1" Margin="0,0,0,6"/>
-        <TextBlock Text="CalDAV Base URL" Grid.Row="2" Margin="0,0,0,4"/>
-        <TextBox x:Name="CalDAVUrlTextBox" Grid.Row="3" Margin="0,0,0,6" ToolTip="Ex: https://zimbra1.mail.ovh.net/dav/user@domain/"/>
-        <TextBlock Text="IMAP Host (for Mail Palisade)" Grid.Row="4" Margin="0,0,0,4"/>
-        <TextBox x:Name="ImapHostTextBox" Grid.Row="5" Margin="0,0,0,6"/>
-        <TextBlock Text="Password" Grid.Row="6" Margin="0,0,0,4"/>
-        <PasswordBox x:Name="PasswordBox" Grid.Row="7" Margin="0,0,0,10"/>
-        <StackPanel Grid.Row="8" Orientation="Horizontal" HorizontalAlignment="Right">
+        <TextBlock Text="Server" Grid.Row="2" Margin="0,0,0,4"/>
+        <TextBox x:Name="ServerTextBox" Grid.Row="3" Margin="0,0,0,6" ToolTip="Ex: zimbra1.mail.ovh.net"/>
+        <TextBlock Text="CalDAV Base URL" Grid.Row="4" Margin="0,0,0,4"/>
+        <TextBox x:Name="CalDAVUrlTextBox" Grid.Row="5" Margin="0,0,0,6" ToolTip="Ex: https://zimbra1.mail.ovh.net/dav/user@domain/"/>
+        <TextBlock Text="IMAP Host (for Mail Palisade)" Grid.Row="6" Margin="0,0,0,4"/>
+        <TextBox x:Name="ImapHostTextBox" Grid.Row="7" Margin="0,0,0,6"/>
+        <TextBlock Text="Password" Grid.Row="8" Margin="0,0,0,4"/>
+        <PasswordBox x:Name="PasswordBox" Grid.Row="9" Margin="0,0,0,10"/>
+        <StackPanel Grid.Row="10" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Content="Cancel" Width="80" Margin="0,0,10,0" Click="CancelButton_Click"/>
             <Button Content="Save" Width="80" IsDefault="True" Click="SaveButton_Click"/>
         </StackPanel>
