@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:model="clr-namespace:Palisades.Model"
         mc:Ignorable="d"
-        Title="Create Mail Palisade" Height="480" Width="420"
-        WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+        Title="Create Mail Palisade" Height="520" MinHeight="520" Width="420" MinWidth="420"
+        WindowStartupLocation="CenterOwner" ResizeMode="CanResize">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -17,6 +17,10 @@
     </Window.Resources>
     <Grid Margin="12">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>

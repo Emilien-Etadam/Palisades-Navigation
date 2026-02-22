@@ -56,7 +56,20 @@ namespace Palisades.ViewModel
                 return;
             }
 
-            // Cas 2 : fichiers depuis l'extérieur — tester via dropInfo.Data directement
+            // Cas 2 : drop externe (Explorateur, etc.) — DragInfo est null, Data peut être wrappé par gong
+            if (dropInfo.DragInfo == null)
+            {
+                if (HasFileDrop(dropInfo))
+                {
+                    dropInfo.DropTargetAdorner = DropTargetAdorners.Highlight;
+                    dropInfo.Effects = DragDropEffects.Copy;
+                    return;
+                }
+                dropInfo.Effects = DragDropEffects.None;
+                return;
+            }
+
+            // Cas 3 : fichiers depuis l'extérieur (avec ou sans DragInfo)
             if (HasFileDrop(dropInfo))
             {
                 dropInfo.DropTargetAdorner = DropTargetAdorners.Highlight;
@@ -64,7 +77,6 @@ namespace Palisades.ViewModel
                 return;
             }
 
-            // Cas 3 : défaut — ne pas accepter (gong montre "sens interdit" si Effects reste None)
             dropInfo.Effects = DragDropEffects.None;
         }
 
@@ -74,7 +86,14 @@ namespace Palisades.ViewModel
                 return true;
             if (dropInfo.Data is IDataObject iDataObject && iDataObject.GetDataPresent(DataFormats.FileDrop))
                 return true;
-            // Gong wraps external drops — check the raw DragEventArgs
+            // Gong wraps external drops — try reflection for GetDataPresent
+            try
+            {
+                var getDataPresent = dropInfo.Data.GetType().GetMethod("GetDataPresent", new[] { typeof(string) });
+                if (getDataPresent?.Invoke(dropInfo.Data, new object[] { DataFormats.FileDrop }) is true)
+                    return true;
+            }
+            catch { }
             try
             {
                 var args = typeof(GongSolutions.Wpf.DragDrop.DropInfo)
@@ -93,6 +112,15 @@ namespace Palisades.ViewModel
                 return (string[])dataObject.GetData(DataFormats.FileDrop);
             if (dropInfo.Data is IDataObject iDataObject && iDataObject.GetDataPresent(DataFormats.FileDrop))
                 return (string[])iDataObject.GetData(DataFormats.FileDrop);
+            try
+            {
+                var getData = dropInfo.Data.GetType().GetMethod("GetData", new[] { typeof(string) });
+                var getDataPresent = dropInfo.Data.GetType().GetMethod("GetDataPresent", new[] { typeof(string) });
+                if (getDataPresent?.Invoke(dropInfo.Data, new object[] { DataFormats.FileDrop }) is true
+                    && getData?.Invoke(dropInfo.Data, new object[] { DataFormats.FileDrop }) is string[] paths)
+                    return paths;
+            }
+            catch { }
             try
             {
                 var args = typeof(GongSolutions.Wpf.DragDrop.DropInfo)
@@ -131,13 +159,21 @@ namespace Palisades.ViewModel
             {
                 foreach (string file in files)
                 {
+                    if (string.IsNullOrEmpty(file) || (!File.Exists(file) && !Directory.Exists(file)))
+                        continue;
                     string? extension = Path.GetExtension(file);
-                    if (extension == null) continue;
                     Shortcut? shortcutItem = null;
-                    if (string.Equals(extension, ".lnk", StringComparison.OrdinalIgnoreCase))
+                    if (extension != null && string.Equals(extension, ".lnk", StringComparison.OrdinalIgnoreCase))
                         shortcutItem = LnkShortcut.BuildFrom(file, Identifier);
-                    else if (string.Equals(extension, ".url", StringComparison.OrdinalIgnoreCase))
+                    else if (extension != null && string.Equals(extension, ".url", StringComparison.OrdinalIgnoreCase))
                         shortcutItem = UrlShortcut.BuildFrom(file, Identifier);
+                    else
+                    {
+                        // Fichier ou dossier quelconque : créer un LnkShortcut pointant vers l'original
+                        string name = Shortcut.GetName(file);
+                        string iconPath = Shortcut.GetIcon(file, Identifier);
+                        shortcutItem = new LnkShortcut(name, iconPath, file);
+                    }
                     if (shortcutItem != null)
                         Shortcuts.Add(shortcutItem);
                 }
