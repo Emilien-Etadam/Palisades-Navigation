@@ -159,12 +159,12 @@
 
                 <!-- Breadcrumb row -->
                 <Grid Grid.Row="1" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
-                    <TextBlock Text="{Binding Breadcrumb}"
+                    <TextBlock Text="{Binding Breadcrumb, Mode=OneWay}"
                                Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
                                FontSize="12"
                                Margin="15,2,15,4"
                                TextTrimming="CharacterEllipsis"
-                               ToolTip="{Binding Breadcrumb}"
+                               ToolTip="{Binding Breadcrumb, Mode=OneWay}"
                                VerticalAlignment="Center" />
                 </Grid>
             </Grid>
@@ -173,7 +173,7 @@
             <Border CornerRadius="0" ClipToBounds="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
                 <Grid x:Name="content">
                 <!-- Error message -->
-                <TextBlock Text="{Binding ErrorMessage}"
+                <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}"
                            Foreground="#FFFF6666"
                            FontSize="13"
                            Margin="15,10"
@@ -183,6 +183,8 @@
                 <!-- Items list -->
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <ItemsControl ItemsSource="{Binding Items}" Margin="10,10,10,10"
+                                  VirtualizingPanel.IsVirtualizing="True"
+                                  VirtualizingPanel.VirtualizationMode="Recycling"
                                   dd:DragDrop.IsDragSource="True"
                                   dd:DragDrop.IsDropTarget="True"
                                   dd:DragDrop.DropHandler="{Binding}"
@@ -220,11 +222,11 @@
                                             <TextBlock TextWrapping="NoWrap"
                                                        TextAlignment="Center"
                                                        TextTrimming="CharacterEllipsis"
-                                                       Text="{Binding Name}"
+                                                       Text="{Binding Name, Mode=OneWay}"
                                                        Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
                                                        HorizontalAlignment="Center"
                                                        Margin="5,0,5,5"
-                                                       ToolTip="{Binding Name}" />
+                                                       ToolTip="{Binding Name, Mode=OneWay}" />
                                         </StackPanel>
                                     </Border>
                                 </ContentControl>

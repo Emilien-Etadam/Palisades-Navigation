@@ -62,9 +62,9 @@
                 </ContextMenu>
             </Border.ContextMenu>
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="{Binding Name}" Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" 
+                <TextBlock Text="{Binding Name, Mode=OneWay}" Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" 
                            VerticalAlignment="Center" Margin="10,0,0,0" FontWeight="Bold"/>
-                <TextBlock Text="{Binding SyncStatus}" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" 
+                <TextBlock Text="{Binding SyncStatus, Mode=OneWay}" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" 
                            VerticalAlignment="Center" Margin="20,0,0,0" FontSize="12"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,10,0">
                     <Button Content="🔄" ToolTip="Force Sync" Command="{Binding ForceSyncCommand}" 
@@ -88,60 +88,78 @@
                 </Grid.RowDefinitions>
 
                 <!-- Error message area -->
-                <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" 
+                <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}" Foreground="Red" 
                            Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}" 
                            Grid.Row="0" Margin="0,0,0,10"/>
 
                 <!-- Tasks list -->
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                    <ItemsControl ItemsSource="{Binding Tasks}" x:Name="TasksList">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border BorderBrush="Gray" BorderThickness="0,0,0,1" Padding="5">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
+                <ListBox Grid.Row="1" ItemsSource="{Binding Tasks}" x:Name="TasksList"
+                         VirtualizingPanel.IsVirtualizing="True"
+                         VirtualizingPanel.VirtualizationMode="Recycling"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         Background="Transparent"
+                         BorderThickness="0">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Margin" Value="0"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <ContentPresenter/>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="Gray" BorderThickness="0,0,0,1" Padding="5">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
 
-                                        <!-- Task completion checkbox -->
-                                        <CheckBox IsChecked="{Binding Completed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                                  VerticalAlignment="Center" Grid.Column="0" 
-                                                  Command="{Binding DataContext.ToggleTaskCompletedCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
-                                                  CommandParameter="{Binding}"/>
+                                    <!-- Task completion checkbox -->
+                                    <CheckBox IsChecked="{Binding Completed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                              VerticalAlignment="Center" Grid.Column="0" 
+                                              Command="{Binding DataContext.ToggleTaskCompletedCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" 
+                                              CommandParameter="{Binding}"/>
 
-                                        <!-- Task details -->
-                                        <StackPanel Grid.Column="1" Margin="10,0,0,0">
-                                            <TextBlock Text="{Binding Title}" FontWeight="Bold" 
-                                                       Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
-                                            <TextBlock Text="{Binding Description}" TextWrapping="Wrap" 
-                                                       Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" 
-                                                       Visibility="{Binding Description, Converter={StaticResource StringToVisibilityConverter}}"/>
-                                            <TextBlock Text="{Binding DueDate, StringFormat='Due: {0:d}'}" 
-                                                       Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" 
-                                                       Visibility="{Binding DueDate, Converter={StaticResource StringToVisibilityConverter}}"/>
-                                        </StackPanel>
+                                    <!-- Task details -->
+                                    <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                                        <TextBlock Text="{Binding Title, Mode=OneWay}" FontWeight="Bold" 
+                                                   Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+                                        <TextBlock Text="{Binding Description, Mode=OneWay}" TextWrapping="Wrap" 
+                                                   Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" 
+                                                   Visibility="{Binding Description, Converter={StaticResource StringToVisibilityConverter}}"/>
+                                        <TextBlock Text="{Binding DueDate, StringFormat='Due: {0:d}', Mode=OneWay}" 
+                                                   Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" 
+                                                   Visibility="{Binding DueDate, Converter={StaticResource StringToVisibilityConverter}}"/>
+                                    </StackPanel>
 
-                                        <!-- Task actions -->
-                                        <StackPanel Grid.Column="2" Orientation="Horizontal">
-                                            <Button Content="📝" ToolTip="Edit" 
-                                                    Command="{Binding DataContext.SaveTaskCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
-                                                    CommandParameter="{Binding}" 
-                                                    Style="{StaticResource CircleButton}" 
-                                                    Width="24" Height="24" Margin="0,0,5,0"/>
-                                            <Button Content="🗑" ToolTip="Delete" 
-                                                    Command="{Binding DataContext.DeleteTaskCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
-                                                    CommandParameter="{Binding}" 
-                                                    Style="{StaticResource CircleButton}" 
-                                                    Width="24" Height="24"/>
-                                        </StackPanel>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
+                                    <!-- Task actions -->
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                        <Button Content="📝" ToolTip="Edit" 
+                                                Command="{Binding DataContext.SaveTaskCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" 
+                                                CommandParameter="{Binding}" 
+                                                Style="{StaticResource CircleButton}" 
+                                                Width="24" Height="24" Margin="0,0,5,0"/>
+                                        <Button Content="🗑" ToolTip="Delete" 
+                                                Command="{Binding DataContext.DeleteTaskCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" 
+                                                CommandParameter="{Binding}" 
+                                                Style="{StaticResource CircleButton}" 
+                                                Width="24" Height="24"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
 
                 <!-- Loading indicator -->
                 <StackPanel Grid.Row="1" Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}" 
