@@ -68,6 +68,7 @@ namespace Palisades.Helpers
 
             using (var client = CreateClient())
             {
+                client.Timeout = TimeSpan.FromMinutes(10);
                 var bytes = await client.GetByteArrayAsync(update.AssetUrl).ConfigureAwait(false);
                 await File.WriteAllBytesAsync(tempInstaller, bytes).ConfigureAwait(false);
             }
@@ -82,7 +83,7 @@ namespace Palisades.Helpers
 
         private static HttpClient CreateClient()
         {
-            var client = new HttpClient();
+            var client = new HttpClient { Timeout = TimeSpan.FromMinutes(10) };
             client.DefaultRequestHeaders.UserAgent.Add(
                 new ProductInfoHeaderValue("Palisades", GetCurrentVersion()));
             client.DefaultRequestHeaders.Accept.Add(
