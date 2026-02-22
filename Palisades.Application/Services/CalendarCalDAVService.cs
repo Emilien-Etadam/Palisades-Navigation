@@ -39,20 +39,15 @@ namespace Palisades.Services
             var events = new List<Model.CalendarEvent>();
             var startUtc = start.ToUniversalTime().ToString("yyyyMMddTHHmmssZ");
             var endUtc = end.ToUniversalTime().ToString("yyyyMMddTHHmmssZ");
-            var requestBody = $@"<?xml version='1.0' encoding='utf-8' ?>
-<C:calendar-query xmlns:C=""urn:ietf:params:xml:ns:caldav"" xmlns:D=""DAV:"">
-  <D:prop>
-    <D:getetag/>
-    <C:calendar-data/>
-  </D:prop>
-  <C:filter>
-    <C:comp-filter name=""VCALENDAR"">
-      <C:comp-filter name=""VEVENT"">
-        <C:time-range start=""{startUtc}"" end=""{endUtc}""/>
-      </C:comp-filter>
-    </C:comp-filter>
-  </C:filter>
-</C:calendar-query>";
+            var requestBody = $@"<?xml version=""1.0"" encoding=""utf-8""?>
+<c:calendar-query xmlns:c=""urn:ietf:params:xml:ns:caldav"" xmlns:d=""DAV:"">
+    <d:prop><d:getetag></d:getetag><c:calendar-data></c:calendar-data></d:prop>
+    <c:filter><c:comp-filter name=""VCALENDAR"">
+        <c:comp-filter name=""VEVENT"">
+            <c:time-range start=""{startUtc}"" end=""{endUtc}""/>
+        </c:comp-filter>
+    </c:comp-filter></c:filter>
+</c:calendar-query>";
 
             var doc = await _client.ReportAsync(calendarHref, requestBody).ConfigureAwait(false);
             ParseEventsFromMultistatus(doc, calendarHref, "Calendar", Colors.SlateGray, events);
@@ -110,5 +105,6 @@ namespace Palisades.Services
         public string CalendarId { get; set; } = "";
         public string DisplayName { get; set; } = "";
         public string Href { get; set; } = "";
+        public List<string> SupportedComponents { get; set; } = new List<string>();
     }
 }

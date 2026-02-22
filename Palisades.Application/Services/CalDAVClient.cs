@@ -74,7 +74,8 @@ namespace Palisades.Services
         {
             var url = ResolveUrl(href);
             var request = new HttpRequestMessage(new HttpMethod("REPORT"), url);
-            request.Headers.Add("Depth", "1");
+            request.Headers.Add("Depth", "0");
+            request.Headers.Add("Prefer", "return-minimal");
             request.Content = new StringContent(requestBody, Encoding.UTF8, "application/xml");
 
             var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
@@ -154,16 +155,18 @@ namespace Palisades.Services
 
         /// <summary>
         /// Découvre les collections de type calendrier (PROPFIND depth 1 sur la base).
+        /// Demande aussi supported-calendar-component-set pour distinguer VEVENT des listes VTODO.
         /// </summary>
         public async Task<List<CalDAVCalendarInfo>> DiscoverCalendarsAsync()
         {
-            const string propfindBody = @"<?xml version='1.0' encoding='utf-8' ?>
-<D:propfind xmlns:D=""DAV:"" xmlns:C=""urn:ietf:params:xml:ns:caldav"">
-  <D:prop>
-    <D:resourcetype/>
-    <D:displayname/>
-  </D:prop>
-</D:propfind>";
+            const string propfindBody = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<d:propfind xmlns:d=""DAV:"" xmlns:c=""urn:ietf:params:xml:ns:caldav"">
+    <d:prop>
+        <d:displayname></d:displayname>
+        <d:resourcetype></d:resourcetype>
+        <c:supported-calendar-component-set></c:supported-calendar-component-set>
+    </d:prop>
+</d:propfind>";
 
             var doc = await PropfindAsync("", 1, propfindBody).ConfigureAwait(false);
             var dav = XNamespace.Get("DAV:");
@@ -195,11 +198,25 @@ namespace Palisades.Services
 
                 var calendarId = href.Contains('/') ? href.TrimEnd('/').Substring(href.TrimEnd('/').LastIndexOf('/') + 1) : href;
 
+                var supportedComponents = new List<string>();
+                var compSet = prop.Descendants()
+                    .FirstOrDefault(e => string.Equals(e.Name.LocalName, "supported-calendar-component-set", StringComparison.OrdinalIgnoreCase));
+                if (compSet != null)
+                {
+                    foreach (var comp in compSet.Descendants().Where(e => string.Equals(e.Name.LocalName, "comp", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        var name = comp.Attribute("name")?.Value;
+                        if (!string.IsNullOrEmpty(name))
+                            supportedComponents.Add(name);
+                    }
+                }
+
                 list.Add(new CalDAVCalendarInfo
                 {
                     Href = href,
                     DisplayName = displayName,
-                    CalendarId = calendarId
+                    CalendarId = calendarId,
+                    SupportedComponents = supportedComponents,
                 });
             }
 

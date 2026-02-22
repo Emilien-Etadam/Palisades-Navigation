@@ -38,18 +38,13 @@ namespace Palisades.Services
             return taskLists;
         }
 
-        private static readonly string CalendarQueryVtodoBody = @"<?xml version='1.0' encoding='utf-8' ?>
-<C:calendar-query xmlns:C=""urn:ietf:params:xml:ns:caldav"" xmlns:D=""DAV:"">
-  <D:prop>
-    <D:getetag/>
-    <C:calendar-data/>
-  </D:prop>
-  <C:filter>
-    <C:comp-filter name=""VCALENDAR"">
-      <C:comp-filter name=""VTODO""/>
-    </C:comp-filter>
-  </C:filter>
-</C:calendar-query>";
+        private static readonly string CalendarQueryVtodoBody = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<c:calendar-query xmlns:c=""urn:ietf:params:xml:ns:caldav"" xmlns:d=""DAV:"">
+    <d:prop><d:getetag></d:getetag><c:calendar-data></c:calendar-data></d:prop>
+    <c:filter><c:comp-filter name=""VCALENDAR"">
+        <c:comp-filter name=""VTODO""></c:comp-filter>
+    </c:comp-filter></c:filter>
+</c:calendar-query>";
 
         public async Task<List<CalDAVTask>> GetTasksAsync(string taskListHref)
         {

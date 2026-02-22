@@ -19,9 +19,22 @@ namespace Palisades.View
 
         private void CreateButton_Click(object sender, RoutedEventArgs e)
         {
-            // Mettre à jour le mot de passe depuis le PasswordBox
             Password = PasswordBox.Password;
-            
+
+            // Lire aussi les valeurs des TextBox manuellement pour être sûr
+            // (au cas où le binding WPF n'aurait pas mis à jour les propriétés)
+            PalisadeTitle = PalisadeTitleTextBox.Text;
+            CalDAVUrl = CalDAVUrlTextBox.Text;
+            Username = UsernameTextBox.Text;
+            TaskListId = TaskListIdTextBox.Text;
+
+            if (string.IsNullOrWhiteSpace(CalDAVUrl) || string.IsNullOrWhiteSpace(Username))
+            {
+                MessageBox.Show("CalDAV URL and Username are required.", "Task Palisade",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             DialogResult = true;
             Close();
         }

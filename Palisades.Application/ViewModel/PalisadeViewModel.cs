@@ -5,6 +5,7 @@ using Palisades.View;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
 
@@ -47,28 +48,61 @@ namespace Palisades.ViewModel
 
         public void DragOver(IDropInfo dropInfo)
         {
+            // Cas 1 : Shortcut (réordonnancement interne ou cross-palissade)
             if (dropInfo.Data is Shortcut)
             {
                 dropInfo.DropTargetAdorner = DropTargetAdorners.Insert;
-                dropInfo.Effects = System.Windows.DragDropEffects.Move;
+                dropInfo.Effects = DragDropEffects.Move;
                 return;
             }
 
-            if (dropInfo.Data is System.Windows.IDataObject dataObject
-                && dataObject.GetDataPresent(System.Windows.DataFormats.FileDrop))
+            // Cas 2 : fichiers depuis l'extérieur — tester via dropInfo.Data directement
+            if (HasFileDrop(dropInfo))
             {
                 dropInfo.DropTargetAdorner = DropTargetAdorners.Highlight;
-                dropInfo.Effects = System.Windows.DragDropEffects.Copy;
+                dropInfo.Effects = DragDropEffects.Copy;
                 return;
             }
 
-            if (dropInfo.Data is System.Windows.DataObject wpfDataObject
-                && wpfDataObject.GetDataPresent(System.Windows.DataFormats.FileDrop))
+            // Cas 3 : défaut — ne pas accepter (gong montre "sens interdit" si Effects reste None)
+            dropInfo.Effects = DragDropEffects.None;
+        }
+
+        private static bool HasFileDrop(IDropInfo dropInfo)
+        {
+            if (dropInfo.Data is DataObject dataObject && dataObject.GetDataPresent(DataFormats.FileDrop))
+                return true;
+            if (dropInfo.Data is IDataObject iDataObject && iDataObject.GetDataPresent(DataFormats.FileDrop))
+                return true;
+            // Gong wraps external drops — check the raw DragEventArgs
+            try
             {
-                dropInfo.DropTargetAdorner = DropTargetAdorners.Highlight;
-                dropInfo.Effects = System.Windows.DragDropEffects.Copy;
-                return;
+                var args = typeof(GongSolutions.Wpf.DragDrop.DropInfo)
+                    .GetProperty("DragEventArgs", BindingFlags.NonPublic | BindingFlags.Instance)
+                    ?.GetValue(dropInfo) as DragEventArgs;
+                if (args?.Data?.GetDataPresent(DataFormats.FileDrop) == true)
+                    return true;
             }
+            catch { }
+            return false;
+        }
+
+        private static string[]? GetFileDropPaths(IDropInfo dropInfo)
+        {
+            if (dropInfo.Data is DataObject dataObject && dataObject.GetDataPresent(DataFormats.FileDrop))
+                return (string[])dataObject.GetData(DataFormats.FileDrop);
+            if (dropInfo.Data is IDataObject iDataObject && iDataObject.GetDataPresent(DataFormats.FileDrop))
+                return (string[])iDataObject.GetData(DataFormats.FileDrop);
+            try
+            {
+                var args = typeof(GongSolutions.Wpf.DragDrop.DropInfo)
+                    .GetProperty("DragEventArgs", BindingFlags.NonPublic | BindingFlags.Instance)
+                    ?.GetValue(dropInfo) as DragEventArgs;
+                if (args?.Data?.GetDataPresent(DataFormats.FileDrop) == true)
+                    return (string[])args.Data.GetData(DataFormats.FileDrop);
+            }
+            catch { }
+            return null;
         }
 
         public void Drop(IDropInfo dropInfo)
@@ -92,31 +126,18 @@ namespace Palisades.ViewModel
                 return;
             }
 
-            string[]? files = null;
-            if (dropInfo.Data is System.Windows.IDataObject dataObject
-                && dataObject.GetDataPresent(System.Windows.DataFormats.FileDrop))
-            {
-                files = (string[])dataObject.GetData(System.Windows.DataFormats.FileDrop);
-            }
-            else if (dropInfo.Data is System.Windows.DataObject wpfDataObject
-                && wpfDataObject.GetDataPresent(System.Windows.DataFormats.FileDrop))
-            {
-                files = (string[])wpfDataObject.GetData(System.Windows.DataFormats.FileDrop);
-            }
-
+            var files = GetFileDropPaths(dropInfo);
             if (files != null)
             {
                 foreach (string file in files)
                 {
-                    string? extension = System.IO.Path.GetExtension(file);
+                    string? extension = Path.GetExtension(file);
                     if (extension == null) continue;
-
                     Shortcut? shortcutItem = null;
-                    if (extension == ".lnk")
+                    if (string.Equals(extension, ".lnk", StringComparison.OrdinalIgnoreCase))
                         shortcutItem = LnkShortcut.BuildFrom(file, Identifier);
-                    else if (extension == ".url")
+                    else if (string.Equals(extension, ".url", StringComparison.OrdinalIgnoreCase))
                         shortcutItem = UrlShortcut.BuildFrom(file, Identifier);
-
                     if (shortcutItem != null)
                         Shortcuts.Add(shortcutItem);
                 }

@@ -60,6 +60,12 @@ namespace Palisades.View
         private void CreateButton_Click(object sender, RoutedEventArgs e)
         {
             Password = PasswordBox.Password;
+
+            // Lire manuellement tous les champs pour garantir les valeurs même si les bindings WPF ont échoué
+            PalisadeTitle = PalisadeTitleTextBox.Text;
+            ImapHost = ImapHostTextBox.Text;
+            Username = UsernameTextBox.Text;
+
             DisplayMode = DisplayModeCombo.SelectedIndex == 1 ? MailDisplayMode.CountAndSubjects : MailDisplayMode.CountOnly;
             SelectedFolders = FoldersListBox.SelectedItems.Cast<string>().ToList();
             if (SelectedFolders.Count == 0)
