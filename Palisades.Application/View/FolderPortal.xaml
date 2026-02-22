@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Palisades.View"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:helpers="clr-namespace:Palisades.Helpers"
         xmlns:viewModel="clr-namespace:Palisades.ViewModel"
@@ -38,8 +37,7 @@
     </Window.Resources>
     <Border x:Name="LayoutRoot" CornerRadius="0" ClipToBounds="True">
         <DockPanel>
-            <!-- Header area -->
-            <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}">
+            <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" RowDefinitions="Auto,Auto">
                 <Grid.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Edit" Command="{Binding Path=Data.EditFolderPortalCommand, Source={StaticResource proxy}}" CommandParameter="{Binding}" />
@@ -75,20 +73,7 @@
                         <MenuItem Header="About" Command="{Binding Path=Data.OpenAboutCommand, Source={StaticResource proxy}}" />
                     </ContextMenu>
                 </Grid.ContextMenu>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-
-                <!-- Title row -->
-                <Grid Grid.Row="0" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    <!-- Back button -->
+                <Grid Grid.Row="0" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" ColumnDefinitions="Auto,*,Auto">
                     <Button Grid.Column="0"
                             Command="{Binding NavigateBackCommand}"
                             Background="Transparent"
@@ -120,8 +105,6 @@
                         </Button.Style>
                         &#x2190;
                     </Button>
-
-                    <!-- Title -->
                     <Label Grid.Column="1" Content="{Binding Name, Mode=OneWay}" Margin="5" FontSize="28" Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" HorizontalAlignment="Center" VerticalAlignment="Center" />
 
                     <!-- Home button -->
@@ -156,8 +139,6 @@
                         &#x2302;
                     </Button>
                 </Grid>
-
-                <!-- Breadcrumb row -->
                 <Grid Grid.Row="1" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
                     <TextBlock Text="{Binding Breadcrumb, Mode=OneWay}"
                                Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
@@ -168,21 +149,16 @@
                                VerticalAlignment="Center" />
                 </Grid>
             </Grid>
-
-            <!-- Main content area -->
             <Border CornerRadius="0" ClipToBounds="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
                 <Grid x:Name="content">
-                <!-- Error message -->
                 <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}"
                            Foreground="#FFFF6666"
                            FontSize="13"
                            Margin="15,10"
                            TextWrapping="Wrap"
                            Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}, FallbackValue=Collapsed}" />
-
-                <!-- Items list -->
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                    <ItemsControl ItemsSource="{Binding Items}" Margin="10,10,10,10"
+                    <ItemsControl ItemsSource="{Binding Items}" Margin="10"
                                   VirtualizingPanel.IsVirtualizing="True"
                                   VirtualizingPanel.VirtualizationMode="Recycling"
                                   dd:DragDrop.IsDragSource="True"
@@ -202,7 +178,7 @@
                                             <i:InvokeCommandAction Command="{Binding Path=Data.NavigateIntoFolderCommand, Source={StaticResource proxy}}" CommandParameter="{Binding}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
-                                    <Border Margin="0,0,0,10" CornerRadius="4" Width="100" MouseRightButtonUp="Item_MouseRightButtonUp">
+                                    <Border Margin="0,10" CornerRadius="4" Width="100" MouseRightButtonUp="Item_MouseRightButtonUp">
                                         <Border.Style>
                                             <Style>
                                                 <Style.Triggers>
@@ -217,7 +193,7 @@
                                                 Source="{Binding IconPath, Converter={StaticResource PathToImage}}"
                                                 Width="48"
                                                 Height="48"
-                                                Stretch="UniformToFill" Margin="5,5,5,5"
+                                                Stretch="UniformToFill" Margin="5"
                                             />
                                             <TextBlock TextWrapping="NoWrap"
                                                        TextAlignment="Center"

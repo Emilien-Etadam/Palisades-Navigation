@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Palisades.View"
         xmlns:viewModel="clr-namespace:Palisades.ViewModel"
         xmlns:helpers="clr-namespace:Palisades.Helpers"
         xmlns:converters="clr-namespace:Palisades.Converters"
@@ -100,7 +99,7 @@
             </Setter>
         </Style>
 
-        <!-- Contenu Standard (PalisadeViewModel) -->
+        <!-- Standard -->
         <DataTemplate DataType="{x:Type viewModel:PalisadeViewModel}">
             <Grid AllowDrop="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
                 <Grid.Resources>
@@ -112,7 +111,7 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                    <ItemsControl ItemsSource="{Binding Shortcuts}" Margin="20,20,20,20"
+                    <ItemsControl ItemsSource="{Binding Shortcuts}" Margin="20"
                                  VirtualizingPanel.IsVirtualizing="True"
                                  VirtualizingPanel.VirtualizationMode="Recycling"
                                  dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True">
@@ -132,7 +131,7 @@
                                             <i:InvokeCommandAction Command="{Binding Path=Data.ClickShortcut, Source={StaticResource tabProxy}}" CommandParameter="{Binding}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
-                                    <Border Margin="0,0,0,10" CornerRadius="4" Width="100">
+                                    <Border Margin="0,10" CornerRadius="4" Width="100">
                                         <Border.Style>
                                             <Style>
                                                 <Style.Triggers>
@@ -152,7 +151,7 @@
                                             </Style>
                                         </Border.Style>
                                         <StackPanel VerticalAlignment="Top" HorizontalAlignment="Center" Cursor="Hand">
-                                            <Image Source="{Binding IconPath, Converter={StaticResource PathToImage}}" Width="48" Height="48" Stretch="UniformToFill" Margin="5,5,5,5" />
+                                            <Image Source="{Binding IconPath, Converter={StaticResource PathToImage}}" Width="48" Height="48" Stretch="UniformToFill" Margin="5" />
                                             <TextBlock TextWrapping="NoWrap" TextAlignment="Center" TextTrimming="CharacterEllipsis" Text="{Binding Name, Mode=OneWay}"
                                                        Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
                                                        HorizontalAlignment="Center" Margin="5,0,5,5" />
@@ -166,7 +165,7 @@
             </Grid>
         </DataTemplate>
 
-        <!-- Contenu FolderPortal (FolderPortalViewModel) -->
+        <!-- FolderPortal -->
         <DataTemplate DataType="{x:Type viewModel:FolderPortalViewModel}">
             <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
                 <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}" Foreground="#FFFF6666" Margin="15,10" Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}" />
@@ -199,7 +198,7 @@
             </Grid>
         </DataTemplate>
 
-        <!-- Contenu TaskPalisade (TaskPalisadeViewModel) -->
+        <!-- Task -->
         <DataTemplate DataType="{x:Type viewModel:TaskPalisadeViewModel}">
             <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
                 <Grid.Resources>
@@ -209,12 +208,7 @@
                         </ResourceDictionary.MergedDictionaries>
                     </ResourceDictionary>
                 </Grid.Resources>
-                <Grid Margin="10">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
+                <Grid Margin="10" RowDefinitions="Auto,*,Auto">
                     <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}" Foreground="Red" Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}" Margin="0,0,0,10"/>
                     <ListBox Grid.Row="1" ItemsSource="{Binding Tasks}"
                              VirtualizingPanel.IsVirtualizing="True"
@@ -240,12 +234,7 @@
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Border BorderBrush="Gray" BorderThickness="0,0,0,1" Padding="5">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
+                                    <Grid ColumnDefinitions="Auto,*,Auto">
                                         <CheckBox IsChecked="{Binding Completed, Mode=TwoWay}" VerticalAlignment="Center" Grid.Column="0"
                                                   Command="{Binding DataContext.ToggleTaskCompletedCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}"/>
                                         <StackPanel Grid.Column="1" Margin="10,0,0,0">
@@ -279,7 +268,7 @@
             </Grid>
         </DataTemplate>
 
-        <!-- Contenu Mail (placeholder dans onglet) -->
+        <!-- Mail -->
         <DataTemplate DataType="{x:Type viewModel:MailPalisadeViewModel}">
             <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
                 <TextBlock Text="Mail" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" />
@@ -288,12 +277,7 @@
     </Window.Resources>
     <Border x:Name="LayoutRoot" CornerRadius="0" ClipToBounds="True">
         <DockPanel>
-            <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="80"/>
-                </Grid.ColumnDefinitions>
+            <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" ColumnDefinitions="80,*,80">
                 <Label Grid.Column="1" Content="{Binding SelectedItem.Name, ElementName=TabControl}" Margin="5" FontSize="28" Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" HorizontalAlignment="Center" VerticalAlignment="Center" />
             </Grid>
             <TabControl x:Name="TabControl" ItemsSource="{Binding Members}" Style="{StaticResource FlatTabStyle}"

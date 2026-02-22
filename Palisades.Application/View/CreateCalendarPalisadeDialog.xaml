@@ -3,25 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Palisades.View"
         mc:Ignorable="d"
         Title="Create Calendar Palisade" MinHeight="520" Height="600" MinWidth="480" Width="520"
         WindowStartupLocation="CenterOwner" ResizeMode="CanResize">
-    <Grid Margin="12">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <Grid Margin="12" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*,Auto">
         <TextBlock Text="Title" Grid.Row="0" Margin="0,0,0,4"/>
         <TextBox x:Name="PalisadeTitleTextBox" Grid.Row="1" Margin="0,0,0,10" Text="{Binding PalisadeTitle, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="CalDAV Base URL" Grid.Row="2" Margin="0,0,0,4"/>

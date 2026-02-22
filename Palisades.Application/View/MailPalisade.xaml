@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Palisades.View"
         xmlns:helpers="clr-namespace:Palisades.Helpers"
         xmlns:converters="clr-namespace:Palisades.Converters"
         xmlns:model="clr-namespace:Palisades.Model"
@@ -36,7 +35,7 @@
     </Window.Resources>
     <Border x:Name="LayoutRoot" CornerRadius="0" ClipToBounds="True">
         <DockPanel>
-            <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
+            <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" ColumnDefinitions="*,Auto">
                 <Grid.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Refresh" Command="{Binding RefreshCommand}" CommandParameter="{Binding}" />
@@ -71,10 +70,6 @@
                         <MenuItem Header="About" Command="{Binding Path=Data.OpenAboutCommand, Source={StaticResource proxy}}" />
                     </ContextMenu>
                 </Grid.ContextMenu>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="8" VerticalAlignment="Center">
                     <TextBlock Text="{Binding Name, Mode=OneWay}" FontSize="16" Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" VerticalAlignment="Center" FontWeight="SemiBold"/>
                     <Border Background="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" CornerRadius="12" Padding="8,2" Margin="10,0,0,0" VerticalAlignment="Center">
@@ -85,11 +80,7 @@
                         Style="{StaticResource CircleButton}" Width="28" Height="28" Margin="0,0,8,0" VerticalAlignment="Center"/>
             </Grid>
             <Border DockPanel.Dock="Top" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" CornerRadius="0" Padding="12">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
+                <Grid RowDefinitions="Auto,*">
                     <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}" Foreground="Red" Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}" Grid.Row="0" Margin="0,0,0,8"/>
                     <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="LoadingPanel">
                         <StackPanel.Style>
@@ -160,11 +151,7 @@
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Border BorderBrush="Gray" BorderThickness="0,0,0,1" Padding="6" Margin="0,0,0,4" Background="#10FFFFFF">
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                        </Grid.RowDefinitions>
+                                    <Grid RowDefinitions="Auto,Auto">
                                         <TextBlock Grid.Row="0" Text="{Binding Subject, Mode=OneWay}" FontWeight="SemiBold" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" TextTrimming="CharacterEllipsis"/>
                                         <TextBlock Grid.Row="1" Text="{Binding Sender, Mode=OneWay}" FontSize="11" Margin="0,2,0,0" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" TextTrimming="CharacterEllipsis"/>
                                         <TextBlock Grid.Row="1" HorizontalAlignment="Right" Text="{Binding Date, StringFormat='{}{0:g}', Mode=OneWay}" FontSize="11" Margin="0,2,0,0" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>

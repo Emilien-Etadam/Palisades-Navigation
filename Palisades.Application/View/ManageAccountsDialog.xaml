@@ -6,12 +6,7 @@
         mc:Ignorable="d"
         Title="Manage Zimbra Accounts" Height="400" Width="620"
         WindowStartupLocation="CenterOwner" ResizeMode="CanResize">
-    <Grid Margin="12">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <Grid Margin="12" RowDefinitions="Auto,*,Auto">
         <TextBlock Text="Zimbra accounts (CalDAV / Mail)" FontWeight="SemiBold" Margin="0,0,0,8"/>
         <ListBox x:Name="AccountsListBox" Grid.Row="1" Margin="0,0,0,10" SelectionChanged="AccountsListBox_SelectionChanged">
             <ListBox.ItemTemplate>

@@ -7,21 +7,12 @@
         Title="Manage layouts"
         Height="420" Width="640"
         WindowStartupLocation="CenterOwner" ResizeMode="CanResize">
-    <Grid Margin="12">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <Grid Margin="12" RowDefinitions="Auto,*,Auto">
         <TextBlock Grid.Row="0" Text="Saved layouts" FontWeight="SemiBold" Margin="0,0,0,8"/>
         <ListBox x:Name="SnapshotsListBox" Grid.Row="1" Margin="0,0,0,10" SelectionChanged="SnapshotsListBox_SelectionChanged">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Grid Margin="4,2">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
+                    <Grid Margin="4,2" ColumnDefinitions="*,Auto">
                         <StackPanel Grid.Column="0" Orientation="Horizontal">
                             <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Margin="0,0,12,0"/>
                             <TextBlock Foreground="Gray" Margin="0,0,12,0">
