@@ -25,37 +25,46 @@
             </ResourceDictionary.MergedDictionaries>
             <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
             <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+            <helpers:BindingProxy x:Key="proxy" Data="{Binding}"/>
         </ResourceDictionary>
     </Window.Resources>
 
     <Border x:Name="LayoutRoot" CornerRadius="0" ClipToBounds="True">
     <Grid>
-        <Border x:Name="Header" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" CornerRadius="0" 
-                Height="30" VerticalAlignment="Top" MouseLeftButtonDown="Header_MouseLeftButtonDown">
-            <Border.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="New Calendar Palisade" Command="{Binding NewCalendarPalisadeCommand}"/>
-                    <MenuItem Header="New Mail Palisade" Command="{Binding NewMailPalisadeCommand}"/>
+        <Grid.ContextMenu>
+            <ContextMenu>
+                <MenuItem Header="Edit" Command="{Binding Path=Data.EditTaskPalisadeCommand, Source={StaticResource proxy}}" CommandParameter="{Binding}"/>
+                <MenuItem Header="Delete" Command="{Binding Path=Data.DeletePalisadeCommand, Source={StaticResource proxy}}" CommandParameter="{Binding Identifier}"/>
+                <Separator/>
+                <MenuItem Header="New fence" Command="{Binding Path=Data.NewPalisadeCommand, Source={StaticResource proxy}}"/>
+                <MenuItem Header="New Folder Portal" Command="{Binding Path=Data.NewFolderPortalCommand, Source={StaticResource proxy}}"/>
+                <MenuItem Header="New Task Palisade" Command="{Binding Path=Data.NewTaskPalisadeCommand, Source={StaticResource proxy}}"/>
+                <MenuItem Header="New Calendar Palisade" Command="{Binding Path=Data.NewCalendarPalisadeCommand, Source={StaticResource proxy}}"/>
+                <MenuItem Header="New Mail Palisade" Command="{Binding Path=Data.NewMailPalisadeCommand, Source={StaticResource proxy}}"/>
+                <Separator/>
+                <MenuItem Header="Manage Zimbra Accounts" Command="{Binding Path=Data.ManageZimbraAccountsCommand, Source={StaticResource proxy}}"/>
+                <Separator/>
+                <MenuItem Header="Layouts" SubmenuOpened="LayoutsSubmenu_SubmenuOpened">
+                    <MenuItem Header="Save current layout..." Command="{Binding Path=Data.SaveSnapshotCommand, Source={StaticResource proxy}}"/>
                     <Separator/>
-                    <MenuItem Header="Layouts" SubmenuOpened="LayoutsSubmenu_SubmenuOpened">
-                        <MenuItem Header="Save current layout..." Command="{Binding SaveSnapshotCommand}"/>
-                        <Separator/>
-                        <MenuItem ItemsSource="{Binding RecentSnapshots}">
-                            <MenuItem.ItemContainerStyle>
-                                <Style TargetType="MenuItem">
-                                    <Setter Property="Header" Value="{Binding Name}"/>
-                                    <Setter Property="Command" Value="{Binding DataContext.RestoreSnapshotCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
-                                    <Setter Property="CommandParameter" Value="{Binding Id}"/>
-                                </Style>
-                            </MenuItem.ItemContainerStyle>
-                        </MenuItem>
-                        <Separator/>
-                        <MenuItem Header="Manage layouts..." Command="{Binding ManageSnapshotsCommand}"/>
+                    <MenuItem ItemsSource="{Binding Path=Data.RecentSnapshots, Source={StaticResource proxy}}">
+                        <MenuItem.ItemContainerStyle>
+                            <Style TargetType="MenuItem">
+                                <Setter Property="Header" Value="{Binding Name}"/>
+                                <Setter Property="Command" Value="{Binding Path=Data.RestoreSnapshotCommand, Source={StaticResource proxy}}"/>
+                                <Setter Property="CommandParameter" Value="{Binding Id}"/>
+                            </Style>
+                        </MenuItem.ItemContainerStyle>
                     </MenuItem>
                     <Separator/>
-                    <MenuItem Header="Manage Zimbra Accounts" Command="{Binding ManageZimbraAccountsCommand}"/>
-                </ContextMenu>
-            </Border.ContextMenu>
+                    <MenuItem Header="Manage layouts..." Command="{Binding Path=Data.ManageSnapshotsCommand, Source={StaticResource proxy}}"/>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="About" Command="{Binding Path=Data.OpenAboutCommand, Source={StaticResource proxy}}"/>
+            </ContextMenu>
+        </Grid.ContextMenu>
+        <Border x:Name="Header" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" CornerRadius="0" 
+                Height="30" VerticalAlignment="Top" MouseLeftButtonDown="Header_MouseLeftButtonDown">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="{Binding Name, Mode=OneWay}" Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" 
                            VerticalAlignment="Center" Margin="10,0,0,0" FontWeight="Bold"/>
