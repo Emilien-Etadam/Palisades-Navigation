@@ -56,6 +56,14 @@ namespace Palisades.ViewModel
                 return;
             }
 
+            if (dropInfo.Data is System.Windows.IDataObject dataObject &&
+                dataObject.GetDataPresent(System.Windows.DataFormats.FileDrop))
+            {
+                dropInfo.DropTargetAdorner = DropTargetAdorners.Insert;
+                dropInfo.Effects = System.Windows.DragDropEffects.Copy;
+                return;
+            }
+
             // Cas 2 : drop externe (Explorateur, etc.) — DragInfo est null, Data peut être wrappé par gong
             if (dropInfo.DragInfo == null)
             {
@@ -151,6 +159,33 @@ namespace Palisades.ViewModel
                 if (insertIndex > Shortcuts.Count)
                     insertIndex = Shortcuts.Count;
                 Shortcuts.Insert(insertIndex, shortcut);
+                return;
+            }
+
+            if (dropInfo.Data is System.Windows.IDataObject dataObj &&
+                dataObj.GetDataPresent(System.Windows.DataFormats.FileDrop))
+            {
+                var droppedFiles = dataObj.GetData(System.Windows.DataFormats.FileDrop) as string[];
+                if (droppedFiles == null) return;
+                foreach (var filePath in droppedFiles)
+                {
+                    var ext = System.IO.Path.GetExtension(filePath)?.ToLowerInvariant();
+                    if (ext == ".lnk" || ext == ".url")
+                    {
+                        var name = System.IO.Path.GetFileNameWithoutExtension(filePath);
+                        var sc = ext == ".lnk"
+                            ? (Shortcut)new LnkShortcut { Name = name, UriOrFileAction = filePath, IconPath = filePath }
+                            : new UrlShortcut { Name = name, UriOrFileAction = filePath, IconPath = filePath };
+                        Shortcuts.Add(sc);
+                    }
+                    else
+                    {
+                        var name = System.IO.Path.GetFileNameWithoutExtension(filePath);
+                        var sc = new LnkShortcut { Name = name, UriOrFileAction = filePath, IconPath = filePath };
+                        Shortcuts.Add(sc);
+                    }
+                }
+                Save();
                 return;
             }
 

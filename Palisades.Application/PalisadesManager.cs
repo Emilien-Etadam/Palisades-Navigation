@@ -243,10 +243,30 @@ namespace Palisades
         public static void ShowCreateCalendarPalisadeDialog()
         {
             var dialog = new CreateCalendarPalisadeDialog();
-            if (dialog.ShowDialog() == true)
+            try { dialog.Owner = System.Windows.Application.Current.MainWindow; } catch { }
+            if (dialog.ShowDialog() != true) return;
+
+            var model = new CalendarPalisadeModel
             {
-                CreateCalendarPalisade(dialog.CalDAVUrl, dialog.Username, dialog.Password, dialog.SelectedCalendarIds, dialog.PalisadeTitle, dialog.ViewMode, dialog.DaysToShow);
-            }
+                Name = dialog.PalisadeTitle,
+                CalDAVBaseUrl = dialog.CalDAVUrl,
+                CalDAVUsername = dialog.Username,
+                CalDAVPassword = CredentialEncryptor.Encrypt(dialog.Password),
+                CalendarIds = dialog.SelectedCalendarIds,
+                ViewMode = dialog.ViewMode,
+                DaysToShow = dialog.DaysToShow,
+                Width = 500,
+                Height = 400
+            };
+
+            var client = new CalDAVClient(model.CalDAVBaseUrl, model.CalDAVUsername, CredentialEncryptor.Decrypt(model.CalDAVPassword));
+            var service = new CalendarCalDAVService(client);
+            var vm = new CalendarPalisadeViewModel(model, service);
+            vm.Save();
+
+            var window = new View.CalendarPalisade(vm);
+            palisades[vm.Identifier] = window;
+            window.Show();
         }
 
         public static void CreateMailPalisade(string imapHost, int imapPort, string username, string password, List<string> monitoredFolders, string title, MailDisplayMode displayMode, int pollIntervalMinutes, string? webmailUrl = null, int? x = null, int? y = null, int? width = null, int? height = null)
