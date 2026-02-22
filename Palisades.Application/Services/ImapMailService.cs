@@ -74,8 +74,8 @@ namespace Palisades.Services
                 folder = _client!.Inbox;
             else
                 folder = await _client!.Inbox.GetSubfolderAsync(folderName).ConfigureAwait(false);
-            var status = await folder.StatusAsync(StatusItems.Unread).ConfigureAwait(false);
-            return status.Unread ?? 0;
+            await folder.StatusAsync(StatusItems.Unread).ConfigureAwait(false);
+            return folder.Unread;
         }
 
         /// <summary>Liste des noms de dossiers (INBOX + sous-dossiers de l'Inbox).</summary>
