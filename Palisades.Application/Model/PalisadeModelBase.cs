@@ -1,5 +1,4 @@
 using System;
-using System.Windows.Media;
 using System.Xml.Serialization;
 
 namespace Palisades.Model
@@ -22,20 +21,12 @@ namespace Palisades.Model
         private int _fenceY;
         private int _width;
         private int _height;
-        private Color _headerColor;
-        private Color _bodyColor;
-        private Color _titleColor;
-        private Color _labelsColor;
         private PalisadeType _type;
 
         protected PalisadeModelBase()
         {
             _identifier = Guid.NewGuid().ToString();
             _name = "No name";
-            _headerColor = Color.FromArgb(200, 0, 0, 0);
-            _bodyColor = Color.FromArgb(120, 0, 0, 0);
-            _titleColor = Color.FromArgb(255, 255, 255, 255);
-            _labelsColor = Color.FromArgb(255, 255, 255, 255);
             _width = 800;
             _height = 450;
             _type = PalisadeType.Standard;
@@ -47,10 +38,6 @@ namespace Palisades.Model
         public int FenceY { get => _fenceY; set => _fenceY = value; }
         public int Width { get => _width; set => _width = value; }
         public int Height { get => _height; set => _height = value; }
-        public Color HeaderColor { get => _headerColor; set => _headerColor = value; }
-        public Color BodyColor { get => _bodyColor; set => _bodyColor = value; }
-        public Color TitleColor { get => _titleColor; set => _titleColor = value; }
-        public Color LabelsColor { get => _labelsColor; set => _labelsColor = value; }
         public PalisadeType Type { get => _type; set => _type = value; }
         /// <summary>Groupe d'onglets (Phase 10.2). Null = palisade autonome.</summary>
         public string? GroupId { get; set; }

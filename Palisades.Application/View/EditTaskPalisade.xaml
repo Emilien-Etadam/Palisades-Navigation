@@ -56,21 +56,8 @@
         <TextBox x:Name="TaskListIdTextBox" Grid.Row="9" Margin="0,0,0,15" 
                  Text="{Binding TaskListId, UpdateSourceTrigger=PropertyChanged}"/>
 
-        <!-- Colors section -->
-        <TextBlock Text="Header Color" Grid.Row="10" Margin="0,15,0,5"/>
-        <StackPanel Grid.Row="11" Orientation="Horizontal">
-            <Rectangle Width="30" Height="20" Fill="{Binding HeaderColor}" Margin="0,0,10,0"/>
-            <Button Content="Change Header Color" Click="ChangeHeaderColor_Click"/>
-        </StackPanel>
-
-        <TextBlock Text="Body Color" Grid.Row="12" Margin="0,15,0,5"/>
-        <StackPanel Grid.Row="13" Orientation="Horizontal">
-            <Rectangle Width="30" Height="20" Fill="{Binding BodyColor}" Margin="0,0,10,0"/>
-            <Button Content="Change Body Color" Click="ChangeBodyColor_Click"/>
-        </StackPanel>
-
         <!-- Buttons -->
-        <StackPanel Grid.Row="14" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
+        <StackPanel Grid.Row="10" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
             <Button Content="Cancel" Width="80" Margin="0,0,10,0" Click="CancelButton_Click"/>
             <Button Content="Save" Width="80" IsDefault="True" Click="SaveButton_Click"/>
         </StackPanel>

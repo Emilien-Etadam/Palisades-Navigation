@@ -9,7 +9,6 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Xml.Serialization;
 
 namespace Palisades.ViewModel
@@ -79,43 +78,6 @@ namespace Palisades.ViewModel
         {
             get => Model.Height;
             set { Model.Height = value; OnPropertyChanged(); Save(); }
-        }
-
-        public Color HeaderColor
-        {
-            get => Model.HeaderColor;
-            set { Model.HeaderColor = value; OnPropertyChanged(); Save(); }
-        }
-
-        public Color BodyColor
-        {
-            get => Model.BodyColor;
-            set { Model.BodyColor = value; OnPropertyChanged(); Save(); }
-        }
-
-        private SolidColorBrush? _titleColorBrush;
-        private SolidColorBrush? _labelsColorBrush;
-
-        public SolidColorBrush TitleColor
-        {
-            get
-            {
-                if (_titleColorBrush == null || _titleColorBrush.Color != Model.TitleColor)
-                    _titleColorBrush = new SolidColorBrush(Model.TitleColor);
-                return _titleColorBrush;
-            }
-            set { Model.TitleColor = value.Color; _titleColorBrush = value; OnPropertyChanged(); Save(); }
-        }
-
-        public SolidColorBrush LabelsColor
-        {
-            get
-            {
-                if (_labelsColorBrush == null || _labelsColorBrush.Color != Model.LabelsColor)
-                    _labelsColorBrush = new SolidColorBrush(Model.LabelsColor);
-                return _labelsColorBrush;
-            }
-            set { Model.LabelsColor = value.Color; _labelsColorBrush = value; OnPropertyChanged(); Save(); }
         }
 
         public string? GroupId { get => Model.GroupId; set { Model.GroupId = value; OnPropertyChanged(); Save(); } }

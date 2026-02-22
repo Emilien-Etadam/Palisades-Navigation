@@ -36,7 +36,7 @@
     </Window.Resources>
     <Border x:Name="LayoutRoot" CornerRadius="20" ClipToBounds="True">
         <DockPanel>
-            <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="#00000000">
+            <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
                 <Grid.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Refresh" Command="{Binding RefreshCommand}" CommandParameter="{Binding}" />
@@ -75,21 +75,16 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Rectangle Grid.ColumnSpan="2">
-                    <Rectangle.Fill>
-                        <SolidColorBrush Color="{Binding HeaderColor}" />
-                    </Rectangle.Fill>
-                </Rectangle>
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="8" VerticalAlignment="Center">
-                    <TextBlock Text="{Binding Name}" FontSize="16" Foreground="{Binding TitleColor}" VerticalAlignment="Center" FontWeight="SemiBold"/>
-                    <Border Background="{Binding BodyColor}" CornerRadius="12" Padding="8,2" Margin="10,0,0,0" VerticalAlignment="Center">
-                        <TextBlock Text="{Binding TotalUnreadCount}" FontWeight="Bold" Foreground="{Binding TitleColor}"/>
+                    <TextBlock Text="{Binding Name}" FontSize="16" Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                    <Border Background="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" CornerRadius="12" Padding="8,2" Margin="10,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding TotalUnreadCount}" FontWeight="Bold" Foreground="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
                     </Border>
                 </StackPanel>
                 <Button Grid.Column="1" Content="🔄" ToolTip="Refresh" Command="{Binding RefreshCommand}" CommandParameter="{Binding}"
                         Style="{StaticResource CircleButton}" Width="28" Height="28" Margin="0,0,8,0" VerticalAlignment="Center"/>
             </Grid>
-            <Border DockPanel.Dock="Top" Background="{Binding BodyColor}" CornerRadius="0,0,20,20" Padding="12">
+            <Border DockPanel.Dock="Top" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" CornerRadius="0,0,20,20" Padding="12">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -124,8 +119,8 @@
                                 </Style.Triggers>
                             </Style>
                         </Grid.Style>
-                        <TextBlock Text="{Binding TotalUnreadCount}" FontSize="48" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{Binding LabelsColor}"/>
-                        <TextBlock Text="{Binding UnreadCountsDisplay}" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,20" Foreground="{Binding LabelsColor}"/>
+                        <TextBlock Text="{Binding TotalUnreadCount}" FontSize="48" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+                        <TextBlock Text="{Binding UnreadCountsDisplay}" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,20" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
                     </Grid>
                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" x:Name="SubjectsPanel">
                         <ScrollViewer.Style>
@@ -151,9 +146,9 @@
                                                 <RowDefinition Height="Auto"/>
                                                 <RowDefinition Height="Auto"/>
                                             </Grid.RowDefinitions>
-                                            <TextBlock Grid.Row="0" Text="{Binding Subject}" FontWeight="SemiBold" Foreground="{Binding DataContext.LabelsColor, RelativeSource={RelativeSource AncestorType=ItemsControl}}" TextTrimming="CharacterEllipsis"/>
-                                            <TextBlock Grid.Row="1" Text="{Binding Sender}" FontSize="11" Margin="0,2,0,0" Foreground="{Binding DataContext.LabelsColor, RelativeSource={RelativeSource AncestorType=ItemsControl}}" TextTrimming="CharacterEllipsis"/>
-                                            <TextBlock Grid.Row="1" HorizontalAlignment="Right" Text="{Binding Date, StringFormat='{}{0:g}'}" FontSize="11" Margin="0,2,0,0" Foreground="{Binding DataContext.LabelsColor, RelativeSource={RelativeSource AncestorType=ItemsControl}}"/>
+                                            <TextBlock Grid.Row="0" Text="{Binding Subject}" FontWeight="SemiBold" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Grid.Row="1" Text="{Binding Sender}" FontSize="11" Margin="0,2,0,0" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Grid.Row="1" HorizontalAlignment="Right" Text="{Binding Date, StringFormat='{}{0:g}'}" FontSize="11" Margin="0,2,0,0" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>

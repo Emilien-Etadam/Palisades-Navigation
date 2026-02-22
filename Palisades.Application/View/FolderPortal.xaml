@@ -39,7 +39,7 @@
     <Border x:Name="LayoutRoot" CornerRadius="20" ClipToBounds="True">
         <DockPanel>
             <!-- Header area -->
-            <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="#00000000" Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}">
+            <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}">
                 <Grid.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Edit" Command="{Binding Path=Data.EditFolderPortalCommand, Source={StaticResource proxy}}" CommandParameter="{Binding}" />
@@ -81,24 +81,19 @@
                 </Grid.RowDefinitions>
 
                 <!-- Title row -->
-                <Grid Grid.Row="0">
+                <Grid Grid.Row="0" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <Rectangle Grid.ColumnSpan="3">
-                        <Rectangle.Fill>
-                            <SolidColorBrush Color="{Binding HeaderColor}" />
-                        </Rectangle.Fill>
-                    </Rectangle>
 
                     <!-- Back button -->
                     <Button Grid.Column="0"
                             Command="{Binding NavigateBackCommand}"
                             Background="Transparent"
                             BorderBrush="Transparent"
-                            Foreground="{Binding TitleColor}"
+                            Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"
                             FontSize="18"
                             FontWeight="Bold"
                             Padding="10,5"
@@ -127,14 +122,14 @@
                     </Button>
 
                     <!-- Title -->
-                    <Label Grid.Column="1" Content="{Binding Name, Mode=OneWay}" Margin="5" FontSize="28" Foreground="{Binding TitleColor}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <Label Grid.Column="1" Content="{Binding Name, Mode=OneWay}" Margin="5" FontSize="28" Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" HorizontalAlignment="Center" VerticalAlignment="Center" />
 
                     <!-- Home button -->
                     <Button Grid.Column="2"
                             Command="{Binding NavigateToRootCommand}"
                             Background="Transparent"
                             BorderBrush="Transparent"
-                            Foreground="{Binding TitleColor}"
+                            Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"
                             FontSize="16"
                             Padding="10,5"
                             Cursor="Hand"
@@ -163,14 +158,9 @@
                 </Grid>
 
                 <!-- Breadcrumb row -->
-                <Grid Grid.Row="1">
-                    <Rectangle>
-                        <Rectangle.Fill>
-                            <SolidColorBrush Color="{Binding HeaderColor}" Opacity="0.7" />
-                        </Rectangle.Fill>
-                    </Rectangle>
+                <Grid Grid.Row="1" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
                     <TextBlock Text="{Binding Breadcrumb}"
-                               Foreground="{Binding LabelsColor}"
+                               Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
                                FontSize="12"
                                Margin="15,2,15,4"
                                TextTrimming="CharacterEllipsis"
@@ -180,10 +170,7 @@
             </Grid>
 
             <!-- Main content area -->
-            <Border CornerRadius="0,0,20,20" ClipToBounds="True">
-                <Border.Background>
-                    <SolidColorBrush Color="{Binding BodyColor}" />
-                </Border.Background>
+            <Border CornerRadius="0,0,20,20" ClipToBounds="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
                 <Grid x:Name="content">
                 <!-- Error message -->
                 <TextBlock Text="{Binding ErrorMessage}"
@@ -234,7 +221,7 @@
                                                        TextAlignment="Center"
                                                        TextTrimming="CharacterEllipsis"
                                                        Text="{Binding Name}"
-                                                       Foreground="{Binding DataContext.LabelsColor, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                                       Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
                                                        HorizontalAlignment="Center"
                                                        Margin="5,0,5,5"
                                                        ToolTip="{Binding Name}" />

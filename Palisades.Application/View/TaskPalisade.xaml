@@ -35,7 +35,7 @@
     <Border x:Name="LayoutRoot" CornerRadius="20" ClipToBounds="True">
     <Grid>
         <!-- Header with drag handle -->
-        <Border x:Name="Header" Background="{Binding HeaderColor}" CornerRadius="20,20,0,0" 
+        <Border x:Name="Header" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" CornerRadius="20,20,0,0" 
                 Height="30" VerticalAlignment="Top" MouseLeftButtonDown="Header_MouseLeftButtonDown">
             <Border.ContextMenu>
                 <ContextMenu>
@@ -62,9 +62,9 @@
                 </ContextMenu>
             </Border.ContextMenu>
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="{Binding Name}" Foreground="{Binding TitleColor}" 
+                <TextBlock Text="{Binding Name}" Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" 
                            VerticalAlignment="Center" Margin="10,0,0,0" FontWeight="Bold"/>
-                <TextBlock Text="{Binding SyncStatus}" Foreground="{Binding LabelsColor}" 
+                <TextBlock Text="{Binding SyncStatus}" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" 
                            VerticalAlignment="Center" Margin="20,0,0,0" FontSize="12"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,10,0">
                     <Button Content="🔄" ToolTip="Force Sync" Command="{Binding ForceSyncCommand}" 
@@ -78,7 +78,7 @@
         </Border>
 
         <!-- Main content area -->
-        <Border Background="{Binding BodyColor}" CornerRadius="0,0,20,20" 
+        <Border Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" CornerRadius="0,0,20,20" 
                 Margin="0,30,0,0" Padding="10">
             <Grid>
                 <Grid.RowDefinitions>
@@ -114,12 +114,12 @@
                                         <!-- Task details -->
                                         <StackPanel Grid.Column="1" Margin="10,0,0,0">
                                             <TextBlock Text="{Binding Title}" FontWeight="Bold" 
-                                                       Foreground="{Binding DataContext.LabelsColor, RelativeSource={RelativeSource AncestorType=ItemsControl}}"/>
+                                                       Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
                                             <TextBlock Text="{Binding Description}" TextWrapping="Wrap" 
-                                                       Foreground="{Binding DataContext.LabelsColor, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
+                                                       Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" 
                                                        Visibility="{Binding Description, Converter={StaticResource StringToVisibilityConverter}}"/>
                                             <TextBlock Text="{Binding DueDate, StringFormat='Due: {0:d}'}" 
-                                                       Foreground="{Binding DataContext.LabelsColor, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
+                                                       Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" 
                                                        Visibility="{Binding DueDate, Converter={StaticResource StringToVisibilityConverter}}"/>
                                         </StackPanel>
 

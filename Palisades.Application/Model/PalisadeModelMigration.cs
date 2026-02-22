@@ -64,10 +64,6 @@ namespace Palisades.Model
             target.FenceY = source.FenceY;
             target.Width = source.Width;
             target.Height = source.Height;
-            target.HeaderColor = source.HeaderColor;
-            target.BodyColor = source.BodyColor;
-            target.TitleColor = source.TitleColor;
-            target.LabelsColor = source.LabelsColor;
             target.Type = source.Type;
         }
     }

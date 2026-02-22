@@ -102,7 +102,7 @@
 
         <!-- Contenu Standard (PalisadeViewModel) -->
         <DataTemplate DataType="{x:Type viewModel:PalisadeViewModel}">
-            <Grid AllowDrop="True">
+            <Grid AllowDrop="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
                 <Grid.Resources>
                     <helpers:BindingProxy x:Key="tabProxy" Data="{Binding}" />
                 </Grid.Resources>
@@ -111,11 +111,6 @@
                         <i:InvokeCommandAction Command="{Binding DropShortcut}" PassEventArgsToCommand="True" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
-                <Rectangle>
-                    <Rectangle.Fill>
-                        <SolidColorBrush Color="{Binding BodyColor}" />
-                    </Rectangle.Fill>
-                </Rectangle>
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <ItemsControl ItemsSource="{Binding Shortcuts}" Margin="20,20,20,20" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True">
                         <ItemsControl.ItemsPanel>
@@ -156,7 +151,7 @@
                                         <StackPanel VerticalAlignment="Top" HorizontalAlignment="Center" Cursor="Hand">
                                             <Image Source="{Binding IconPath, Converter={StaticResource PathToImage}}" Width="48" Height="48" Stretch="UniformToFill" Margin="5,5,5,5" />
                                             <TextBlock TextWrapping="NoWrap" TextAlignment="Center" TextTrimming="CharacterEllipsis" Text="{Binding Name}"
-                                                       Foreground="{Binding DataContext.LabelsColor, RelativeSource={RelativeSource AncestorType=TabItem}}"
+                                                       Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
                                                        HorizontalAlignment="Center" Margin="5,0,5,5" />
                                         </StackPanel>
                                     </Border>
@@ -170,12 +165,7 @@
 
         <!-- Contenu FolderPortal (FolderPortalViewModel) -->
         <DataTemplate DataType="{x:Type viewModel:FolderPortalViewModel}">
-            <Grid>
-                <Rectangle>
-                    <Rectangle.Fill>
-                        <SolidColorBrush Color="{Binding BodyColor}" />
-                    </Rectangle.Fill>
-                </Rectangle>
+            <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
                 <TextBlock Text="{Binding ErrorMessage}" Foreground="#FFFF6666" Margin="15,10" Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}" />
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="10">
                     <ItemsControl ItemsSource="{Binding Items}">
@@ -194,7 +184,7 @@
                                     </i:Interaction.Triggers>
                                     <StackPanel>
                                         <Image Source="{Binding IconPath, Converter={StaticResource PathToImage}}" Width="48" Height="48" Stretch="UniformToFill" Margin="5" />
-                                        <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" Foreground="{Binding DataContext.LabelsColor, RelativeSource={RelativeSource AncestorType=TabItem}}" Margin="5,0,5,5" />
+                                        <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" Margin="5,0,5,5" />
                                     </StackPanel>
                                 </Border>
                             </DataTemplate>
@@ -206,7 +196,7 @@
 
         <!-- Contenu TaskPalisade (TaskPalisadeViewModel) -->
         <DataTemplate DataType="{x:Type viewModel:TaskPalisadeViewModel}">
-            <Grid>
+            <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
                 <Grid.Resources>
                     <ResourceDictionary>
                         <ResourceDictionary.MergedDictionaries>
@@ -214,11 +204,6 @@
                         </ResourceDictionary.MergedDictionaries>
                     </ResourceDictionary>
                 </Grid.Resources>
-                <Rectangle>
-                    <Rectangle.Fill>
-                        <SolidColorBrush Color="{Binding BodyColor}" />
-                    </Rectangle.Fill>
-                </Rectangle>
                 <Grid Margin="10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -240,10 +225,10 @@
                                             <CheckBox IsChecked="{Binding Completed, Mode=TwoWay}" VerticalAlignment="Center" Grid.Column="0"
                                                       Command="{Binding DataContext.ToggleTaskCompletedCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}"/>
                                             <StackPanel Grid.Column="1" Margin="10,0,0,0">
-                                                <TextBlock Text="{Binding Title}" FontWeight="Bold" Foreground="{Binding DataContext.LabelsColor, RelativeSource={RelativeSource AncestorType=ItemsControl}}"/>
-                                                <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Foreground="{Binding DataContext.LabelsColor, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                <TextBlock Text="{Binding Title}" FontWeight="Bold" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+                                                <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
                                                            Visibility="{Binding Description, Converter={StaticResource StringToVisibilityConverter}}"/>
-                                                <TextBlock Text="{Binding DueDate, StringFormat='Due: {0:d}'}" Foreground="{Binding DataContext.LabelsColor, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                <TextBlock Text="{Binding DueDate, StringFormat='Due: {0:d}'}" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
                                                            Visibility="{Binding DueDate, Converter={StaticResource StringToVisibilityConverter}}"/>
                                             </StackPanel>
                                             <StackPanel Grid.Column="2" Orientation="Horizontal">
@@ -266,49 +251,34 @@
 
         <!-- Contenu Calendar (placeholder dans onglet) -->
         <DataTemplate DataType="{x:Type viewModel:CalendarPalisadeViewModel}">
-            <Grid>
-                <Rectangle>
-                    <Rectangle.Fill>
-                        <SolidColorBrush Color="{Binding BodyColor}" />
-                    </Rectangle.Fill>
-                </Rectangle>
-                <TextBlock Text="Calendar" Foreground="{Binding LabelsColor}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" />
+            <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+                <TextBlock Text="Calendar" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" />
             </Grid>
         </DataTemplate>
 
         <!-- Contenu Mail (placeholder dans onglet) -->
         <DataTemplate DataType="{x:Type viewModel:MailPalisadeViewModel}">
-            <Grid>
-                <Rectangle>
-                    <Rectangle.Fill>
-                        <SolidColorBrush Color="{Binding BodyColor}" />
-                    </Rectangle.Fill>
-                </Rectangle>
-                <TextBlock Text="Mail" Foreground="{Binding LabelsColor}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" />
+            <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+                <TextBlock Text="Mail" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" />
             </Grid>
         </DataTemplate>
     </Window.Resources>
     <Border x:Name="LayoutRoot" CornerRadius="20" ClipToBounds="True">
         <DockPanel>
-            <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="#00000000">
+            <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="80"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="80"/>
                 </Grid.ColumnDefinitions>
-                <Rectangle Grid.ColumnSpan="3">
-                    <Rectangle.Fill>
-                        <SolidColorBrush Color="{Binding SelectedItem.HeaderColor, ElementName=TabControl}" />
-                    </Rectangle.Fill>
-                </Rectangle>
-                <Label Grid.Column="1" Content="{Binding SelectedItem.Name, ElementName=TabControl}" Margin="5" FontSize="28" Foreground="{Binding SelectedItem.TitleColor, ElementName=TabControl}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <Label Grid.Column="1" Content="{Binding SelectedItem.Name, ElementName=TabControl}" Margin="5" FontSize="28" Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" HorizontalAlignment="Center" VerticalAlignment="Center" />
             </Grid>
             <TabControl x:Name="TabControl" ItemsSource="{Binding Members}" Style="{StaticResource FlatTabStyle}"
                         ItemContainerStyle="{StaticResource FlatTabItemStyle}"
                         SelectedIndex="0">
                 <TabControl.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding Name}" Foreground="{Binding TitleColor}" />
+                        <TextBlock Text="{Binding Name}" Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
                     </DataTemplate>
                 </TabControl.ItemTemplate>
                 <TabControl.ContentTemplate>

@@ -42,7 +42,7 @@
     </i:Interaction.Triggers>
     <Border x:Name="LayoutRoot" CornerRadius="20" ClipToBounds="True">
         <DockPanel>
-            <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="#00000000" Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}">
+            <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}">
                 <Grid.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Edit" Command="{Binding Path=Data.EditPalisadeCommand, Source={StaticResource proxy}}" CommandParameter="{Binding}" />
@@ -80,17 +80,9 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="80"/>
                 </Grid.ColumnDefinitions>
-                <Rectangle Grid.ColumnSpan="3">
-                    <Rectangle.Fill>
-                        <SolidColorBrush Color="{Binding HeaderColor}" />
-                    </Rectangle.Fill>
-                </Rectangle>
-                <Label Grid.Column="1"  Content="{Binding Name, Mode=OneWay}" Margin="5" FontSize="32" Foreground="{Binding TitleColor}"  HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <Label Grid.Column="1"  Content="{Binding Name, Mode=OneWay}" Margin="5" FontSize="32" Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"  HorizontalAlignment="Center" VerticalAlignment="Center" />
             </Grid>
-            <Border x:Name="drag" CornerRadius="0,0,20,20">
-                <Border.Background>
-                    <SolidColorBrush Color="{Binding BodyColor}" />
-                </Border.Background>
+            <Border x:Name="drag" CornerRadius="0,0,20,20" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <ItemsControl ItemsSource="{Binding Shortcuts}" Margin="20, 20, 20, 20"
               dd:DragDrop.IsDragSource="True"
@@ -138,7 +130,7 @@
                                                 Height="48"
                                                 Stretch="UniformToFill" Margin="5,5,5,5"
                                             />
-                                            <TextBlock TextWrapping="NoWrap" TextAlignment="Center" TextTrimming="CharacterEllipsis" Text="{Binding Name}" Foreground="{Binding DataContext.LabelsColor, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" HorizontalAlignment="Center" Margin="5,0,5,5" />
+                                            <TextBlock TextWrapping="NoWrap" TextAlignment="Center" TextTrimming="CharacterEllipsis" Text="{Binding Name}" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" HorizontalAlignment="Center" Margin="5,0,5,5" />
                                         </StackPanel>
                                     </Border>
                                 </ContentControl>

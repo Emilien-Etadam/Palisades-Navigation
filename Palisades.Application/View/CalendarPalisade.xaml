@@ -36,7 +36,7 @@
     </Window.Resources>
     <Border x:Name="LayoutRoot" CornerRadius="20" ClipToBounds="True">
         <DockPanel>
-            <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="#00000000">
+            <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
                 <Grid.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Edit" Command="{Binding Path=Data.EditCalendarPalisadeCommand, Source={StaticResource proxy}}" CommandParameter="{Binding}" />
@@ -75,16 +75,11 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Rectangle Grid.ColumnSpan="2">
-                    <Rectangle.Fill>
-                        <SolidColorBrush Color="{Binding HeaderColor}" />
-                    </Rectangle.Fill>
-                </Rectangle>
-                <Label Grid.Column="0" Content="{Binding Name}" Margin="8" FontSize="18" Foreground="{Binding TitleColor}" VerticalAlignment="Center" />
+                <Label Grid.Column="0" Content="{Binding Name}" Margin="8" FontSize="18" Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" VerticalAlignment="Center" />
                 <Button Grid.Column="1" Content="🔄" ToolTip="Refresh" Command="{Binding RefreshCommand}" CommandParameter="{Binding}"
                         Style="{StaticResource CircleButton}" Width="28" Height="28" Margin="0,0,8,0" VerticalAlignment="Center"/>
             </Grid>
-            <Border DockPanel.Dock="Top" Background="{Binding BodyColor}" CornerRadius="0,0,20,20" Margin="0,0,0,0" Padding="12">
+            <Border DockPanel.Dock="Top" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" CornerRadius="0,0,20,20" Margin="0,0,0,0" Padding="12">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -95,7 +90,7 @@
                     <StackPanel Grid.Row="1" Visibility="{Binding IsLoading, Converter={StaticResource MultiValueEqualityConverter}, ConverterParameter='True,Visible;False,Collapsed'}"
                                 HorizontalAlignment="Center" VerticalAlignment="Center">
                         <ProgressBar IsIndeterminate="True" Width="120" Height="8"/>
-                        <TextBlock Text="Chargement..." HorizontalAlignment="Center" Margin="0,8,0,0" Foreground="{Binding LabelsColor}"/>
+                        <TextBlock Text="Chargement..." HorizontalAlignment="Center" Margin="0,8,0,0" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
                     </StackPanel>
                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Visibility="{Binding IsLoading, Converter={StaticResource MultiValueEqualityConverter}, ConverterParameter='False,Visible;True,Collapsed'}">
                         <ItemsControl ItemsSource="{Binding Events}">
@@ -107,8 +102,8 @@
                                                 <RowDefinition Height="Auto"/>
                                                 <RowDefinition Height="Auto"/>
                                             </Grid.RowDefinitions>
-                                            <TextBlock Grid.Row="0" Text="{Binding Summary}" FontWeight="SemiBold" Foreground="{Binding DataContext.LabelsColor, RelativeSource={RelativeSource AncestorType=ItemsControl}}" TextTrimming="CharacterEllipsis"/>
-                                            <TextBlock Grid.Row="1" Margin="0,2,0,0" Foreground="{Binding DataContext.LabelsColor, RelativeSource={RelativeSource AncestorType=ItemsControl}}" FontSize="12">
+                                            <TextBlock Grid.Row="0" Text="{Binding Summary}" FontWeight="SemiBold" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Grid.Row="1" Margin="0,2,0,0" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" FontSize="12">
                                                 <TextBlock.Text>
                                                     <MultiBinding StringFormat="{}{0:g} → {1:g}">
                                                         <Binding Path="DtStart"/>
