@@ -66,6 +66,19 @@ namespace Palisades.View
             ImapHost = ImapHostTextBox.Text;
             Username = UsernameTextBox.Text;
 
+            var host = ImapHostTextBox.Text?.Trim() ?? "";
+            var user = UsernameTextBox.Text?.Trim() ?? "";
+            if (string.IsNullOrWhiteSpace(host))
+            {
+                MessageBox.Show("Please enter an IMAP Host.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(user))
+            {
+                MessageBox.Show("Please enter a username.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             DisplayMode = DisplayModeCombo.SelectedIndex == 1 ? MailDisplayMode.CountAndSubjects : MailDisplayMode.CountOnly;
             SelectedFolders = FoldersListBox.SelectedItems.Cast<string>().ToList();
             if (SelectedFolders.Count == 0)

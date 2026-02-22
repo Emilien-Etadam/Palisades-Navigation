@@ -1,6 +1,7 @@
+using System;
+using System.Collections.Generic;
 using Palisades.Model;
 using Palisades.Services;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -65,6 +66,23 @@ namespace Palisades.View
             Password = PasswordBox.Password;
             if (CalendarsListBox.SelectedItems.Count > 0)
                 SelectedCalendarIds = CalendarsListBox.SelectedItems.Cast<CalDAVCalendarInfo>().Select(c => c.Href).ToList();
+            var url = CalDAVUrlTextBox.Text?.Trim() ?? "";
+            var user = UsernameTextBox.Text?.Trim() ?? "";
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                MessageBox.Show("Please enter a CalDAV Base URL.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            if (!url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+            {
+                MessageBox.Show("The CalDAV URL must start with https://.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(user))
+            {
+                MessageBox.Show("Please enter a username.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
             DialogResult = true;
             Close();
         }

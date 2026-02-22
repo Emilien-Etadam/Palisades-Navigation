@@ -1,3 +1,4 @@
+using System;
 using System.Windows;
 
 namespace Palisades.View
@@ -28,10 +29,21 @@ namespace Palisades.View
             Username = UsernameTextBox.Text;
             TaskListId = TaskListIdTextBox.Text;
 
-            if (string.IsNullOrWhiteSpace(CalDAVUrl) || string.IsNullOrWhiteSpace(Username))
+            var url = CalDAVUrlTextBox.Text?.Trim() ?? "";
+            var user = UsernameTextBox.Text?.Trim() ?? "";
+            if (string.IsNullOrWhiteSpace(url))
             {
-                MessageBox.Show("CalDAV URL and Username are required.", "Task Palisade",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Please enter a CalDAV Server URL.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            if (!url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+            {
+                MessageBox.Show("The CalDAV URL must start with https://.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(user))
+            {
+                MessageBox.Show("Please enter a username.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 

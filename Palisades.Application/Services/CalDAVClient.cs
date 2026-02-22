@@ -18,6 +18,7 @@ namespace Palisades.Services
     {
         private readonly HttpClient _httpClient;
         private readonly Uri _baseUri;
+        private readonly bool _isConfigured;
         private bool _disposed;
 
         private static void EnsureHttps(string url)
@@ -31,15 +32,24 @@ namespace Palisades.Services
         public CalDAVClient(string baseUrl, string username, string password)
         {
             var url = (baseUrl ?? "").Trim();
+            if (string.IsNullOrEmpty(url) || url.Equals("https://localhost/", StringComparison.OrdinalIgnoreCase))
+            {
+                _isConfigured = false;
+                _baseUri = new Uri("https://localhost/");
+                var handler = new HttpClientHandler();
+                _httpClient = new HttpClient(handler);
+                return;
+            }
             EnsureHttps(url);
+            _isConfigured = true;
             _baseUri = new Uri(url.TrimEnd('/') + "/");
 
-            var handler = new HttpClientHandler
+            var handler2 = new HttpClientHandler
             {
                 Credentials = new NetworkCredential(username ?? "", password ?? ""),
                 PreAuthenticate = true
             };
-            _httpClient = new HttpClient(handler);
+            _httpClient = new HttpClient(handler2);
             _httpClient.DefaultRequestHeaders.Add("User-Agent", "Palisades/1.0");
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/xml"));
@@ -56,6 +66,8 @@ namespace Palisades.Services
 
         public async Task<XDocument> PropfindAsync(string href, int depth, string? requestBody = null)
         {
+            if (!_isConfigured)
+                throw new InvalidOperationException("CalDAV client is not configured. Please set a valid CalDAV URL.");
             var url = ResolveUrl(href);
             var request = new HttpRequestMessage(new HttpMethod("PROPFIND"), url);
             request.Headers.Add("Depth", depth.ToString());
@@ -72,6 +84,8 @@ namespace Palisades.Services
 
         public async Task<XDocument> ReportAsync(string href, string requestBody)
         {
+            if (!_isConfigured)
+                throw new InvalidOperationException("CalDAV client is not configured. Please set a valid CalDAV URL.");
             var url = ResolveUrl(href);
             var request = new HttpRequestMessage(new HttpMethod("REPORT"), url);
             request.Headers.Add("Depth", "1");
@@ -87,6 +101,8 @@ namespace Palisades.Services
 
         public async Task<string?> PutAsync(string href, string icalData, string? etag = null)
         {
+            if (!_isConfigured)
+                throw new InvalidOperationException("CalDAV client is not configured. Please set a valid CalDAV URL.");
             var url = ResolveUrl(href);
             var request = new HttpRequestMessage(HttpMethod.Put, url);
             request.Content = new StringContent(icalData, Encoding.UTF8, "text/calendar");
@@ -103,6 +119,8 @@ namespace Palisades.Services
 
         public async Task DeleteAsync(string href, string? etag = null)
         {
+            if (!_isConfigured)
+                throw new InvalidOperationException("CalDAV client is not configured. Please set a valid CalDAV URL.");
             var url = ResolveUrl(href);
             var request = new HttpRequestMessage(HttpMethod.Delete, url);
             if (!string.IsNullOrEmpty(etag))
@@ -158,6 +176,8 @@ namespace Palisades.Services
         /// </summary>
         public async Task<List<CalDAVCalendarInfo>> DiscoverCalendarsAsync()
         {
+            if (!_isConfigured)
+                throw new InvalidOperationException("CalDAV client is not configured. Please set a valid CalDAV URL.");
             const string propfindBody = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <d:propfind xmlns:d=""DAV:"" xmlns:c=""urn:ietf:params:xml:ns:caldav"">
     <d:prop>
