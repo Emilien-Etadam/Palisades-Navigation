@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.Extensions.Configuration;
 using Palisades.Helpers;
@@ -62,6 +63,7 @@ namespace Palisades
 
                 ShutdownMode = ShutdownMode.OnExplicitShutdown;
                 _trayIcon = new TrayIconManager();
+                _ = RunAutoUpdateAsync();
                 WriteStartupLog("TrayIcon created");
 
                 Exit += (_, _) =>
@@ -121,6 +123,34 @@ namespace Palisades
         {
             SentrySdk.CaptureException(e.Exception);
             e.Handled = true;
+        }
+
+        private static async Task RunAutoUpdateAsync()
+        {
+            await Task.Delay(TimeSpan.FromSeconds(8));
+            var update = await UpdateChecker.CheckAsync();
+            if (update == null) return;
+
+            var result = Current.Dispatcher.Invoke(() =>
+                MessageBox.Show(
+                    $"Version {update.Version} disponible.\n\n{update.ReleaseNotes}\n\nInstaller et relancer ?",
+                    "Mise à jour Palisades",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Information));
+
+            if (result != MessageBoxResult.Yes) return;
+
+            try
+            {
+                await UpdateChecker.ApplyUpdateAsync(update);
+                Current.Dispatcher.Invoke(() => Current.Shutdown());
+            }
+            catch (Exception ex)
+            {
+                Current.Dispatcher.Invoke(() =>
+                    MessageBox.Show($"Échec de la mise à jour : {ex.Message}", "Erreur",
+                        MessageBoxButton.OK, MessageBoxImage.Warning));
+            }
         }
     }
 }
