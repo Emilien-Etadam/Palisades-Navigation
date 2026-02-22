@@ -1,11 +1,8 @@
 <Window x:Class="Palisades.View.TaskPalisade"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:helpers="clr-namespace:Palisades.Helpers"
         xmlns:converters="clr-namespace:Palisades.Converters"
-        mc:Ignorable="d"
         Title="TaskPalisade"
         helpers:WindowBackdrop.IsEnabled="True"
         helpers:WindowSinker.AlwaysOnBottom="True"
@@ -33,7 +30,7 @@
 
     <Border x:Name="LayoutRoot" CornerRadius="0" ClipToBounds="True">
     <Grid>
-        <Border x:Name="Header" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" CornerRadius="20,20,0,0" 
+        <Border x:Name="Header" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" CornerRadius="0" 
                 Height="30" VerticalAlignment="Top" MouseLeftButtonDown="Header_MouseLeftButtonDown">
             <Border.ContextMenu>
                 <ContextMenu>
