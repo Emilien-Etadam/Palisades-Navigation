@@ -100,6 +100,62 @@ namespace Palisades.ViewModel
             }
 
             UpdateBreadcrumb();
+
+            CreateNewFolderCommand = new RelayCommand(() =>
+            {
+                var currentPath = GetCurrentDirectoryPath();
+                if (string.IsNullOrEmpty(currentPath)) return;
+                var name = "New Folder";
+                var path = Path.Combine(currentPath, name);
+                var counter = 1;
+                while (Directory.Exists(path))
+                {
+                    name = $"New Folder ({counter++})";
+                    path = Path.Combine(currentPath, name);
+                }
+                Directory.CreateDirectory(path);
+                RefreshCommand.Execute(null);
+            });
+
+            CreateNewFileCommand = new RelayCommand(() =>
+            {
+                var currentPath = GetCurrentDirectoryPath();
+                if (string.IsNullOrEmpty(currentPath)) return;
+                var name = "New File.txt";
+                var path = Path.Combine(currentPath, name);
+                var counter = 1;
+                while (File.Exists(path))
+                {
+                    name = $"New File ({counter++}).txt";
+                    path = Path.Combine(currentPath, name);
+                }
+                File.WriteAllText(path, string.Empty);
+                RefreshCommand.Execute(null);
+            });
+
+            PasteFromClipboardCommand = new RelayCommand(() =>
+            {
+                var currentPath = GetCurrentDirectoryPath();
+                if (string.IsNullOrEmpty(currentPath)) return;
+                if (!Clipboard.ContainsFileDropList()) return;
+                var files = Clipboard.GetFileDropList();
+                if (files == null) return;
+                foreach (string? source in files)
+                {
+                    if (string.IsNullOrEmpty(source)) continue;
+                    var destName = Path.GetFileName(source);
+                    var dest = Path.Combine(currentPath, destName);
+                    try
+                    {
+                        if (File.Exists(source))
+                            File.Copy(source, dest, false);
+                        else if (Directory.Exists(source))
+                            CopyDirectory(source, dest);
+                    }
+                    catch { }
+                }
+                RefreshCommand.Execute(null);
+            });
         }
 
         public void LoadFolder(string path)
@@ -239,6 +295,11 @@ namespace Palisades.ViewModel
                 LoadFolder(CurrentPath);
         }
 
+        private string GetCurrentDirectoryPath()
+        {
+            return CurrentPath ?? "";
+        }
+
         #region IDragSource
         public void StartDrag(IDragInfo dragInfo)
         {
@@ -366,6 +427,10 @@ namespace Palisades.ViewModel
         #endregion
 
         #region Commands
+        public ICommand CreateNewFolderCommand { get; }
+        public ICommand CreateNewFileCommand { get; }
+        public ICommand PasteFromClipboardCommand { get; }
+
         public ICommand NavigateIntoFolderCommand => new RelayCommand<FolderPortalItem>(item =>
         {
             if (item == null) return;

@@ -148,6 +148,16 @@
             </Grid>
             <Border CornerRadius="0" ClipToBounds="True" Background="{DynamicResource PalisadeControlBrush}">
                 <Grid x:Name="content">
+                    <Grid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="New folder" Command="{Binding CreateNewFolderCommand}"/>
+                            <MenuItem Header="New text file" Command="{Binding CreateNewFileCommand}"/>
+                            <MenuItem Header="Paste" Command="{Binding PasteFromClipboardCommand}"/>
+                            <Separator/>
+                            <MenuItem Header="Refresh" Command="{Binding RefreshCommand}"/>
+                            <MenuItem Header="Open in Explorer" Command="{Binding OpenInExplorerCommand}"/>
+                        </ContextMenu>
+                    </Grid.ContextMenu>
                 <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}"
                            Foreground="{DynamicResource PalisadeErrorBrush}"
                            FontSize="13"

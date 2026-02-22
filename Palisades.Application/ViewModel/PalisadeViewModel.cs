@@ -5,6 +5,7 @@ using Palisades.View;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
@@ -22,7 +23,42 @@ namespace Palisades.ViewModel
         {
             _model = model;
             Shortcuts.CollectionChanged += (_, _) => Save();
+
+            PasteShortcutCommand = new RelayCommand(() =>
+            {
+                if (!System.Windows.Clipboard.ContainsFileDropList()) return;
+                var files = System.Windows.Clipboard.GetFileDropList();
+                if (files == null) return;
+                foreach (string? filePath in files)
+                {
+                    if (string.IsNullOrEmpty(filePath)) continue;
+                    var name = System.IO.Path.GetFileNameWithoutExtension(filePath);
+                    var ext = System.IO.Path.GetExtension(filePath)?.ToLowerInvariant();
+                    Shortcut sc = ext == ".url"
+                        ? new UrlShortcut { Name = name, UriOrFileAction = filePath, IconPath = filePath }
+                        : new LnkShortcut { Name = name, UriOrFileAction = filePath, IconPath = filePath };
+                    Shortcuts.Add(sc);
+                }
+                Save();
+            });
+
+            SortByNameCommand = new RelayCommand(() =>
+            {
+                var sorted = Shortcuts.OrderBy(s => s.Name, StringComparer.OrdinalIgnoreCase).ToList();
+                Shortcuts.Clear();
+                foreach (var s in sorted) Shortcuts.Add(s);
+                Save();
+            });
+
+            RemoveSelectedShortcutCommand = new RelayCommand<Shortcut>(sc =>
+            {
+                if (sc != null && Shortcuts.Remove(sc)) Save();
+            });
         }
+
+        public ICommand PasteShortcutCommand { get; }
+        public ICommand SortByNameCommand { get; }
+        public ICommand RemoveSelectedShortcutCommand { get; }
 
         public ObservableCollection<Shortcut> Shortcuts
         {

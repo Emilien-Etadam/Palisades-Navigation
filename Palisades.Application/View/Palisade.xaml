@@ -74,6 +74,18 @@
                 <Label Grid.Column="1"  Content="{Binding Name, Mode=OneWay}" Margin="5" FontSize="32" Foreground="{DynamicResource PalisadeTextBrush}"  HorizontalAlignment="Center" VerticalAlignment="Center" />
             </Grid>
             <Border x:Name="drag" CornerRadius="0" Background="{DynamicResource PalisadeControlBrush}">
+                <Border.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Paste" Command="{Binding PasteShortcutCommand}"/>
+                        <MenuItem Header="Sort by name" Command="{Binding SortByNameCommand}"/>
+                        <Separator/>
+                        <MenuItem Header="New fence" Command="{Binding NewPalisadeCommand}"/>
+                        <MenuItem Header="New Folder Portal" Command="{Binding NewFolderPortalCommand}"/>
+                        <MenuItem Header="New Task Palisade" Command="{Binding NewTaskPalisadeCommand}"/>
+                        <MenuItem Header="New Calendar Palisade" Command="{Binding NewCalendarPalisadeCommand}"/>
+                        <MenuItem Header="New Mail Palisade" Command="{Binding NewMailPalisadeCommand}"/>
+                    </ContextMenu>
+                </Border.ContextMenu>
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <ItemsControl ItemsSource="{Binding Shortcuts}" Margin="20"
               VirtualizingPanel.IsVirtualizing="True"
