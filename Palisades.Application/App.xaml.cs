@@ -12,6 +12,8 @@ namespace Palisades
 {
     public partial class App : System.Windows.Application
     {
+        private TrayIconManager? _trayIcon;
+
         private static void WriteStartupLog(string message, Exception? ex = null)
         {
             try
@@ -58,7 +60,15 @@ namespace Palisades
                 }
                 WriteStartupLog("DesktopDrawingOverlay shown");
 
-                Exit += (_, _) => LayoutSnapshotService.SaveAutoSnapshotAndPrune(3);
+                ShutdownMode = ShutdownMode.OnExplicitShutdown;
+                _trayIcon = new TrayIconManager();
+                WriteStartupLog("TrayIcon created");
+
+                Exit += (_, _) =>
+                {
+                    _trayIcon?.Dispose();
+                    LayoutSnapshotService.SaveAutoSnapshotAndPrune(3);
+                };
             }
             catch (Exception ex)
             {
