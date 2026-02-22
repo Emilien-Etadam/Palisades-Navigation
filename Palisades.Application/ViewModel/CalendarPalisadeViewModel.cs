@@ -25,6 +25,7 @@ namespace Palisades.ViewModel
         private string _errorMessage = string.Empty;
         private bool _isLoading;
         private Timer? _refreshTimer;
+        private readonly HashSet<string> _notifiedEventUids = new HashSet<string>();
 
         public CalendarPalisadeViewModel() : this(
             new CalendarPalisadeModel { Name = "Calendar", Width = 500, Height = 400 },
@@ -98,6 +99,13 @@ namespace Palisades.ViewModel
                     Events.Clear();
                     foreach (var evt in ordered)
                         Events.Add(evt);
+                    var now = DateTime.Now;
+                    var threshold = now.AddMinutes(15);
+                    foreach (var evt in Events)
+                    {
+                        if (evt.DtStart >= now && evt.DtStart <= threshold && _notifiedEventUids.Add(evt.Uid))
+                            ToastHelper.ShowEventReminder(evt.Summary, evt.DtStart);
+                    }
                 });
             }
             catch (Exception ex)

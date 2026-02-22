@@ -66,6 +66,7 @@ namespace Palisades
 
                 Exit += (_, _) =>
                 {
+                    Helpers.ToastHelper.Cleanup();
                     _trayIcon?.Dispose();
                     LayoutSnapshotService.SaveAutoSnapshotAndPrune(3);
                 };

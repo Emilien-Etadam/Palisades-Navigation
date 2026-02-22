@@ -26,6 +26,8 @@ namespace Palisades.ViewModel
         private Timer? _pollTimer;
         private readonly object _countsLock = new object();
         private Dictionary<string, int> _unreadCounts = new Dictionary<string, int>();
+        private readonly Dictionary<string, int> _previousUnreadCounts = new Dictionary<string, int>();
+        private bool _firstLoad = true;
 
         public MailPalisadeViewModel() : this(new MailPalisadeModel { Name = "Mail", Width = 320, Height = 240 })
         { }
@@ -149,6 +151,22 @@ namespace Palisades.ViewModel
                 lock (_countsLock)
                 {
                     _unreadCounts = counts;
+                    if (_firstLoad)
+                    {
+                        _firstLoad = false;
+                        foreach (var kvp in _unreadCounts)
+                            _previousUnreadCounts[kvp.Key] = kvp.Value;
+                    }
+                    else
+                    {
+                        foreach (var kvp in _unreadCounts)
+                        {
+                            _previousUnreadCounts.TryGetValue(kvp.Key, out var prev);
+                            if (kvp.Value > prev)
+                                ToastHelper.ShowMailNotification(kvp.Key, kvp.Value - prev);
+                            _previousUnreadCounts[kvp.Key] = kvp.Value;
+                        }
+                    }
                 }
                 Dispatch(() =>
                 {
