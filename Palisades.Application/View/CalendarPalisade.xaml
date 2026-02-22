@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Palisades.View"
         xmlns:helpers="clr-namespace:Palisades.Helpers"
         xmlns:converters="clr-namespace:Palisades.Converters"
-        helpers:WindowBlur.IsEnabled="True"
+        helpers:WindowBackdrop.IsEnabled="True"
         helpers:WindowSinker.AlwaysOnBottom="True"
         ShowInTaskbar="False"
         mc:Ignorable="d"
@@ -21,7 +21,7 @@
         Top="{Binding FenceY, Mode=TwoWay}"
         UseLayoutRounding="True">
     <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="0" ResizeBorderThickness="5" CornerRadius="20" GlassFrameThickness="0" NonClientFrameEdges="None" UseAeroCaptionButtons="False" />
+        <WindowChrome CaptionHeight="0" ResizeBorderThickness="5" CornerRadius="0" GlassFrameThickness="0" NonClientFrameEdges="None" UseAeroCaptionButtons="False" />
     </WindowChrome.WindowChrome>
     <Window.Resources>
         <ResourceDictionary>
@@ -34,7 +34,7 @@
             <helpers:BindingProxy x:Key="proxy" Data="{Binding}" />
         </ResourceDictionary>
     </Window.Resources>
-    <Border x:Name="LayoutRoot" CornerRadius="20" ClipToBounds="True">
+    <Border x:Name="LayoutRoot" CornerRadius="0" ClipToBounds="True">
         <DockPanel>
             <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
                 <Grid.ContextMenu>
@@ -79,7 +79,7 @@
                 <Button Grid.Column="1" Content="🔄" ToolTip="Refresh" Command="{Binding RefreshCommand}" CommandParameter="{Binding}"
                         Style="{StaticResource CircleButton}" Width="28" Height="28" Margin="0,0,8,0" VerticalAlignment="Center"/>
             </Grid>
-            <Border DockPanel.Dock="Top" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" CornerRadius="0,0,20,20" Margin="0,0,0,0" Padding="12">
+            <Border DockPanel.Dock="Top" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" CornerRadius="0" Margin="0,0,0,0" Padding="12">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>

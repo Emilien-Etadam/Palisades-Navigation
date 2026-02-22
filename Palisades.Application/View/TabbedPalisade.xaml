@@ -9,7 +9,7 @@
         xmlns:converters="clr-namespace:Palisades.Converters"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
-        helpers:WindowBlur.IsEnabled="True"
+        helpers:WindowBackdrop.IsEnabled="True"
         helpers:WindowSinker.AlwaysOnBottom="True"
         ShowInTaskbar="False"
         mc:Ignorable="d"
@@ -24,7 +24,7 @@
         Background="Transparent"
         UseLayoutRounding="True">
     <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="0" ResizeBorderThickness="5" CornerRadius="20" GlassFrameThickness="0" NonClientFrameEdges="None" UseAeroCaptionButtons="False" />
+        <WindowChrome CaptionHeight="0" ResizeBorderThickness="5" CornerRadius="0" GlassFrameThickness="0" NonClientFrameEdges="None" UseAeroCaptionButtons="False" />
     </WindowChrome.WindowChrome>
     <Window.Resources>
         <converters:PathToImageConverter x:Key="PathToImage" />
@@ -263,7 +263,7 @@
             </Grid>
         </DataTemplate>
     </Window.Resources>
-    <Border x:Name="LayoutRoot" CornerRadius="20" ClipToBounds="True">
+    <Border x:Name="LayoutRoot" CornerRadius="0" ClipToBounds="True">
         <DockPanel>
             <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
                 <Grid.ColumnDefinitions>

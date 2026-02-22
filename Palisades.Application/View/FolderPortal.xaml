@@ -9,7 +9,7 @@
         xmlns:viewModel="clr-namespace:Palisades.ViewModel"
         xmlns:converters="clr-namespace:Palisades.Converters"
         xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
-        helpers:WindowBlur.IsEnabled="True"
+        helpers:WindowBackdrop.IsEnabled="True"
         helpers:WindowSinker.AlwaysOnBottom="True"
         ShowInTaskbar="False"
         mc:Ignorable="d"
@@ -25,7 +25,7 @@
         UseLayoutRounding="True"
         >
     <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="0" ResizeBorderThickness="5" CornerRadius="20" GlassFrameThickness="0" NonClientFrameEdges="None" UseAeroCaptionButtons="False" />
+        <WindowChrome CaptionHeight="0" ResizeBorderThickness="5" CornerRadius="0" GlassFrameThickness="0" NonClientFrameEdges="None" UseAeroCaptionButtons="False" />
     </WindowChrome.WindowChrome>
     <Window.DataContext>
         <viewModel:FolderPortalViewModel />
@@ -36,7 +36,7 @@
         <helpers:BindingProxy x:Key="proxy" Data="{Binding}" />
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </Window.Resources>
-    <Border x:Name="LayoutRoot" CornerRadius="20" ClipToBounds="True">
+    <Border x:Name="LayoutRoot" CornerRadius="0" ClipToBounds="True">
         <DockPanel>
             <!-- Header area -->
             <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}">
@@ -170,7 +170,7 @@
             </Grid>
 
             <!-- Main content area -->
-            <Border CornerRadius="0,0,20,20" ClipToBounds="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+            <Border CornerRadius="0" ClipToBounds="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
                 <Grid x:Name="content">
                 <!-- Error message -->
                 <TextBlock Text="{Binding ErrorMessage}"

@@ -8,7 +8,7 @@
         xmlns:converters="clr-namespace:Palisades.Converters"
         mc:Ignorable="d"
         Title="TaskPalisade"
-        helpers:WindowBlur.IsEnabled="True"
+        helpers:WindowBackdrop.IsEnabled="True"
         helpers:WindowSinker.AlwaysOnBottom="True"
         ShowInTaskbar="False"
         WindowStyle="None" AllowsTransparency="True"
@@ -20,7 +20,7 @@
         ResizeMode="CanResize"
         UseLayoutRounding="True">
     <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="0" ResizeBorderThickness="5" CornerRadius="20" GlassFrameThickness="0" NonClientFrameEdges="None" UseAeroCaptionButtons="False" />
+        <WindowChrome CaptionHeight="0" ResizeBorderThickness="5" CornerRadius="0" GlassFrameThickness="0" NonClientFrameEdges="None" UseAeroCaptionButtons="False" />
     </WindowChrome.WindowChrome>
     <Window.Resources>
         <ResourceDictionary>
@@ -32,7 +32,7 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Border x:Name="LayoutRoot" CornerRadius="20" ClipToBounds="True">
+    <Border x:Name="LayoutRoot" CornerRadius="0" ClipToBounds="True">
     <Grid>
         <!-- Header with drag handle -->
         <Border x:Name="Header" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" CornerRadius="20,20,0,0" 
@@ -78,7 +78,7 @@
         </Border>
 
         <!-- Main content area -->
-        <Border Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" CornerRadius="0,0,20,20" 
+        <Border Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" CornerRadius="0" 
                 Margin="0,30,0,0" Padding="10">
             <Grid>
                 <Grid.RowDefinitions>

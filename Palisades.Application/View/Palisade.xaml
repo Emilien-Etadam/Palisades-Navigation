@@ -9,7 +9,7 @@
         xmlns:viewModel="clr-namespace:Palisades.ViewModel"
         xmlns:converters="clr-namespace:Palisades.Converters"
         xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
-        helpers:WindowBlur.IsEnabled="True"
+        helpers:WindowBackdrop.IsEnabled="True"
         helpers:WindowSinker.AlwaysOnBottom="True"
         ShowInTaskbar="False"
         mc:Ignorable="d"
@@ -25,7 +25,7 @@
         UseLayoutRounding="True"
         >
     <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="0" ResizeBorderThickness="5" CornerRadius="20" GlassFrameThickness="0" NonClientFrameEdges="None" UseAeroCaptionButtons="False" />
+        <WindowChrome CaptionHeight="0" ResizeBorderThickness="5" CornerRadius="0" GlassFrameThickness="0" NonClientFrameEdges="None" UseAeroCaptionButtons="False" />
     </WindowChrome.WindowChrome>
     <Window.DataContext>
         <viewModel:PalisadeViewModel />
@@ -40,7 +40,7 @@
             <i:InvokeCommandAction Command="{Binding DelKeyPressed}" CommandParameter="{Binding}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
-    <Border x:Name="LayoutRoot" CornerRadius="20" ClipToBounds="True">
+    <Border x:Name="LayoutRoot" CornerRadius="0" ClipToBounds="True">
         <DockPanel>
             <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}">
                 <Grid.ContextMenu>
@@ -82,7 +82,7 @@
                 </Grid.ColumnDefinitions>
                 <Label Grid.Column="1"  Content="{Binding Name, Mode=OneWay}" Margin="5" FontSize="32" Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"  HorizontalAlignment="Center" VerticalAlignment="Center" />
             </Grid>
-            <Border x:Name="drag" CornerRadius="0,0,20,20" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+            <Border x:Name="drag" CornerRadius="0" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <ItemsControl ItemsSource="{Binding Shortcuts}" Margin="20, 20, 20, 20"
               dd:DragDrop.IsDragSource="True"
