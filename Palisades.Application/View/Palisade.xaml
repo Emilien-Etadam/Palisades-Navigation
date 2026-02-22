@@ -38,7 +38,7 @@
     </i:Interaction.Triggers>
     <Border x:Name="LayoutRoot" CornerRadius="0" ClipToBounds="True">
         <DockPanel>
-            <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" ColumnDefinitions="80,*,80">
+            <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource PalisadeWindowBrush}" Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" ColumnDefinitions="80,*,80">
                 <Grid.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Edit" Command="{Binding Path=Data.EditPalisadeCommand, Source={StaticResource proxy}}" CommandParameter="{Binding}" />
@@ -71,9 +71,9 @@
                         <MenuItem Header="About" Command="{Binding Path=Data.OpenAboutCommand, Source={StaticResource proxy}}" />
                     </ContextMenu>
                 </Grid.ContextMenu>
-                <Label Grid.Column="1"  Content="{Binding Name, Mode=OneWay}" Margin="5" FontSize="32" Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"  HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <Label Grid.Column="1"  Content="{Binding Name, Mode=OneWay}" Margin="5" FontSize="32" Foreground="{DynamicResource PalisadeTextBrush}"  HorizontalAlignment="Center" VerticalAlignment="Center" />
             </Grid>
-            <Border x:Name="drag" CornerRadius="0" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+            <Border x:Name="drag" CornerRadius="0" Background="{DynamicResource PalisadeControlBrush}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <ItemsControl ItemsSource="{Binding Shortcuts}" Margin="20"
               VirtualizingPanel.IsVirtualizing="True"
@@ -123,7 +123,7 @@
                                                 Height="48"
                                                 Stretch="UniformToFill" Margin="5"
                                             />
-                                            <TextBlock TextWrapping="NoWrap" TextAlignment="Center" TextTrimming="CharacterEllipsis" Text="{Binding Name, Mode=OneWay}" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" HorizontalAlignment="Center" Margin="5,0,5,5" />
+                                            <TextBlock TextWrapping="NoWrap" TextAlignment="Center" TextTrimming="CharacterEllipsis" Text="{Binding Name, Mode=OneWay}" Foreground="{DynamicResource PalisadeTextBrush}" HorizontalAlignment="Center" Margin="5,0,5,5" />
                                         </StackPanel>
                                     </Border>
                                 </ContentControl>

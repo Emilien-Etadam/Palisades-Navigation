@@ -63,12 +63,12 @@
                 <MenuItem Header="About" Command="{Binding Path=Data.OpenAboutCommand, Source={StaticResource proxy}}"/>
             </ContextMenu>
         </Grid.ContextMenu>
-        <Border x:Name="Header" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" CornerRadius="0" 
+        <Border x:Name="Header" Background="{DynamicResource PalisadeWindowBrush}" CornerRadius="0" 
                 Height="30" VerticalAlignment="Top" MouseLeftButtonDown="Header_MouseLeftButtonDown">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="{Binding Name, Mode=OneWay}" Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" 
+                <TextBlock Text="{Binding Name, Mode=OneWay}" Foreground="{DynamicResource PalisadeTextBrush}" 
                            VerticalAlignment="Center" Margin="10,0,0,0" FontWeight="Bold"/>
-                <TextBlock Text="{Binding SyncStatus, Mode=OneWay}" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" 
+                <TextBlock Text="{Binding SyncStatus, Mode=OneWay}" Foreground="{DynamicResource PalisadeTextBrush}" 
                            VerticalAlignment="Center" Margin="20,0,0,0" FontSize="12"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,10,0">
                     <Button Content="🔄" ToolTip="Force Sync" Command="{Binding ForceSyncCommand}" 
@@ -80,10 +80,10 @@
                 </StackPanel>
             </StackPanel>
         </Border>
-        <Border Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" CornerRadius="0" 
+        <Border Background="{DynamicResource PalisadeControlBrush}" CornerRadius="0" 
                 Margin="0,30,0,0" Padding="10">
             <Grid RowDefinitions="Auto,*,Auto">
-                <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}" Foreground="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}" 
+                <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}" Foreground="{DynamicResource PalisadeErrorBrush}" 
                            Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}" 
                            Grid.Row="0" Margin="0,10"/>
 
@@ -118,12 +118,12 @@
                                               CommandParameter="{Binding}"/>
                                     <StackPanel Grid.Column="1" Margin="10,0,0,0">
                                         <TextBlock Text="{Binding Title, Mode=OneWay}" FontWeight="Bold" 
-                                                   Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+                                                   Foreground="{DynamicResource PalisadeTextBrush}"/>
                                         <TextBlock Text="{Binding Description, Mode=OneWay}" TextWrapping="Wrap" 
-                                                   Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" 
+                                                   Foreground="{DynamicResource PalisadeTextBrush}" 
                                                    Visibility="{Binding Description, Converter={StaticResource StringToVisibilityConverter}}"/>
                                         <TextBlock Text="{Binding DueDate, StringFormat='Due: {0:d}', Mode=OneWay}" 
-                                                   Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" 
+                                                   Foreground="{DynamicResource PalisadeTextBrush}" 
                                                    Visibility="{Binding DueDate, Converter={StaticResource StringToVisibilityConverter}}"/>
                                     </StackPanel>
                                     <StackPanel Grid.Column="2" Orientation="Horizontal">

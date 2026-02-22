@@ -34,7 +34,7 @@
     </Window.Resources>
     <Border x:Name="LayoutRoot" CornerRadius="0" ClipToBounds="True">
         <DockPanel>
-            <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" RowDefinitions="Auto,Auto">
+            <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource PalisadeWindowBrush}" Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" RowDefinitions="Auto,Auto">
                 <Grid.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Edit" Command="{Binding Path=Data.EditFolderPortalCommand, Source={StaticResource proxy}}" CommandParameter="{Binding}" />
@@ -70,12 +70,12 @@
                         <MenuItem Header="About" Command="{Binding Path=Data.OpenAboutCommand, Source={StaticResource proxy}}" />
                     </ContextMenu>
                 </Grid.ContextMenu>
-                <Grid Grid.Row="0" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" ColumnDefinitions="Auto,*,Auto">
+                <Grid Grid.Row="0" Background="{DynamicResource PalisadeWindowBrush}" ColumnDefinitions="Auto,*,Auto">
                     <Button Grid.Column="0"
                             Command="{Binding NavigateBackCommand}"
                             Background="Transparent"
                             BorderBrush="Transparent"
-                            Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"
+                            Foreground="{DynamicResource PalisadeTextBrush}"
                             FontSize="18"
                             FontWeight="Bold"
                             Padding="10,5"
@@ -102,14 +102,14 @@
                         </Button.Style>
                         &#x2190;
                     </Button>
-                    <Label Grid.Column="1" Content="{Binding Name, Mode=OneWay}" Margin="5" FontSize="28" Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <Label Grid.Column="1" Content="{Binding Name, Mode=OneWay}" Margin="5" FontSize="28" Foreground="{DynamicResource PalisadeTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
 
                     <!-- Home button -->
                     <Button Grid.Column="2"
                             Command="{Binding NavigateToRootCommand}"
                             Background="Transparent"
                             BorderBrush="Transparent"
-                            Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"
+                            Foreground="{DynamicResource PalisadeTextBrush}"
                             FontSize="16"
                             Padding="10,5"
                             Cursor="Hand"
@@ -136,9 +136,9 @@
                         &#x2302;
                     </Button>
                 </Grid>
-                <Grid Grid.Row="1" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
+                <Grid Grid.Row="1" Background="{DynamicResource PalisadeWindowBrush}">
                     <TextBlock Text="{Binding Breadcrumb, Mode=OneWay}"
-                               Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                               Foreground="{DynamicResource PalisadeTextBrush}"
                                FontSize="12"
                                Margin="15,2,15,4"
                                TextTrimming="CharacterEllipsis"
@@ -146,10 +146,10 @@
                                VerticalAlignment="Center" />
                 </Grid>
             </Grid>
-            <Border CornerRadius="0" ClipToBounds="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+            <Border CornerRadius="0" ClipToBounds="True" Background="{DynamicResource PalisadeControlBrush}">
                 <Grid x:Name="content">
                 <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}"
-                           Foreground="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}"
+                           Foreground="{DynamicResource PalisadeErrorBrush}"
                            FontSize="13"
                            Margin="15,10"
                            TextWrapping="Wrap"
@@ -196,7 +196,7 @@
                                                        TextAlignment="Center"
                                                        TextTrimming="CharacterEllipsis"
                                                        Text="{Binding Name, Mode=OneWay}"
-                                                       Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                                                       Foreground="{DynamicResource PalisadeTextBrush}"
                                                        HorizontalAlignment="Center"
                                                        Margin="5,0,5,5"
                                                        ToolTip="{Binding Name, Mode=OneWay}" />

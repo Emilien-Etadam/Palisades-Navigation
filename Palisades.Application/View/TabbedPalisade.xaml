@@ -98,7 +98,7 @@
 
         <!-- Standard -->
         <DataTemplate DataType="{x:Type viewModel:PalisadeViewModel}">
-            <Grid AllowDrop="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+            <Grid AllowDrop="True" Background="{DynamicResource PalisadeControlBrush}">
                 <Grid.Resources>
                     <helpers:BindingProxy x:Key="tabProxy" Data="{Binding}" />
                 </Grid.Resources>
@@ -150,7 +150,7 @@
                                         <StackPanel VerticalAlignment="Top" HorizontalAlignment="Center" Cursor="Hand">
                                             <Image Source="{Binding IconPath, Converter={StaticResource PathToImage}}" Width="48" Height="48" Stretch="UniformToFill" Margin="5" />
                                             <TextBlock TextWrapping="NoWrap" TextAlignment="Center" TextTrimming="CharacterEllipsis" Text="{Binding Name, Mode=OneWay}"
-                                                       Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                                                       Foreground="{DynamicResource PalisadeTextBrush}"
                                                        HorizontalAlignment="Center" Margin="5,0,5,5" />
                                         </StackPanel>
                                     </Border>
@@ -164,8 +164,8 @@
 
         <!-- FolderPortal -->
         <DataTemplate DataType="{x:Type viewModel:FolderPortalViewModel}">
-            <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
-                <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}" Foreground="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}" Margin="15,10" Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}" />
+            <Grid Background="{DynamicResource PalisadeControlBrush}">
+                <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}" Foreground="{DynamicResource PalisadeErrorBrush}" Margin="15,10" Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}" />
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="10">
                     <ItemsControl ItemsSource="{Binding Items}"
                                  VirtualizingPanel.IsVirtualizing="True"
@@ -185,7 +185,7 @@
                                     </i:Interaction.Triggers>
                                     <StackPanel>
                                         <Image Source="{Binding IconPath, Converter={StaticResource PathToImage}}" Width="48" Height="48" Stretch="UniformToFill" Margin="5" />
-                                        <TextBlock Text="{Binding Name, Mode=OneWay}" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" Margin="5,0,5,5" />
+                                        <TextBlock Text="{Binding Name, Mode=OneWay}" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource PalisadeTextBrush}" Margin="5,0,5,5" />
                                     </StackPanel>
                                 </Border>
                             </DataTemplate>
@@ -197,7 +197,7 @@
 
         <!-- Task -->
         <DataTemplate DataType="{x:Type viewModel:TaskPalisadeViewModel}">
-            <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+            <Grid Background="{DynamicResource PalisadeControlBrush}">
                 <Grid.Resources>
                     <ResourceDictionary>
                         <ResourceDictionary.MergedDictionaries>
@@ -206,7 +206,7 @@
                     </ResourceDictionary>
                 </Grid.Resources>
                 <Grid Margin="10" RowDefinitions="Auto,*,Auto">
-                    <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}" Foreground="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}" Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}" Margin="0,0,0,10"/>
+                    <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}" Foreground="{DynamicResource PalisadeErrorBrush}" Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}" Margin="0,0,0,10"/>
                     <ListBox Grid.Row="1" ItemsSource="{Binding Tasks}"
                              VirtualizingPanel.IsVirtualizing="True"
                              VirtualizingPanel.VirtualizationMode="Recycling"
@@ -235,10 +235,10 @@
                                         <CheckBox IsChecked="{Binding Completed, Mode=TwoWay}" VerticalAlignment="Center" Grid.Column="0"
                                                   Command="{Binding DataContext.ToggleTaskCompletedCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}"/>
                                         <StackPanel Grid.Column="1" Margin="10,0,0,0">
-                                            <TextBlock Text="{Binding Title, Mode=OneWay}" FontWeight="Bold" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
-                                            <TextBlock Text="{Binding Description, Mode=OneWay}" TextWrapping="Wrap" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                                            <TextBlock Text="{Binding Title, Mode=OneWay}" FontWeight="Bold" Foreground="{DynamicResource PalisadeTextBrush}"/>
+                                            <TextBlock Text="{Binding Description, Mode=OneWay}" TextWrapping="Wrap" Foreground="{DynamicResource PalisadeTextBrush}"
                                                        Visibility="{Binding Description, Converter={StaticResource StringToVisibilityConverter}}"/>
-                                            <TextBlock Text="{Binding DueDate, StringFormat='Due: {0:d}', Mode=OneWay}" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                                            <TextBlock Text="{Binding DueDate, StringFormat='Due: {0:d}', Mode=OneWay}" Foreground="{DynamicResource PalisadeTextBrush}"
                                                        Visibility="{Binding DueDate, Converter={StaticResource StringToVisibilityConverter}}"/>
                                         </StackPanel>
                                         <StackPanel Grid.Column="2" Orientation="Horizontal">
@@ -260,29 +260,29 @@
 
         <!-- Contenu Calendar (placeholder dans onglet) -->
         <DataTemplate DataType="{x:Type viewModel:CalendarPalisadeViewModel}">
-            <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
-                <TextBlock Text="Calendar" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" />
+            <Grid Background="{DynamicResource PalisadeControlBrush}">
+                <TextBlock Text="Calendar" Foreground="{DynamicResource PalisadeTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" />
             </Grid>
         </DataTemplate>
 
         <!-- Mail -->
         <DataTemplate DataType="{x:Type viewModel:MailPalisadeViewModel}">
-            <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
-                <TextBlock Text="Mail" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" />
+            <Grid Background="{DynamicResource PalisadeControlBrush}">
+                <TextBlock Text="Mail" Foreground="{DynamicResource PalisadeTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" />
             </Grid>
         </DataTemplate>
     </Window.Resources>
     <Border x:Name="LayoutRoot" CornerRadius="0" ClipToBounds="True">
         <DockPanel>
-            <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" ColumnDefinitions="80,*,80">
-                <Label Grid.Column="1" Content="{Binding SelectedItem.Name, ElementName=TabControl}" Margin="5" FontSize="28" Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource PalisadeWindowBrush}" ColumnDefinitions="80,*,80">
+                <Label Grid.Column="1" Content="{Binding SelectedItem.Name, ElementName=TabControl}" Margin="5" FontSize="28" Foreground="{DynamicResource PalisadeTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
             </Grid>
             <TabControl x:Name="TabControl" ItemsSource="{Binding Members}" Style="{StaticResource FlatTabStyle}"
                         ItemContainerStyle="{StaticResource FlatTabItemStyle}"
                         SelectedIndex="0">
                 <TabControl.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding Name, Mode=OneWay}" Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
+                        <TextBlock Text="{Binding Name, Mode=OneWay}" Foreground="{DynamicResource PalisadeTextBrush}" />
                     </DataTemplate>
                 </TabControl.ItemTemplate>
                 <TabControl.ContentTemplate>

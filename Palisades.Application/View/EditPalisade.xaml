@@ -5,11 +5,11 @@
         Title="Edit Palisade"
         Width="400"
         SizeToContent="Height"
-        TextElement.Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+        TextElement.Foreground="{DynamicResource PalisadeTextBrush}"
         TextElement.FontWeight="Regular"
         TextOptions.TextFormattingMode="Ideal" 
         TextOptions.TextRenderingMode="Auto"        
-        Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
+        Background="{DynamicResource PalisadeWindowBrush}"
         ResizeMode="NoResize">
     <Window.DataContext>
         <viewModel:PalisadeViewModel />

@@ -42,6 +42,8 @@ namespace Palisades
                 SetupSentry();
                 WriteStartupLog("SetupSentry() ok");
 
+                ThemeWatcher.Apply(Resources);
+
                 PalisadesManager.LoadPalisades();
                 WriteStartupLog("LoadPalisades() ok, count=" + PalisadesManager.palisades.Count);
 
