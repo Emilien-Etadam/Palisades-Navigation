@@ -27,8 +27,7 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign2.Defaults.xaml" />
+                <ResourceDictionary Source="/View/Styles/PalisadeStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
             <BooleanToVisibilityConverter x:Key="BoolToVis" />
@@ -88,7 +87,7 @@
                     </Border>
                 </StackPanel>
                 <Button Grid.Column="1" Content="🔄" ToolTip="Refresh" Command="{Binding RefreshCommand}" CommandParameter="{Binding}"
-                        Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Width="28" Height="28" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                        Style="{StaticResource CircleButton}" Width="28" Height="28" Margin="0,0,8,0" VerticalAlignment="Center"/>
             </Grid>
             <Border DockPanel.Dock="Top" Background="{Binding BodyColor}" CornerRadius="0,0,20,20" Padding="12">
                 <Grid>

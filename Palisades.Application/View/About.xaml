@@ -8,13 +8,11 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:helpers="clr-namespace:Palisades.Helpers"
         mc:Ignorable="d"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
         TextElement.FontWeight="Regular"
         TextOptions.TextFormattingMode="Ideal" 
         TextOptions.TextRenderingMode="Auto"        
-        Background="{DynamicResource MaterialDesignPaper}"
-        FontFamily="{DynamicResource MaterialDesignFont}"
-        Style="{StaticResource MaterialDesignWindow}"
+        Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
         Title="About Palisades"
         Width="408"
         SizeToContent="Height"
@@ -31,11 +29,11 @@
             </StackPanel>
             <TextBlock TextAlignment="Justify" TextWrapping="Wrap" Foreground="#DDFFFFFF" Margin="0,20,0,0" Padding="20,0,20,0">
                 <Run Text="This software is maintained by " />
-                <helpers:HyperlinkCommander Foreground="{StaticResource MaterialDesignDarkForeground}" Command="{Binding NavigateCommand}" CommandParameter="https://stouder.io/">
+                <helpers:HyperlinkCommander Foreground="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}" Command="{Binding NavigateCommand}" CommandParameter="https://stouder.io/">
                     <Run Text="Xavier Stouder" />
                 </helpers:HyperlinkCommander>
                 <Run Text=" and released under MIT licence. You can report issues, check for updates and even contribute on the " />
-                <helpers:HyperlinkCommander Foreground="{StaticResource MaterialDesignDarkForeground}" Command="{Binding NavigateCommand}" CommandParameter="https://github.com/Emilien-Etadam/Palisades-Navigation">
+                <helpers:HyperlinkCommander Foreground="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}" Command="{Binding NavigateCommand}" CommandParameter="https://github.com/Emilien-Etadam/Palisades-Navigation">
                     <Run Text="Github repository." />
                 </helpers:HyperlinkCommander>
             </TextBlock>
@@ -45,18 +43,15 @@
                     Palisades uses the following open source libraries to work.
                 </TextBlock>
                 <Label Padding="20,0,20,0">
-                    <helpers:HyperlinkCommander Foreground="{StaticResource MaterialDesignDarkForeground}" Command="{Binding NavigateCommand}" CommandParameter="http://materialdesigninxaml.net/">MaterialDesignThemes</helpers:HyperlinkCommander>
+                    <helpers:HyperlinkCommander Foreground="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}" Command="{Binding NavigateCommand}" CommandParameter="https://github.com/punker76/gong-wpf-dragdrop">GongSolutions.WPF.DragDrop</helpers:HyperlinkCommander>
                 </Label>
                 <Label Padding="20,0,20,0">
-                    <helpers:HyperlinkCommander Foreground="{StaticResource MaterialDesignDarkForeground}" Command="{Binding NavigateCommand}" CommandParameter="https://github.com/punker76/gong-wpf-dragdrop">GongSolutions.WPF.DragDrop</helpers:HyperlinkCommander>
-                </Label>
-                <Label Padding="20,0,20,0">
-                    <helpers:HyperlinkCommander Foreground="{StaticResource MaterialDesignDarkForeground}" Command="{Binding NavigateCommand}" CommandParameter="https://github.com/Microsoft/XamlBehaviorsWpf">
+                    <helpers:HyperlinkCommander Foreground="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}" Command="{Binding NavigateCommand}" CommandParameter="https://github.com/Microsoft/XamlBehaviorsWpf">
                         XamlBehaviors for WPF
                     </helpers:HyperlinkCommander>
                 </Label>
                 <Label Padding="20,0,20,0">
-                    <helpers:HyperlinkCommander Foreground="{StaticResource MaterialDesignDarkForeground}" Command="{Binding NavigateCommand}" CommandParameter="https://sentry.io/">
+                    <helpers:HyperlinkCommander Foreground="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}" Command="{Binding NavigateCommand}" CommandParameter="https://sentry.io/">
                         Sentry
                     </helpers:HyperlinkCommander>
                 </Label>

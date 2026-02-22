@@ -48,7 +48,6 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="10.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0" />
     <PackageReference Include="gong-wpf-dragdrop" Version="4.0.0" />
-    <PackageReference Include="MaterialDesignThemes" Version="5.3.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
     <PackageReference Include="Sentry" Version="6.1.0" />
     <PackageReference Include="System.Drawing.Common" Version="10.0.0" />
