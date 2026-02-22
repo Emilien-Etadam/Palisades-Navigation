@@ -1,36 +1,15 @@
 <Window x:Class="Palisades.View.TaskPalisadeSettingsDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Palisades.View"
-        mc:Ignorable="d"
-        Title="Task Palisade Settings" Height="350" Width="400"
-        WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
-    
-    <Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign2.Defaults.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Window.Resources>
+        Title="Task Palisade Settings" Height="350" Width="400" MinHeight="350" MinWidth="400"
+        WindowStartupLocation="CenterOwner" ResizeMode="CanResize">
 
-    <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <Grid Margin="10" RowDefinitions="Auto,Auto,Auto,Auto,*,Auto">
 
         <!-- Sync Interval -->
         <TextBlock Text="Sync Interval (minutes)" Grid.Row="0" Margin="0,0,0,5"/>
-        <Slider x:Name="SyncIntervalSlider" Grid.Row="1" Minimum="1" Maximum="60" 
-                Value="5" TickFrequency="5" TickPlacement="BottomRight" 
+        <Slider x:Name="SyncIntervalSlider" Grid.Row="1" Minimum="1" Maximum="60"
+                Value="5" TickFrequency="5" TickPlacement="BottomRight"
                 AutoToolTipPlacement="BottomRight" IsSnapToTickEnabled="True"/>
 
         <!-- Enable Logging -->
