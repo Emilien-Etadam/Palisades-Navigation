@@ -149,7 +149,7 @@
             <Border CornerRadius="0" ClipToBounds="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
                 <Grid x:Name="content">
                 <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}"
-                           Foreground="#FFFF6666"
+                           Foreground="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}"
                            FontSize="13"
                            Margin="15,10"
                            TextWrapping="Wrap"
