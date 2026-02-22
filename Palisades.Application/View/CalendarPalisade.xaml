@@ -73,7 +73,7 @@
             </Grid>
             <Border DockPanel.Dock="Top" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" CornerRadius="0" Padding="12">
                 <Grid RowDefinitions="Auto,*,Auto">
-                    <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}" Foreground="Red" Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}" Grid.Row="0" Margin="0,0,0,8"/>
+                    <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}" Foreground="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}" Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}" Grid.Row="0" Margin="0,0,0,8"/>
                     <StackPanel Grid.Row="1" Visibility="{Binding IsLoading, Converter={StaticResource MultiValueEqualityConverter}, ConverterParameter='True,Visible;False,Collapsed'}"
                                 HorizontalAlignment="Center" VerticalAlignment="Center">
                         <ProgressBar IsIndeterminate="True" Width="120" Height="8"/>

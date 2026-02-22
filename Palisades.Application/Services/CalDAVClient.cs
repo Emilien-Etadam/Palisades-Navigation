@@ -74,8 +74,7 @@ namespace Palisades.Services
         {
             var url = ResolveUrl(href);
             var request = new HttpRequestMessage(new HttpMethod("REPORT"), url);
-            request.Headers.Add("Depth", "0");
-            request.Headers.Add("Prefer", "return-minimal");
+            request.Headers.Add("Depth", "1");
             request.Content = new StringContent(requestBody, Encoding.UTF8, "application/xml");
 
             var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
