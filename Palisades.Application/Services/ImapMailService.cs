@@ -69,24 +69,30 @@ namespace Palisades.Services
         public async Task<int> GetUnreadCountAsync(string folderName)
         {
             EnsureConnected();
-            IMailFolder folder;
-            if (string.Equals(folderName, "INBOX", StringComparison.OrdinalIgnoreCase))
-                folder = _client!.Inbox;
-            else
-                folder = await _client!.Inbox.GetSubfolderAsync(folderName).ConfigureAwait(false);
-            await folder.StatusAsync(StatusItems.Unread).ConfigureAwait(false);
-            return folder.Unread;
+            var folder = await _client!.GetFolderAsync(folderName).ConfigureAwait(false);
+            await folder.OpenAsync(FolderAccess.ReadOnly).ConfigureAwait(false);
+            var count = folder.Unread;
+            await folder.CloseAsync().ConfigureAwait(false);
+            return count;
         }
 
-        /// <summary>Liste des noms de dossiers (INBOX + sous-dossiers de l'Inbox).</summary>
+        /// <summary>Liste des noms de dossiers (récursif, FullName).</summary>
         public async Task<List<string>> GetFolderNamesAsync()
         {
             EnsureConnected();
-            var list = new List<string> { "INBOX" };
-            var folders = await _client!.Inbox.GetSubfoldersAsync().ConfigureAwait(false);
-            foreach (var f in folders)
-                list.Add(f.Name);
-            return list;
+            var result = new List<string>();
+            await CollectFoldersAsync(_client!.GetFolder(_client.PersonalNamespaces[0]), result).ConfigureAwait(false);
+            return result;
+        }
+
+        private async Task CollectFoldersAsync(IMailFolder parent, List<string> result)
+        {
+            var subfolders = await parent.GetSubfoldersAsync(false).ConfigureAwait(false);
+            foreach (var folder in subfolders)
+            {
+                result.Add(folder.FullName);
+                await CollectFoldersAsync(folder, result).ConfigureAwait(false);
+            }
         }
 
         /// <summary>Récupère les N derniers mails non lus (enveloppe : expéditeur, sujet, date).</summary>

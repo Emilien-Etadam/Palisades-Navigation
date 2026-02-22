@@ -1,5 +1,6 @@
 using Palisades.Model;
 using Palisades.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -44,6 +45,7 @@ namespace Palisades.View
                 var service = new ImapMailService(ImapHost, ImapPort, Username, Password);
                 await service.ConnectAsync();
                 var folders = await service.GetFolderNamesAsync();
+                folders.Sort(StringComparer.OrdinalIgnoreCase);
                 FoldersListBox.ItemsSource = folders;
                 FoldersListBox.SelectedItems.Clear();
                 if (folders.Contains("INBOX"))

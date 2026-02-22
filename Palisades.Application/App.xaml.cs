@@ -56,11 +56,6 @@ namespace Palisades
                 var overlay = new DesktopDrawingOverlay();
                 overlay.Show();
                 overlay.ShowActivated = false;
-                foreach (var kv in PalisadesManager.palisades)
-                {
-                    if (kv.Value is Window w)
-                    { w.Activate(); break; }
-                }
                 WriteStartupLog("DesktopDrawingOverlay shown");
 
                 ShutdownMode = ShutdownMode.OnExplicitShutdown;
@@ -74,6 +69,16 @@ namespace Palisades
                     _trayIcon?.Dispose();
                     LayoutSnapshotService.SaveAutoSnapshotAndPrune(3);
                 };
+
+                Dispatcher.InvokeAsync(async () =>
+                {
+                    await Task.Delay(100);
+                    foreach (var kv in PalisadesManager.palisades)
+                    {
+                        if (kv.Value is Window w)
+                        { w.Activate(); break; }
+                    }
+                }, System.Windows.Threading.DispatcherPriority.Background);
             }
             catch (Exception ex)
             {
