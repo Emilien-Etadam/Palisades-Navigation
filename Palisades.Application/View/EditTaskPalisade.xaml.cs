@@ -18,6 +18,12 @@ namespace Palisades.View
             DataContext = viewModel;
         }
 
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is TaskPalisadeViewModel vm)
+                PasswordBox.Password = vm.CalDAVPassword;
+        }
+
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             var vm = _viewModel ?? (TaskPalisadeViewModel)DataContext;
