@@ -40,7 +40,7 @@
             <i:InvokeCommandAction Command="{Binding DelKeyPressed}" CommandParameter="{Binding}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
-    <Border x:Name="LayoutRoot" CornerRadius="20">
+    <Border x:Name="LayoutRoot" CornerRadius="20" ClipToBounds="True">
         <DockPanel>
             <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="#00000000" Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}">
                 <Grid.ContextMenu>
@@ -72,7 +72,7 @@
                             <MenuItem Header="Manage layouts..." Command="{Binding Path=Data.ManageSnapshotsCommand, Source={StaticResource proxy}}" />
                         </MenuItem>
                         <Separator />
-                        <MenuItem Header="About" Command="{Binding Path=Data.OpenAboutCommand, Source={StaticResource proxy}}" CommandParameter="{Binding}" />
+                        <MenuItem Header="About" Command="{Binding Path=Data.OpenAboutCommand, Source={StaticResource proxy}}" />
                     </ContextMenu>
                 </Grid.ContextMenu>
                 <Grid.ColumnDefinitions>
@@ -87,19 +87,15 @@
                 </Rectangle>
                 <Label Grid.Column="1"  Content="{Binding Name, Mode=OneWay}" Margin="5" FontSize="32" Foreground="{Binding TitleColor}"  HorizontalAlignment="Center" VerticalAlignment="Center" />
             </Grid>
-            <Grid x:Name="drag" AllowDrop="True">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="Drop">
-                        <i:InvokeCommandAction Command="{Binding DropShortcut}" PassEventArgsToCommand="True" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-                <Rectangle>
-                    <Rectangle.Fill>
-                        <SolidColorBrush Color="{Binding BodyColor}" />
-                    </Rectangle.Fill>
-                </Rectangle>
+            <Border x:Name="drag" CornerRadius="0,0,20,20">
+                <Border.Background>
+                    <SolidColorBrush Color="{Binding BodyColor}" />
+                </Border.Background>
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                    <ItemsControl ItemsSource="{Binding Shortcuts}" Margin="20, 20, 20, 20" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True">
+                    <ItemsControl ItemsSource="{Binding Shortcuts}" Margin="20, 20, 20, 20"
+              dd:DragDrop.IsDragSource="True"
+              dd:DragDrop.IsDropTarget="True"
+              dd:DragDrop.DropHandler="{Binding}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <WrapPanel />
@@ -150,7 +146,7 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </ScrollViewer>
-            </Grid>
+            </Border>
         </DockPanel>
     </Border>
 </Window>

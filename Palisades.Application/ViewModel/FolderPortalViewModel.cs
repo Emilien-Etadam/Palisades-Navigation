@@ -1,3 +1,4 @@
+using GongSolutions.Wpf.DragDrop;
 using Palisades.Helpers;
 using Palisades.Model;
 using Palisades.Services;
@@ -20,7 +21,7 @@ using Color = System.Windows.Media.Color;
 
 namespace Palisades.ViewModel
 {
-    public class FolderPortalViewModel : INotifyPropertyChanged, IPalisadeViewModel
+    public class FolderPortalViewModel : INotifyPropertyChanged, IPalisadeViewModel, IDropTarget, IDragSource
     {
         #region Attributes
         private readonly FolderPortalModel model;
@@ -351,6 +352,163 @@ namespace Palisades.ViewModel
 
             return "";
         }
+
+        private void RefreshItems()
+        {
+            if (!string.IsNullOrEmpty(CurrentPath))
+                LoadFolder(CurrentPath);
+        }
+        #endregion
+
+        #region IDragSource
+        public void StartDrag(IDragInfo dragInfo)
+        {
+            if (dragInfo.SourceItem is FolderPortalItem item && !string.IsNullOrEmpty(item.FullPath))
+            {
+                var dataObject = new DataObject(DataFormats.FileDrop, new[] { item.FullPath });
+                dragInfo.DataObject = dataObject;
+                dragInfo.Effects = DragDropEffects.Copy | DragDropEffects.Move;
+            }
+        }
+
+        public bool CanStartDrag(IDragInfo dragInfo)
+        {
+            return dragInfo.SourceItem is FolderPortalItem;
+        }
+
+        public void Dropped(IDropInfo dropInfo)
+        {
+        }
+
+        public void DragDropOperationFinished(DragDropEffects operationResult, IDragInfo dragInfo)
+        {
+            if (operationResult.HasFlag(DragDropEffects.Move))
+                RefreshItems();
+        }
+
+        public void DragCancelled()
+        {
+        }
+
+        public bool TryCatchOccurredException(Exception exception)
+        {
+            return false;
+        }
+        #endregion
+
+        #region IDropTarget
+        public void DragOver(IDropInfo dropInfo)
+        {
+            if (dropInfo.Data is DataObject dataObject
+                && dataObject.GetDataPresent(DataFormats.FileDrop))
+            {
+                bool isCopy = (dropInfo.KeyStates & DragDropKeyStates.ControlKey) != 0;
+                dropInfo.Effects = isCopy ? DragDropEffects.Copy : DragDropEffects.Move;
+                dropInfo.DropTargetAdorner = DropTargetAdorners.Highlight;
+                return;
+            }
+
+            if (dropInfo.Data is IDataObject iDataObject
+                && iDataObject.GetDataPresent(DataFormats.FileDrop))
+            {
+                bool isCopy = (dropInfo.KeyStates & DragDropKeyStates.ControlKey) != 0;
+                dropInfo.Effects = isCopy ? DragDropEffects.Copy : DragDropEffects.Move;
+                dropInfo.DropTargetAdorner = DropTargetAdorners.Highlight;
+                return;
+            }
+
+            if (dropInfo.Data is FolderPortalItem)
+            {
+                bool isCopy = (dropInfo.KeyStates & DragDropKeyStates.ControlKey) != 0;
+                dropInfo.Effects = isCopy ? DragDropEffects.Copy : DragDropEffects.Move;
+                dropInfo.DropTargetAdorner = DropTargetAdorners.Highlight;
+                return;
+            }
+        }
+
+        public void Drop(IDropInfo dropInfo)
+        {
+            string targetDir = CurrentPath;
+            if (string.IsNullOrEmpty(targetDir) || !Directory.Exists(targetDir))
+                return;
+
+            string[]? files = null;
+
+            if (dropInfo.Data is DataObject dataObject
+                && dataObject.GetDataPresent(DataFormats.FileDrop))
+            {
+                files = (string[])dataObject.GetData(DataFormats.FileDrop);
+            }
+            else if (dropInfo.Data is IDataObject iDataObject
+                && iDataObject.GetDataPresent(DataFormats.FileDrop))
+            {
+                files = (string[])iDataObject.GetData(DataFormats.FileDrop);
+            }
+            else if (dropInfo.Data is FolderPortalItem item && !string.IsNullOrEmpty(item.FullPath))
+            {
+                files = new[] { item.FullPath };
+            }
+
+            if (files == null || files.Length == 0)
+                return;
+
+            bool isCopy = (dropInfo.KeyStates & DragDropKeyStates.ControlKey) != 0;
+
+            foreach (string sourcePath in files)
+            {
+                try
+                {
+                    string fileName = Path.GetFileName(sourcePath);
+                    string destPath = Path.Combine(targetDir, fileName);
+
+                    if (string.Equals(sourcePath, destPath, StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    if (File.Exists(destPath) || Directory.Exists(destPath))
+                    {
+                        string nameWithoutExt = Path.GetFileNameWithoutExtension(fileName);
+                        string ext = Path.GetExtension(fileName);
+                        int counter = 1;
+                        do
+                        {
+                            destPath = Path.Combine(targetDir, $"{nameWithoutExt} ({counter}){ext}");
+                            counter++;
+                        }
+                        while (File.Exists(destPath) || Directory.Exists(destPath));
+                    }
+
+                    if (Directory.Exists(sourcePath))
+                    {
+                        if (isCopy)
+                            CopyDirectory(sourcePath, destPath);
+                        else
+                            Directory.Move(sourcePath, destPath);
+                    }
+                    else if (File.Exists(sourcePath))
+                    {
+                        if (isCopy)
+                            File.Copy(sourcePath, destPath);
+                        else
+                            File.Move(sourcePath, destPath);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ErrorMessage = $"Failed to {(isCopy ? "copy" : "move")} {Path.GetFileName(sourcePath)}: {ex.Message}";
+                }
+            }
+
+            RefreshItems();
+        }
+
+        private static void CopyDirectory(string sourceDir, string destDir)
+        {
+            Directory.CreateDirectory(destDir);
+            foreach (string file in Directory.GetFiles(sourceDir))
+                File.Copy(file, Path.Combine(destDir, Path.GetFileName(file)));
+            foreach (string dir in Directory.GetDirectories(sourceDir))
+                CopyDirectory(dir, Path.Combine(destDir, Path.GetFileName(dir)));
+        }
         #endregion
 
         #region Commands
@@ -528,20 +686,6 @@ namespace Palisades.ViewModel
             edit.ShowDialog();
         });
 
-        public ICommand OpenAboutCommand { get; private set; } = new RelayCommand<FolderPortalViewModel>((viewModel) =>
-        {
-            About about = new()
-            {
-                DataContext = new AboutViewModel()
-            };
-            try
-            {
-                about.Owner = PalisadesManager.GetWindow(viewModel.Identifier);
-            }
-            catch { }
-            about.ShowDialog();
-        });
-
         private void SaveAsync()
         {
             if (!shouldSave) return;
@@ -553,8 +697,7 @@ namespace Palisades.ViewModel
                     string saveDirectory = PDirectory.GetPalisadeDirectory(Identifier);
                     PDirectory.EnsureExists(saveDirectory);
                     using StreamWriter writer = new(Path.Combine(saveDirectory, "state.xml"));
-                    System.Xml.Serialization.XmlSerializer serializer = new(typeof(FolderPortalModel));
-                    serializer.Serialize(writer, this.model);
+                    ViewModelBase.SharedSerializer.Serialize(writer, model);
                 }
                 catch { /* réessayer au prochain cycle */ }
                 finally { shouldSave = false; }

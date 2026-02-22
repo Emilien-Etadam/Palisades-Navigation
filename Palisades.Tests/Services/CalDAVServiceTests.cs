@@ -12,7 +12,8 @@ namespace Palisades.Tests.Services
         [Fact]
         public async Task GetTaskListsAsync_WithInvalidUrl_ReturnsEmptyOrThrows()
         {
-            var service = new CalDAVService("https://invalid.example.invalid/", "u", "p");
+            var client = new CalDAVClient("https://invalid.example.invalid/", "u", "p");
+            var service = new CalDAVService(client);
             try
             {
                 var taskLists = await service.GetTaskListsAsync();

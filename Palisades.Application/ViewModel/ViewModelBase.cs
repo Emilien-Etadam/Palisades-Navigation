@@ -10,11 +10,28 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Xml.Serialization;
 
 namespace Palisades.ViewModel
 {
     public abstract class ViewModelBase : INotifyPropertyChanged, IPalisadeViewModel
     {
+        /// <summary>Sérialiseur partagé pour garantir un format XML compatible avec LoadPalisades (root/namespace cohérents).</summary>
+        public static readonly XmlSerializer SharedSerializer = new XmlSerializer(
+            typeof(PalisadeModelBase),
+            new[]
+            {
+                typeof(PalisadeModel),
+                typeof(StandardPalisadeModel),
+                typeof(FolderPortalModel),
+                typeof(TaskPalisadeModel),
+                typeof(CalendarPalisadeModel),
+                typeof(MailPalisadeModel),
+                typeof(Shortcut),
+                typeof(LnkShortcut),
+                typeof(UrlShortcut)
+            });
+
         protected readonly PalisadeModelBase Model;
         protected volatile bool ShouldSave;
         private readonly object _saveLock = new object();
@@ -124,11 +141,6 @@ namespace Palisades.ViewModel
         }
 
         /// <summary>
-        /// Sérialise le modèle dans le flux XML. Chaque sous-classe implémente pour ses types spécifiques.
-        /// </summary>
-        protected abstract void SerializeModel(StreamWriter writer);
-
-        /// <summary>
         /// Callback du timer : sauvegarde toutes les 1 s si nécessaire.
         /// </summary>
         private void SaveAsync()
@@ -142,7 +154,7 @@ namespace Palisades.ViewModel
                     string saveDirectory = PDirectory.GetPalisadeDirectory(Identifier);
                     PDirectory.EnsureExists(saveDirectory);
                     using StreamWriter writer = new(Path.Combine(saveDirectory, "state.xml"));
-                    SerializeModel(writer);
+                    SharedSerializer.Serialize(writer, Model);
                 }
                 catch { /* réessayer au prochain cycle */ }
                 finally { ShouldSave = false; }
@@ -171,14 +183,13 @@ namespace Palisades.ViewModel
 
         public ICommand DeletePalisadeCommand { get; } = new RelayCommand<string>(identifier => PalisadesManager.DeletePalisade(identifier));
 
-        public ICommand OpenAboutCommand { get; } = new RelayCommand<ViewModelBase>(viewModel =>
+        public ICommand OpenAboutCommand { get; } = new RelayCommand(() =>
         {
-            if (viewModel == null) return;
             var about = new About
             {
                 DataContext = new AboutViewModel()
             };
-            try { about.Owner = PalisadesManager.GetWindow(viewModel.Identifier); } catch { }
+            try { about.Owner = System.Windows.Application.Current.MainWindow; } catch { }
             about.ShowDialog();
         });
 

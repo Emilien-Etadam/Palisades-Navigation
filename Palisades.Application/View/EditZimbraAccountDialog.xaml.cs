@@ -16,26 +16,9 @@ namespace Palisades.View
             {
                 Account = existing;
                 EmailTextBox.Text = existing.Email;
-                ServerTextBox.Text = existing.Server;
                 CalDAVUrlTextBox.Text = existing.CalDAVBaseUrl;
                 ImapHostTextBox.Text = existing.ImapHost;
             }
-        }
-
-        private void EmailTextBox_TextChanged(object sender, TextChangedEventArgs e) { }
-
-        private void DetectOvhButton_Click(object sender, RoutedEventArgs e)
-        {
-            var email = EmailTextBox.Text?.Trim() ?? "";
-            var (imapHost, caldavBaseUrl) = ZimbraOvhDetection.SuggestFromEmail(email);
-            ImapHostTextBox.Text = imapHost;
-            CalDAVUrlTextBox.Text = caldavBaseUrl;
-            try
-            {
-                var uri = new System.Uri(caldavBaseUrl);
-                ServerTextBox.Text = uri.Host;
-            }
-            catch { ServerTextBox.Text = "ssl0.ovh.net"; }
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -49,8 +32,16 @@ namespace Palisades.View
             if (Account == null)
                 Account = new ZimbraAccount();
             Account.Email = email;
-            Account.Server = ServerTextBox.Text?.Trim() ?? "";
             Account.CalDAVBaseUrl = CalDAVUrlTextBox.Text?.Trim() ?? "";
+            try
+            {
+                var uri = new System.Uri(Account.CalDAVBaseUrl);
+                Account.Server = uri.Host;
+            }
+            catch
+            {
+                Account.Server = "";
+            }
             Account.ImapHost = ImapHostTextBox.Text?.Trim() ?? Account.Server;
             if (!string.IsNullOrEmpty(PasswordBox.Password))
                 Account.EncryptedPassword = CredentialEncryptor.Encrypt(PasswordBox.Password);

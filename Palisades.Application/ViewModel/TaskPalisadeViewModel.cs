@@ -14,7 +14,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Xml.Serialization;
 
 namespace Palisades.ViewModel
 {
@@ -184,7 +183,7 @@ namespace Palisades.ViewModel
         }
         #endregion
 
-        public TaskPalisadeViewModel() : this(new TaskPalisadeModel { Name = "Task Palisade", Width = 600, Height = 400 }, new CalDAVService("", "", ""))
+        public TaskPalisadeViewModel() : this(new TaskPalisadeModel { Name = "Task Palisade", Width = 600, Height = 400 }, new CalDAVService(new CalDAVClient("https://localhost/", "", "")))
         { }
 
         public TaskPalisadeViewModel(TaskPalisadeModel model, CalDAVService caldavService)
@@ -325,8 +324,7 @@ namespace Palisades.ViewModel
                     string saveDirectory = PDirectory.GetPalisadeDirectory(Identifier);
                     PDirectory.EnsureExists(saveDirectory);
                     using var writer = new System.IO.StreamWriter(System.IO.Path.Combine(saveDirectory, "state.xml"));
-                    XmlSerializer serializer = new XmlSerializer(typeof(TaskPalisadeModel));
-                    serializer.Serialize(writer, _model);
+                    ViewModelBase.SharedSerializer.Serialize(writer, _model);
                 }
                 catch { /* réessayer au prochain cycle */ }
                 finally { _shouldSave = false; }
@@ -423,20 +421,6 @@ namespace Palisades.ViewModel
             }
             catch { }
             settings.ShowDialog();
-        });
-
-        public ICommand OpenAboutCommand { get; private set; } = new RelayCommand<TaskPalisadeViewModel>((viewModel) =>
-        {
-            About about = new()
-            {
-                DataContext = new AboutViewModel()
-            };
-            try
-            {
-                about.Owner = PalisadesManager.GetWindow(viewModel.Identifier);
-            }
-            catch { }
-            about.ShowDialog();
         });
 
         public ICommand ForceSyncCommand

@@ -14,7 +14,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Xml.Serialization;
 
 namespace Palisades.ViewModel
 {
@@ -29,7 +28,7 @@ namespace Palisades.ViewModel
 
         public CalendarPalisadeViewModel() : this(
             new CalendarPalisadeModel { Name = "Calendar", Width = 500, Height = 400 },
-            new CalendarCalDAVService("", "", ""))
+            new CalendarCalDAVService(new CalDAVClient("https://localhost/", "", "")))
         { }
 
         public CalendarPalisadeViewModel(CalendarPalisadeModel model, CalendarCalDAVService calendarService)
@@ -78,7 +77,7 @@ namespace Palisades.ViewModel
         {
             if (_model.CalendarIds == null || _model.CalendarIds.Count == 0)
             {
-                Dispatch(() => { Events.Clear(); ErrorMessage = ""; });
+                Dispatch(() => { Events.Clear(); ErrorMessage = "No calendars configured. Right-click > Edit to configure."; });
                 return;
             }
             IsLoading = true;
@@ -125,27 +124,8 @@ namespace Palisades.ViewModel
                 action();
         }
 
-        protected override void SerializeModel(StreamWriter writer)
-        {
-            var serializer = new XmlSerializer(typeof(CalendarPalisadeModel));
-            serializer.Serialize(writer, _model);
-        }
-
         #region Commands
 
-        public ICommand NewPalisadeCommand { get; } = new RelayCommand(() => PalisadesManager.CreatePalisade());
-        public ICommand NewFolderPortalCommand { get; } = new RelayCommand(() => PalisadesManager.ShowCreateFolderPortalDialog());
-        public ICommand NewTaskPalisadeCommand { get; } = new RelayCommand(() => PalisadesManager.ShowCreateTaskPalisadeDialog());
-        public ICommand NewCalendarPalisadeCommand { get; } = new RelayCommand(() => PalisadesManager.ShowCreateCalendarPalisadeDialog());
-        public ICommand NewMailPalisadeCommand { get; } = new RelayCommand(() => PalisadesManager.ShowCreateMailPalisadeDialog());
-        public ICommand DeletePalisadeCommand { get; } = new RelayCommand<string>(id => PalisadesManager.DeletePalisade(id));
-        public ICommand OpenAboutCommand { get; } = new RelayCommand<ViewModelBase>(vm =>
-        {
-            if (vm == null) return;
-            var about = new About { DataContext = new AboutViewModel() };
-            try { about.Owner = PalisadesManager.GetWindow(vm.Identifier); } catch { }
-            about.ShowDialog();
-        });
         public ICommand RefreshCommand { get; } = new RelayCommand<CalendarPalisadeViewModel>(async vm => { if (vm != null) await vm.LoadEventsAsync(); });
 
         public ICommand EditCalendarPalisadeCommand { get; } = new RelayCommand<CalendarPalisadeViewModel>(vm =>
@@ -155,9 +135,5 @@ namespace Palisades.ViewModel
         });
 
         #endregion
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

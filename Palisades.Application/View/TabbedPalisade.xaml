@@ -289,7 +289,7 @@
             </Grid>
         </DataTemplate>
     </Window.Resources>
-    <Border x:Name="LayoutRoot" CornerRadius="20">
+    <Border x:Name="LayoutRoot" CornerRadius="20" ClipToBounds="True">
         <DockPanel>
             <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="#00000000">
                 <Grid.ColumnDefinitions>

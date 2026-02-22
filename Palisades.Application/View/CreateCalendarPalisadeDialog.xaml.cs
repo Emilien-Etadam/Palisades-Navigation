@@ -41,7 +41,8 @@ namespace Palisades.View
             }
             try
             {
-                var service = new CalendarCalDAVService(CalDAVUrl, Username, Password);
+                using var client = new CalDAVClient(CalDAVUrl, Username, Password);
+                var service = new CalendarCalDAVService(client);
                 _calendarList = await service.GetCalendarListAsync();
                 CalendarsListBox.ItemsSource = _calendarList;
                 CalendarsListBox.SelectedItems.Clear();
@@ -56,14 +57,14 @@ namespace Palisades.View
 
         private void CalendarsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            SelectedCalendarIds = CalendarsListBox.SelectedItems.Cast<CalDAVCalendarInfo>().Select(c => c.CalendarId).ToList();
+            SelectedCalendarIds = CalendarsListBox.SelectedItems.Cast<CalDAVCalendarInfo>().Select(c => c.Href).ToList();
         }
 
         private void CreateButton_Click(object sender, RoutedEventArgs e)
         {
             Password = PasswordBox.Password;
             if (CalendarsListBox.SelectedItems.Count > 0)
-                SelectedCalendarIds = CalendarsListBox.SelectedItems.Cast<CalDAVCalendarInfo>().Select(c => c.CalendarId).ToList();
+                SelectedCalendarIds = CalendarsListBox.SelectedItems.Cast<CalDAVCalendarInfo>().Select(c => c.Href).ToList();
             DialogResult = true;
             Close();
         }

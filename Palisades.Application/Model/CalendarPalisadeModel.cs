@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 
 namespace Palisades.Model
 {
+    [XmlType(Namespace = "io.stouder")]
     public class CalendarPalisadeModel : PalisadeModelBase
     {
         public CalendarPalisadeModel()

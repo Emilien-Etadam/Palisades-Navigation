@@ -14,7 +14,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Xml.Serialization;
 using System.Diagnostics;
 
 namespace Palisades.ViewModel
@@ -188,12 +187,6 @@ namespace Palisades.ViewModel
                 action();
         }
 
-        protected override void SerializeModel(StreamWriter writer)
-        {
-            var serializer = new XmlSerializer(typeof(MailPalisadeModel));
-            serializer.Serialize(writer, _model);
-        }
-
         public void OpenWebmail()
         {
             var url = _model.WebmailUrl?.Trim();
@@ -210,13 +203,6 @@ namespace Palisades.ViewModel
         public new ICommand NewCalendarPalisadeCommand { get; } = new RelayCommand(() => PalisadesManager.ShowCreateCalendarPalisadeDialog());
         public new ICommand NewMailPalisadeCommand { get; } = new RelayCommand(() => PalisadesManager.ShowCreateMailPalisadeDialog());
         public new ICommand DeletePalisadeCommand { get; } = new RelayCommand<string>(id => PalisadesManager.DeletePalisade(id));
-        public new ICommand OpenAboutCommand { get; } = new RelayCommand<ViewModelBase>(vm =>
-        {
-            if (vm == null) return;
-            var about = new About { DataContext = new AboutViewModel() };
-            try { about.Owner = PalisadesManager.GetWindow(vm.Identifier); } catch { }
-            about.ShowDialog();
-        });
         public ICommand RefreshCommand { get; } = new RelayCommand<MailPalisadeViewModel>(async vm => { if (vm != null) await vm.RefreshAsync(); });
         public ICommand OpenWebmailCommand { get; } = new RelayCommand<MailPalisadeViewModel>(vm => { vm?.OpenWebmail(); });
 

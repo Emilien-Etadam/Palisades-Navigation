@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Palisades.View"
         mc:Ignorable="d"
-        Title="Create Task Palisade" Height="400" Width="500"
-        WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+        Title="Create Task Palisade" MinHeight="450" Height="480" MinWidth="500" Width="500"
+        WindowStartupLocation="CenterOwner" ResizeMode="CanResize">
     
     <Window.Resources>
         <ResourceDictionary>
@@ -25,7 +25,10 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
@@ -38,7 +41,7 @@
         <TextBlock Text="CalDAV Server URL" Grid.Row="2" Margin="0,0,0,5"/>
         <TextBox x:Name="CalDAVUrlTextBox" Grid.Row="3" Margin="0,0,0,15" 
                  Text="{Binding CalDAVUrl, UpdateSourceTrigger=PropertyChanged}" 
-                 ToolTip="e.g., https://caldav.example.com/caldav.php"/>
+                 ToolTip="Ex: https://zimbra1.mail.ovh.net/dav/user@domain/"/>
 
         <!-- Username -->
         <TextBlock Text="Username" Grid.Row="4" Margin="0,0,0,5"/>
@@ -47,14 +50,13 @@
 
         <!-- Password -->
         <TextBlock Text="Password" Grid.Row="6" Margin="0,0,0,5"/>
-        <PasswordBox x:Name="PasswordBox" Grid.Row="7" Margin="0,0,0,15" 
-                    Password="{Binding Password, UpdateSourceTrigger=PropertyChanged}"/>
+        <PasswordBox x:Name="PasswordBox" Grid.Row="7" Margin="0,0,0,15"/>
 
         <!-- Task List ID -->
         <TextBlock Text="Task List ID" Grid.Row="8" Margin="0,0,0,5"/>
         <TextBox x:Name="TaskListIdTextBox" Grid.Row="9" Margin="0,0,0,15" 
                  Text="{Binding TaskListId, UpdateSourceTrigger=PropertyChanged}" 
-                 ToolTip="Leave empty to use default task list"/>
+                 ToolTip="Ex: Tasks (pour Zimbra OVH)"/>
 
         <!-- Buttons -->
         <StackPanel Grid.Row="10" Orientation="Horizontal" HorizontalAlignment="Right">

@@ -6,13 +6,11 @@ namespace Palisades.Tests.Helpers
     public class ZimbraOvhDetectionTests
     {
         [Fact]
-        public void SuggestFromEmail_WithEmail_ReturnsImapAndCaldav()
+        public void SuggestFromEmail_WithEmail_ReturnsImapAndEmptyCaldav()
         {
             var (imap, caldav) = ZimbraOvhDetection.SuggestFromEmail("user@domain.com");
-            Assert.Equal("mail.domain.com", imap);
-            Assert.Contains("user@domain.com", caldav);
-            Assert.StartsWith("https://", caldav);
-            Assert.Contains("/dav/", caldav);
+            Assert.Equal("ssl0.ovh.net", imap);
+            Assert.Equal("", caldav);
         }
 
         [Fact]

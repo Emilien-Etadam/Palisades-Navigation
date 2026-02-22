@@ -1,5 +1,4 @@
 using System;
-using System.Text.RegularExpressions;
 
 namespace Palisades.Helpers
 {
@@ -9,11 +8,11 @@ namespace Palisades.Helpers
     /// </summary>
     public static class ZimbraOvhDetection
     {
-        private static readonly Regex EmailRegex = new Regex(@"^[^@]+@(.+)$", RegexOptions.Compiled);
-
         /// <summary>
         /// Suggère l'hôte IMAP et l'URL de base CalDAV pour un email (conventions OVH Zimbra).
-        /// L'utilisateur peut ajuster manuellement.
+        /// IMAP OVH : ssl0.ovh.net fonctionne pour tous les domaines.
+        /// CalDAV OVH : le host exact dépend du nœud Zimbra attribué au compte ; on ne peut pas le deviner.
+        /// On laisse l'URL vide — l'utilisateur renseignera son URL réelle (ex: https://zimbra1.mail.ovh.net/dav/user@domain/).
         /// </summary>
         public static (string ImapHost, string CalDAVBaseUrl) SuggestFromEmail(string email)
         {
@@ -21,26 +20,8 @@ namespace Palisades.Helpers
                 return ("ssl0.ovh.net", "");
 
             email = email.Trim();
-            var match = EmailRegex.Match(email);
-            var domain = match.Success ? match.Groups[1].Value : "";
-
-            // OVH : souvent ssl0.ovh.net pour IMAP, et https://ssl0.ovh.net/dav/email@domain/ pour CalDAV
-            // Certains domaines ont un serveur dédié type mail.domaine.com
             string imapHost = "ssl0.ovh.net";
-            string hostForCalDav = "ssl0.ovh.net";
-            if (domain.EndsWith(".ovh", StringComparison.OrdinalIgnoreCase) ||
-                domain.EndsWith(".ovh.net", StringComparison.OrdinalIgnoreCase))
-            {
-                // Garder ssl0.ovh.net
-            }
-            else if (!string.IsNullOrEmpty(domain))
-            {
-                // Option : mail.domaine.com pour les domaines personnalisés OVH
-                hostForCalDav = "mail." + domain;
-                imapHost = "mail." + domain;
-            }
-
-            var caldavBaseUrl = $"https://{hostForCalDav}/dav/{email}/";
+            string caldavBaseUrl = "";
             return (imapHost, caldavBaseUrl);
         }
     }

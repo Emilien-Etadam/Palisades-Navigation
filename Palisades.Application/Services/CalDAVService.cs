@@ -3,10 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Ical.Net;
@@ -18,144 +14,77 @@ namespace Palisades.Services
 {
     public class CalDAVService
     {
-        private readonly string _caldavUrl;
-        private readonly HttpClient _httpClient;
+        private readonly CalDAVClient _client;
         private readonly CalendarSerializer _serializer = new CalendarSerializer();
 
-        /// <summary>
-        /// Vérifie que l'URL utilise HTTPS lorsqu'elle est renseignée (Phase 3.3).
-        /// </summary>
-        private static void EnsureHttps(string url)
+        public CalDAVService(CalDAVClient client)
         {
-            if (string.IsNullOrWhiteSpace(url)) return;
-            if (!url.TrimStart().StartsWith("https://", StringComparison.OrdinalIgnoreCase))
-                throw new InvalidOperationException("L'URL CalDAV doit utiliser HTTPS. Les connexions non sécurisées sont refusées.");
-        }
-
-        /// <param name="caldavUrl">Base CalDAV, ex. https://serveur/dav/email@domain/ (Zimbra OVH : tâches sous /Tasks)</param>
-        public CalDAVService(string caldavUrl, string username, string password)
-        {
-            _caldavUrl = (caldavUrl ?? "").TrimEnd('/');
-            EnsureHttps(_caldavUrl);
-
-            var handler = new HttpClientHandler
-            {
-                Credentials = new NetworkCredential(username ?? "", password ?? ""),
-                PreAuthenticate = true
-            };
-            _httpClient = new HttpClient(handler)
-            {
-                DefaultRequestHeaders =
-                {
-                    { "Depth", "1" },
-                    { "User-Agent", "Palisades/1.0" }
-                }
-            };
-            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
-            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/xml"));
-            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/calendar"));
+            _client = client ?? throw new ArgumentNullException(nameof(client));
         }
 
         public async Task<List<CalDAVTaskList>> GetTaskListsAsync()
         {
-            try
+            var calendars = await _client.DiscoverCalendarsAsync().ConfigureAwait(false);
+            var taskLists = new List<CalDAVTaskList>();
+            foreach (var c in calendars)
             {
-                var request = new HttpRequestMessage(new HttpMethod("PROPFIND"), _caldavUrl);
-                var response = await _httpClient.SendAsync(request);
-                response.EnsureSuccessStatusCode();
-                var body = await response.Content.ReadAsStringAsync();
-
-                var taskLists = new List<CalDAVTaskList>();
-                var xdoc = XDocument.Parse(body);
-                var ns = XNamespace.Get("DAV:");
-                var responses = xdoc.Descendants(ns + "response");
-                foreach (var resp in responses)
+                taskLists.Add(new CalDAVTaskList(c.DisplayName, c.DisplayName, c.Href)
                 {
-                    var href = resp.Descendants(ns + "href").FirstOrDefault()?.Value;
-                    var displayName = resp.Descendants(ns + "displayname").FirstOrDefault()?.Value;
-                    if (!string.IsNullOrEmpty(href) && (href.Contains("/tasks/", StringComparison.OrdinalIgnoreCase) || href.Contains("/calendars/", StringComparison.OrdinalIgnoreCase)))
-                    {
-                        taskLists.Add(new CalDAVTaskList
-                        {
-                            Name = href.Split('/').Last(),
-                            DisplayName = displayName ?? href.Split('/').Last(),
-                            CalDAVUrl = href
-                        });
-                    }
-                }
-                return taskLists;
+                    CalDAVUrl = c.Href,
+                    Name = c.CalendarId,
+                    DisplayName = c.DisplayName
+                });
             }
-            catch (Exception)
-            {
-                return new List<CalDAVTaskList>();
-            }
+            return taskLists;
         }
 
-        public async Task<List<CalDAVTask>> GetTasksAsync(string taskListId)
-        {
-            try
-            {
-                var taskListUrl = $"{_caldavUrl}/{taskListId}";
-                string requestBody = @"<?xml version='1.0' encoding='utf-8' ?>
+        private static readonly string CalendarQueryVtodoBody = @"<?xml version='1.0' encoding='utf-8' ?>
 <C:calendar-query xmlns:C=""urn:ietf:params:xml:ns:caldav"" xmlns:D=""DAV:"">
-    <D:prop>
-        <D:getetag/>
-        <C:calendar-data/>
-    </D:prop>
-    <C:filter>
-        <C:comp-filter name=""VCALENDAR"">
-            <C:comp-filter name=""VTODO""/>
-        </C:comp-filter>
-    </C:filter>
+  <D:prop>
+    <D:getetag/>
+    <C:calendar-data/>
+  </D:prop>
+  <C:filter>
+    <C:comp-filter name=""VCALENDAR"">
+      <C:comp-filter name=""VTODO""/>
+    </C:comp-filter>
+  </C:filter>
 </C:calendar-query>";
 
-                var request = new HttpRequestMessage(new HttpMethod("REPORT"), taskListUrl);
-                request.Content = new StringContent(requestBody, Encoding.UTF8, "application/xml");
-                var response = await _httpClient.SendAsync(request);
-                response.EnsureSuccessStatusCode();
-                var body = await response.Content.ReadAsStringAsync();
-                return ParseMultistatusCalendarData(body);
-            }
-            catch (Exception)
-            {
-                return new List<CalDAVTask>();
-            }
+        public async Task<List<CalDAVTask>> GetTasksAsync(string taskListHref)
+        {
+            var doc = await _client.ReportAsync(taskListHref, CalendarQueryVtodoBody).ConfigureAwait(false);
+            return ParseMultistatusCalendarData(doc);
         }
 
-        /// <summary>Parse une réponse multistatus CalDAV et extrait les VTODO en CalDAVTask (Phase 4.1).</summary>
-        private static List<CalDAVTask> ParseMultistatusCalendarData(string multistatusXml)
+        private static List<CalDAVTask> ParseMultistatusCalendarData(XDocument xdoc)
         {
             var tasks = new List<CalDAVTask>();
-            var dav = XNamespace.Get("DAV:");
-            var caldav = XNamespace.Get("urn:ietf:params:xml:ns:caldav");
-            try
+            var responses = CalDAVClient.ParseMultistatus(xdoc);
+
+            foreach (var (href, props, _) in responses)
             {
-                var xdoc = XDocument.Parse(multistatusXml);
-                foreach (var response in xdoc.Descendants(dav + "response"))
+                if (string.IsNullOrEmpty(href))
+                    continue;
+                var caldavId = href.Contains('/') ? href.Substring(href.LastIndexOf('/') + 1) : href;
+                if (!props.TryGetValue("getetag", out var etag))
+                    etag = "";
+                etag = etag.Trim('"');
+                if (!props.TryGetValue("calendar-data", out var calendarData) || string.IsNullOrWhiteSpace(calendarData))
+                    continue;
+
+                try
                 {
-                    var href = response.Descendants(dav + "href").FirstOrDefault()?.Value?.TrimEnd('/');
-                    if (string.IsNullOrEmpty(href)) continue;
-                    var caldavId = href.Contains('/') ? href.Substring(href.LastIndexOf('/') + 1) : href;
-                    var propstat = response.Descendants(dav + "propstat").FirstOrDefault(p => p.Element(dav + "status")?.Value?.Contains("200") == true);
-                    var prop = propstat?.Element(dav + "prop");
-                    if (prop == null) continue;
-                    var etagEl = prop.Element(dav + "getetag");
-                    var etag = etagEl?.Value?.Trim('"') ?? "";
-                    var calendarDataEl = prop.Element(caldav + "calendar-data");
-                    var calendarData = calendarDataEl?.Value;
-                    if (string.IsNullOrWhiteSpace(calendarData)) continue;
-                    try
-                    {
-                        var calendar = Calendar.Load(calendarData);
-                        foreach (var todo in calendar.Todos)
-                        {
-                            tasks.Add(MapTodoToCalDAVTask(todo, caldavId, etag));
-                        }
-                    }
-                    catch { /* ignorer un bloc calendar invalide */ }
+                    var calendar = Calendar.Load(calendarData);
+                    foreach (var todo in calendar.Todos)
+                        tasks.Add(MapTodoToCalDAVTask(todo, caldavId, etag));
+                }
+                catch
+                {
+                    /* ignorer un bloc calendar invalide */
                 }
             }
-            catch { }
+
             return tasks;
         }
 
@@ -179,7 +108,7 @@ namespace Palisades.Services
             };
         }
 
-        public async Task<CalDAVTask> CreateTaskAsync(string taskListId, CalDAVTask task)
+        public async Task<CalDAVTask> CreateTaskAsync(string taskListHref, CalDAVTask task)
         {
             var calendar = new Calendar();
             var uid = string.IsNullOrEmpty(task.Uid) ? Guid.NewGuid().ToString() : task.Uid;
@@ -197,20 +126,16 @@ namespace Palisades.Services
             calendar.Todos.Add(todo);
             var calendarData = _serializer.SerializeToString(calendar);
 
-            var taskListUrl = $"{_caldavUrl}/{taskListId}";
-            var taskFilename = $"{uid}.ics";
-            var request = new HttpRequestMessage(HttpMethod.Put, $"{taskListUrl}/{taskFilename}");
-            request.Content = new StringContent(calendarData, Encoding.UTF8, "text/calendar");
-            var response = await _httpClient.SendAsync(request);
-            response.EnsureSuccessStatusCode();
+            var resourceHref = taskListHref.TrimEnd('/') + "/" + uid + ".ics";
+            var createdEtag = await _client.PutAsync(resourceHref, calendarData).ConfigureAwait(false);
 
-            task.CalDAVId = taskFilename;
+            task.CalDAVId = uid + ".ics";
             task.Uid = uid;
-            task.CalDAVEtag = "created";
+            task.CalDAVEtag = createdEtag ?? "created";
             return task;
         }
 
-        public async Task UpdateTaskAsync(string taskListId, CalDAVTask task)
+        public async Task UpdateTaskAsync(string taskListHref, CalDAVTask task)
         {
             var calendar = new Calendar();
             var uid = !string.IsNullOrEmpty(task.Uid) ? task.Uid : (!string.IsNullOrEmpty(task.CalDAVId) ? Path.GetFileNameWithoutExtension(task.CalDAVId) : null) ?? Guid.NewGuid().ToString();
@@ -228,39 +153,33 @@ namespace Palisades.Services
             calendar.Todos.Add(todo);
             var calendarData = _serializer.SerializeToString(calendar);
 
-            var taskListUrl = $"{_caldavUrl}/{taskListId}";
-            var request = new HttpRequestMessage(HttpMethod.Put, $"{taskListUrl}/{task.CalDAVId}");
-            request.Content = new StringContent(calendarData, Encoding.UTF8, "text/calendar");
-            var response = await _httpClient.SendAsync(request);
-            response.EnsureSuccessStatusCode();
-            task.CalDAVEtag = "updated";
+            var resourceHref = taskListHref.TrimEnd('/') + "/" + task.CalDAVId;
+            var etag = await _client.PutAsync(resourceHref, calendarData, task.CalDAVEtag).ConfigureAwait(false);
+            task.CalDAVEtag = etag ?? "updated";
         }
 
-        public async Task DeleteTaskAsync(string taskListId, string taskId)
+        public async Task DeleteTaskAsync(string taskListHref, string taskId)
         {
-            var taskListUrl = $"{_caldavUrl}/{taskListId}";
-            var request = new HttpRequestMessage(HttpMethod.Delete, $"{taskListUrl}/{taskId}");
-            var response = await _httpClient.SendAsync(request);
-            response.EnsureSuccessStatusCode();
+            var resourceHref = taskListHref.TrimEnd('/') + "/" + taskId;
+            await _client.DeleteAsync(resourceHref).ConfigureAwait(false);
         }
 
-        /// <summary>Sync bidirectionnelle (Phase 4.3) : tâches distantes inconnues localement sont ajoutées, pas supprimées du serveur.</summary>
-        public async Task<List<CalDAVTask>> SyncTasksAsync(string taskListId, List<CalDAVTask> localTasks)
+        public async Task<List<CalDAVTask>> SyncTasksAsync(string taskListHref, List<CalDAVTask> localTasks)
         {
-            var remoteTasks = await GetTasksAsync(taskListId);
+            var remoteTasks = await GetTasksAsync(taskListHref).ConfigureAwait(false);
             var merged = new List<CalDAVTask>();
             foreach (var local in localTasks)
             {
                 var remote = remoteTasks.FirstOrDefault(r => r.CalDAVId == local.CalDAVId || (!string.IsNullOrEmpty(local.Uid) && r.Uid == local.Uid));
                 if (remote == null)
                 {
-                    var created = await CreateTaskAsync(taskListId, local);
+                    var created = await CreateTaskAsync(taskListHref, local).ConfigureAwait(false);
                     merged.Add(created);
                 }
                 else
                 {
                     if (local.LastModified > remote.LastModified)
-                        await UpdateTaskAsync(taskListId, local);
+                        await UpdateTaskAsync(taskListHref, local).ConfigureAwait(false);
                     merged.Add(local.LastModified >= remote.LastModified ? local : remote);
                 }
             }

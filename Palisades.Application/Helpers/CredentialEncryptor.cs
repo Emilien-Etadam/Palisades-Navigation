@@ -43,17 +43,5 @@ namespace Palisades.Helpers
                 return string.Empty;
             }
         }
-
-        /// <summary>
-        /// Conservé pour compatibilité des signatures ; le second paramètre est ignoré (DPAPI n'utilise pas de clé utilisateur).
-        /// </summary>
-        [Obsolete("Utiliser Encrypt(string) avec DPAPI.")]
-        public static string Encrypt(string plainText, string _) => Encrypt(plainText);
-
-        /// <summary>
-        /// Conservé pour compatibilité des signatures ; le second paramètre est ignoré.
-        /// </summary>
-        [Obsolete("Utiliser Decrypt(string) avec DPAPI.")]
-        public static string Decrypt(string cipherText, string _) => Decrypt(cipherText);
     }
 }

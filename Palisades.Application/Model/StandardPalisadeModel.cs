@@ -3,6 +3,7 @@ using System.Xml.Serialization;
 
 namespace Palisades.Model
 {
+    [XmlType(Namespace = "io.stouder")]
     public class StandardPalisadeModel : PalisadeModelBase
     {
         private ObservableCollection<Shortcut> _shortcuts = new();

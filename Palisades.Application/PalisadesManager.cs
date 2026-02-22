@@ -117,7 +117,8 @@ namespace Palisades
                     username = taskModel.CalDAVUsername ?? string.Empty;
                     password = CredentialEncryptor.Decrypt(taskModel.CalDAVPassword ?? "");
                 }
-                var caldavService = new Services.CalDAVService(caldavUrl, username, password);
+                var client = new CalDAVClient(caldavUrl, username, password);
+                var caldavService = new Services.CalDAVService(client);
                 return new TaskPalisadeViewModel(taskModel, caldavService);
             }
             if (concrete is CalendarPalisadeModel calendarModel)
@@ -137,7 +138,8 @@ namespace Palisades
                     username = calendarModel.CalDAVUsername ?? string.Empty;
                     password = CredentialEncryptor.Decrypt(calendarModel.CalDAVPassword ?? "");
                 }
-                var calendarService = new CalendarCalDAVService(caldavUrl, username, password);
+                var client = new CalDAVClient(caldavUrl, username, password);
+                var calendarService = new CalendarCalDAVService(client);
                 return new CalendarPalisadeViewModel(calendarModel, calendarService);
             }
             if (concrete is MailPalisadeModel mailModel)
@@ -190,7 +192,8 @@ namespace Palisades
             };
             if (x.HasValue) model.FenceX = x.Value;
             if (y.HasValue) model.FenceY = y.Value;
-            var caldavService = new Services.CalDAVService(caldavUrl, username, password);
+            var client = new CalDAVClient(caldavUrl, username, password);
+            var caldavService = new Services.CalDAVService(client);
             var viewModel = new TaskPalisadeViewModel(model, caldavService);
             palisades.Add(viewModel.Identifier, new TaskPalisade(viewModel));
             viewModel.Save();
@@ -230,7 +233,8 @@ namespace Palisades
             };
             if (x.HasValue) model.FenceX = x.Value;
             if (y.HasValue) model.FenceY = y.Value;
-            var calendarService = new CalendarCalDAVService(caldavUrl, username, password);
+            var client = new CalDAVClient(caldavUrl, username, password);
+            var calendarService = new CalendarCalDAVService(client);
             var viewModel = new CalendarPalisadeViewModel(model, calendarService);
             palisades.Add(viewModel.Identifier, new CalendarPalisade(viewModel));
             viewModel.Save();

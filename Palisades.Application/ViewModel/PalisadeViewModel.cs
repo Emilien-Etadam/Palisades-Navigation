@@ -1,160 +1,43 @@
+using GongSolutions.Wpf.DragDrop;
 using Palisades.Helpers;
 using Palisades.Model;
-using Palisades.Services;
 using Palisades.View;
 using System;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Collections.Specialized;
-using System.ComponentModel;
 using System.IO;
-using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Xml.Serialization;
 
 namespace Palisades.ViewModel
 {
-    public class PalisadeViewModel : INotifyPropertyChanged, IPalisadeViewModel
+    public class PalisadeViewModel : ViewModelBase, IDropTarget
     {
-        #region Attributs
-        private readonly StandardPalisadeModel model;
+        private readonly StandardPalisadeModel _model;
+        private Shortcut? _selectedShortcut;
 
-        private volatile bool shouldSave;
-        private Shortcut? selectedShortcut;
-        private readonly object _saveLock = new object();
-        private readonly System.Threading.Timer _saveTimer;
-        #endregion
+        public PalisadeViewModel() : this(new StandardPalisadeModel()) { }
 
-        #region Accessors
-        public string Identifier
+        public PalisadeViewModel(StandardPalisadeModel model) : base(model)
         {
-            get { return model.Identifier; }
-            set { model.Identifier = value; OnPropertyChanged(); Save(); }
+            _model = model;
+            Shortcuts.CollectionChanged += (_, _) => Save();
         }
-
-        public string Name
-        {
-            get { return model.Name; }
-            set { model.Name = value; OnPropertyChanged(); Save(); }
-        }
-
-        public int FenceX
-        {
-            get { return model.FenceX; }
-            set { model.FenceX = value; OnPropertyChanged(); Save(); }
-        }
-
-        public int FenceY
-        {
-            get { return model.FenceY; }
-            set { model.FenceY = value; OnPropertyChanged(); Save(); }
-        }
-
-        public int Width
-        {
-            get { return model.Width; }
-            set { model.Width = value; OnPropertyChanged(); Save(); }
-        }
-
-        public int Height
-        {
-            get { return model.Height; }
-            set { model.Height = value; OnPropertyChanged(); Save(); }
-        }
-
-        public Color HeaderColor
-        {
-            get { return model.HeaderColor; }
-            set { model.HeaderColor = value; OnPropertyChanged(); Save(); }
-        }
-
-        public Color BodyColor
-        {
-            get { return model.BodyColor; }
-            set { model.BodyColor = value; OnPropertyChanged(); Save(); }
-        }
-
-        public SolidColorBrush TitleColor
-        {
-            get => new(model.TitleColor);
-            set { model.TitleColor = value.Color; OnPropertyChanged(); Save(); }
-        }
-        public SolidColorBrush LabelsColor
-        {
-            get => new(model.LabelsColor);
-            set { model.LabelsColor = value.Color; OnPropertyChanged(); Save(); }
-        }
-
-        public string? GroupId { get => model.GroupId; set { model.GroupId = value; OnPropertyChanged(); Save(); } }
-        public int TabOrder { get => model.TabOrder; set { model.TabOrder = value; OnPropertyChanged(); Save(); } }
 
         public ObservableCollection<Shortcut> Shortcuts
         {
-            get { return model.Shortcuts; }
-            set { model.Shortcuts = value; OnPropertyChanged(); Save(); }
+            get => _model.Shortcuts;
+            set { _model.Shortcuts = value; OnPropertyChanged(); Save(); }
         }
 
         public Shortcut? SelectedShortcut
         {
-            get => selectedShortcut;
-            set { selectedShortcut = value; OnPropertyChanged(); }
-        }
-        #endregion
-
-        public PalisadeViewModel() : this(new StandardPalisadeModel()) { }
-
-        public PalisadeViewModel(StandardPalisadeModel model)
-        {
-            this.model = model;
-
-            OnPropertyChanged();
-            Shortcuts.CollectionChanged += (object? sender, NotifyCollectionChangedEventArgs e) =>
-            {
-                Save();
-            };
-
-            _saveTimer = new System.Threading.Timer(_ => SaveAsync(), null, 1000, 1000);
+            get => _selectedShortcut;
+            set { _selectedShortcut = value; OnPropertyChanged(); }
         }
 
-        #region Methods
-        public void Save()
+        public ICommand EditPalisadeCommand { get; } = new RelayCommand<PalisadeViewModel>(viewModel =>
         {
-            shouldSave = true;
-        }
-
-
-        public void Delete()
-        {
-            string saveDirectory = PDirectory.GetPalisadeDirectory(Identifier);
-            Directory.Delete(Path.Combine(saveDirectory), true);
-        }
-
-        #endregion
-
-        #region Commands
-        public ICommand NewPalisadeCommand { get; private set; } = new RelayCommand(() =>
-        {
-            PalisadesManager.CreatePalisade();
-        });
-
-        public ICommand NewFolderPortalCommand { get; private set; } = new RelayCommand(() =>
-        {
-            PalisadesManager.ShowCreateFolderPortalDialog();
-        });
-
-        public ICommand NewTaskPalisadeCommand { get; private set; } = new RelayCommand(() => PalisadesManager.ShowCreateTaskPalisadeDialog());
-        public ICommand NewCalendarPalisadeCommand { get; private set; } = new RelayCommand(() => PalisadesManager.ShowCreateCalendarPalisadeDialog());
-        public ICommand NewMailPalisadeCommand { get; private set; } = new RelayCommand(() => PalisadesManager.ShowCreateMailPalisadeDialog());
-        public ICommand ManageZimbraAccountsCommand { get; private set; } = new RelayCommand(() => { var d = new View.ManageAccountsDialog(); d.ShowDialog(); });
-
-        public ICommand DeletePalisadeCommand { get; private set; } = new RelayCommand<string>((identifier) => PalisadesManager.DeletePalisade(identifier));
-
-        public ICommand EditPalisadeCommand { get; private set; } = new RelayCommand<PalisadeViewModel>((viewModel) =>
-        {
-            EditPalisade edit = new()
+            var edit = new EditPalisade
             {
                 DataContext = viewModel,
                 Owner = PalisadesManager.GetWindow(viewModel.Identifier)
@@ -162,102 +45,85 @@ namespace Palisades.ViewModel
             edit.ShowDialog();
         });
 
-        public ICommand OpenAboutCommand { get; private set; } = new RelayCommand<PalisadeViewModel>((viewModel) =>
+        public void DragOver(IDropInfo dropInfo)
         {
-            About about = new()
+            if (dropInfo.Data is Shortcut)
             {
-                DataContext = new AboutViewModel(),
-                Owner = PalisadesManager.GetWindow(viewModel.Identifier)
-            };
-            about.ShowDialog();
-        });
-
-        public ICommand SaveSnapshotCommand { get; private set; } = new RelayCommand(() =>
-        {
-            var dialog = new SaveSnapshotDialog();
-            try { dialog.Owner = Application.Current.MainWindow; } catch { }
-            if (dialog.ShowDialog() == true && !string.IsNullOrWhiteSpace(dialog.SnapshotName))
-                LayoutSnapshotService.SaveSnapshot(dialog.SnapshotName.Trim());
-        });
-
-        public ICommand ManageSnapshotsCommand { get; private set; } = new RelayCommand(() =>
-        {
-            var dialog = new ManageSnapshotsDialog();
-            try { dialog.Owner = Application.Current.MainWindow; } catch { }
-            dialog.ShowDialog();
-        });
-
-        public ICommand RestoreSnapshotCommand { get; private set; } = new RelayCommand<string>(id =>
-        {
-            if (string.IsNullOrEmpty(id)) return;
-            if (MessageBox.Show("This will replace your current layout. Continue?", "Restore layout", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
-                return;
-            LayoutSnapshotService.RestoreSnapshot(id);
-        });
-
-        public ObservableCollection<LayoutSnapshot> RecentSnapshots { get; } = new();
-
-        public void RefreshRecentSnapshots()
-        {
-            RecentSnapshots.Clear();
-            foreach (var s in LayoutSnapshotService.ListSnapshots().Take(5))
-                RecentSnapshots.Add(s);
-        }
-
-        public ICommand DropShortcut
-        {
-            get
-            {
-                return new RelayCommand<DragEventArgs>(DropShortcutsHandler);
-            }
-        }
-
-        public void DropShortcutsHandler(DragEventArgs dragEventArgs)
-        {
-
-            dragEventArgs.Handled = true;
-            if (!dragEventArgs.Data.GetDataPresent(DataFormats.FileDrop))
-            {
-                dragEventArgs.Handled = false;
+                dropInfo.DropTargetAdorner = DropTargetAdorners.Insert;
+                dropInfo.Effects = System.Windows.DragDropEffects.Move;
                 return;
             }
 
-            string[] shortcuts = (string[])dragEventArgs.Data.GetData(DataFormats.FileDrop);
-            foreach (string shortcut in shortcuts)
+            if (dropInfo.Data is System.Windows.IDataObject dataObject
+                && dataObject.GetDataPresent(System.Windows.DataFormats.FileDrop))
             {
-                string? extension = Path.GetExtension(shortcut);
+                dropInfo.DropTargetAdorner = DropTargetAdorners.Highlight;
+                dropInfo.Effects = System.Windows.DragDropEffects.Copy;
+                return;
+            }
 
-                if (extension == null)
-                {
-                    continue;
-                }
-
-                if (extension == ".lnk")
-                {
-                    Shortcut? shortcutItem = LnkShortcut.BuildFrom(shortcut, Identifier);
-                    if (shortcutItem != null)
-                    {
-                        Shortcuts.Add(shortcutItem);
-                    }
-                }
-                if (extension == ".url")
-                {
-                    Shortcut? shortcutItem = UrlShortcut.BuildFrom(shortcut, Identifier);
-                    if (shortcutItem != null)
-                    {
-                        Shortcuts.Add(shortcutItem);
-                    }
-                }
+            if (dropInfo.Data is System.Windows.DataObject wpfDataObject
+                && wpfDataObject.GetDataPresent(System.Windows.DataFormats.FileDrop))
+            {
+                dropInfo.DropTargetAdorner = DropTargetAdorners.Highlight;
+                dropInfo.Effects = System.Windows.DragDropEffects.Copy;
+                return;
             }
         }
 
-        public ICommand ClickShortcut
+        public void Drop(IDropInfo dropInfo)
         {
-            get
+            if (dropInfo.Data is Shortcut shortcut)
             {
-                return new RelayCommand<Shortcut>(SelectShortcut);
+                if (dropInfo.DragInfo?.SourceCollection is System.Collections.IList sourceList
+                    && sourceList != Shortcuts)
+                {
+                    sourceList.Remove(shortcut);
+                }
+                else if (dropInfo.DragInfo?.SourceCollection == Shortcuts)
+                {
+                    Shortcuts.Remove(shortcut);
+                }
+
+                int insertIndex = dropInfo.InsertIndex;
+                if (insertIndex > Shortcuts.Count)
+                    insertIndex = Shortcuts.Count;
+                Shortcuts.Insert(insertIndex, shortcut);
+                return;
+            }
+
+            string[]? files = null;
+            if (dropInfo.Data is System.Windows.IDataObject dataObject
+                && dataObject.GetDataPresent(System.Windows.DataFormats.FileDrop))
+            {
+                files = (string[])dataObject.GetData(System.Windows.DataFormats.FileDrop);
+            }
+            else if (dropInfo.Data is System.Windows.DataObject wpfDataObject
+                && wpfDataObject.GetDataPresent(System.Windows.DataFormats.FileDrop))
+            {
+                files = (string[])wpfDataObject.GetData(System.Windows.DataFormats.FileDrop);
+            }
+
+            if (files != null)
+            {
+                foreach (string file in files)
+                {
+                    string? extension = System.IO.Path.GetExtension(file);
+                    if (extension == null) continue;
+
+                    Shortcut? shortcutItem = null;
+                    if (extension == ".lnk")
+                        shortcutItem = LnkShortcut.BuildFrom(file, Identifier);
+                    else if (extension == ".url")
+                        shortcutItem = UrlShortcut.BuildFrom(file, Identifier);
+
+                    if (shortcutItem != null)
+                        Shortcuts.Add(shortcutItem);
+                }
             }
         }
+
+        public ICommand ClickShortcut => new RelayCommand<Shortcut>(SelectShortcut);
 
         public void SelectShortcut(Shortcut shortcut)
         {
@@ -269,52 +135,14 @@ namespace Palisades.ViewModel
             SelectedShortcut = shortcut;
         }
 
-        public ICommand DelKeyPressed
-        {
-            get
-            {
-                return new RelayCommand(DeleteShortcut);
-            }
-        }
+        public ICommand DelKeyPressed => new RelayCommand(DeleteShortcut);
 
         public void DeleteShortcut()
         {
-            if(SelectedShortcut == null)
-            {
-                return;
-            }
-
+            if (SelectedShortcut == null) return;
             Shortcuts.Remove(SelectedShortcut);
             SelectedShortcut = null;
         }
 
-        /// <summary>
-        /// Callback du timer : sauvegarde toutes les 1 s si nécessaire.
-        /// </summary>
-        private void SaveAsync()
-        {
-            if (!shouldSave) return;
-            lock (_saveLock)
-            {
-                if (!shouldSave) return;
-                try
-                {
-                    string saveDirectory = PDirectory.GetPalisadeDirectory(Identifier);
-                    PDirectory.EnsureExists(saveDirectory);
-                    using StreamWriter writer = new(Path.Combine(saveDirectory, "state.xml"));
-                    XmlSerializer serializer = new(typeof(StandardPalisadeModel), new Type[] { typeof(Shortcut), typeof(LnkShortcut), typeof(UrlShortcut) });
-                    serializer.Serialize(writer, this.model);
-                }
-                catch { /* réessayer au prochain cycle */ }
-                finally { shouldSave = false; }
-            }
-        }
-        #endregion
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-        private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
     }
 }

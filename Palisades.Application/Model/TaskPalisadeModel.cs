@@ -1,7 +1,9 @@
 using System;
+using System.Xml.Serialization;
 
 namespace Palisades.Model
 {
+    [XmlType(Namespace = "io.stouder")]
     public class TaskPalisadeModel : PalisadeModelBase
     {
         public TaskPalisadeModel()

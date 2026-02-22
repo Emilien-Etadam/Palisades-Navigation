@@ -37,7 +37,7 @@
             <helpers:BindingProxy x:Key="proxy" Data="{Binding}" />
         </ResourceDictionary>
     </Window.Resources>
-    <Border x:Name="LayoutRoot" CornerRadius="20">
+    <Border x:Name="LayoutRoot" CornerRadius="20" ClipToBounds="True">
         <DockPanel>
             <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="#00000000">
                 <Grid.ContextMenu>
@@ -71,7 +71,7 @@
                             <MenuItem Header="Manage layouts..." Command="{Binding Path=Data.ManageSnapshotsCommand, Source={StaticResource proxy}}" />
                         </MenuItem>
                         <Separator />
-                        <MenuItem Header="About" Command="{Binding Path=Data.OpenAboutCommand, Source={StaticResource proxy}}" CommandParameter="{Binding}" />
+                        <MenuItem Header="About" Command="{Binding Path=Data.OpenAboutCommand, Source={StaticResource proxy}}" />
                     </ContextMenu>
                 </Grid.ContextMenu>
                 <Grid.ColumnDefinitions>

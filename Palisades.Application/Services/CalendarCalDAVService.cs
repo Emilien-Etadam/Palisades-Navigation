@@ -2,110 +2,44 @@ using Palisades.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Ical.Net;
 using Ical.Net.CalendarComponents;
-using Ical.Net.DataTypes;
+using System.Windows.Media;
 
 namespace Palisades.Services
 {
     /// <summary>
-    /// Service CalDAV pour les calendriers (VEVENT). Réutilise le même schéma d'authentification que CalDAVService.
+    /// Service CalDAV pour les calendriers (VEVENT). Utilise CalDAVClient pour le transport.
     /// </summary>
     public class CalendarCalDAVService
     {
-        private readonly string _caldavBaseUrl;
-        private readonly HttpClient _httpClient;
+        private readonly CalDAVClient _client;
 
-        public CalendarCalDAVService(string caldavBaseUrl, string username, string password)
+        public CalendarCalDAVService(CalDAVClient client)
         {
-            _caldavBaseUrl = (caldavBaseUrl ?? "").TrimEnd('/');
-            if (!string.IsNullOrEmpty(_caldavBaseUrl) && !_caldavBaseUrl.TrimStart().StartsWith("https://", StringComparison.OrdinalIgnoreCase))
-                throw new InvalidOperationException("L'URL CalDAV doit utiliser HTTPS.");
-
-            var handler = new HttpClientHandler
-            {
-                Credentials = new NetworkCredential(username ?? "", password ?? ""),
-                PreAuthenticate = true
-            };
-            _httpClient = new HttpClient(handler)
-            {
-                DefaultRequestHeaders =
-                {
-                    { "Depth", "1" },
-                    { "User-Agent", "Palisades/1.0" }
-                }
-            };
-            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
-            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/calendar"));
+            _client = client ?? throw new ArgumentNullException(nameof(client));
         }
 
         /// <summary>
-        /// Découvre les collections de type calendrier (PROPFIND).
-        /// Pour Zimbra : souvent sous /Calendar ou /Calendars.
+        /// Découvre les collections de type calendrier (délègue à CalDAVClient.DiscoverCalendarsAsync).
         /// </summary>
         public async Task<List<CalDAVCalendarInfo>> GetCalendarListAsync()
         {
-            var list = new List<CalDAVCalendarInfo>();
-            try
-            {
-                string body = @"<?xml version='1.0' encoding='utf-8' ?>
-<D:propfind xmlns:D=""DAV:"">
-  <D:prop>
-    <D:resourcetype/>
-    <D:displayname/>
-  </D:prop>
-</D:propfind>";
-                var request = new HttpRequestMessage(new HttpMethod("PROPFIND"), _caldavBaseUrl);
-                request.Content = new StringContent(body, Encoding.UTF8, "application/xml");
-                request.Headers.Add("Depth", "1");
-                var response = await _httpClient.SendAsync(request);
-                response.EnsureSuccessStatusCode();
-                var xml = await response.Content.ReadAsStringAsync();
-                var dav = XNamespace.Get("DAV:");
-                var xdoc = XDocument.Parse(xml);
-                foreach (var resp in xdoc.Descendants(dav + "response"))
-                {
-                    var href = resp.Descendants(dav + "href").FirstOrDefault()?.Value?.TrimEnd('/');
-                    if (string.IsNullOrEmpty(href)) continue;
-                    var propstat = resp.Descendants(dav + "propstat").FirstOrDefault(p => p.Element(dav + "status")?.Value?.Contains("200") == true);
-                    var prop = propstat?.Element(dav + "prop");
-                    if (prop == null) continue;
-                    var resourcetype = prop.Element(dav + "resourcetype");
-                    var isCalendar = resourcetype?.Descendants().Any(e => e.Name.LocalName.Equals("calendar", StringComparison.OrdinalIgnoreCase)) == true;
-                    if (!isCalendar) continue;
-                    var displayName = prop.Element(dav + "displayname")?.Value ?? (href.Contains('/') ? href.Substring(href.LastIndexOf('/') + 1) : href);
-                    var calendarId = href.Contains('/') ? href.Substring(href.LastIndexOf('/') + 1) : href;
-                    list.Add(new CalDAVCalendarInfo
-                    {
-                        CalendarId = calendarId,
-                        DisplayName = displayName,
-                        Href = href
-                    });
-                }
-            }
-            catch { }
-            return list;
+            return await _client.DiscoverCalendarsAsync().ConfigureAwait(false);
         }
 
         /// <summary>
         /// Récupère les événements (VEVENT) dans la plage [start, end] pour un calendrier.
-        /// calendarIdOrHref : id court (nom de collection) ou URL complète.
+        /// calendarHref : HREF complet de la collection calendrier.
         /// </summary>
-        public async Task<List<Palisades.Model.CalendarEvent>> GetEventsAsync(string calendarIdOrHref, DateTime start, DateTime end)
+        public async Task<List<Model.CalendarEvent>> GetEventsAsync(string calendarHref, DateTime start, DateTime end)
         {
-            var events = new List<Palisades.Model.CalendarEvent>();
-            string calendarUrl = calendarIdOrHref.Contains("http") ? calendarIdOrHref : $"{_caldavBaseUrl}/{calendarIdOrHref}";
-            try
-            {
-                string startUtc = start.ToUniversalTime().ToString("yyyyMMddTHHmmssZ");
-                string endUtc = end.ToUniversalTime().ToString("yyyyMMddTHHmmssZ");
-                string requestBody = $@"<?xml version='1.0' encoding='utf-8' ?>
+            var events = new List<Model.CalendarEvent>();
+            var startUtc = start.ToUniversalTime().ToString("yyyyMMddTHHmmssZ");
+            var endUtc = end.ToUniversalTime().ToString("yyyyMMddTHHmmssZ");
+            var requestBody = $@"<?xml version='1.0' encoding='utf-8' ?>
 <C:calendar-query xmlns:C=""urn:ietf:params:xml:ns:caldav"" xmlns:D=""DAV:"">
   <D:prop>
     <D:getetag/>
@@ -119,57 +53,42 @@ namespace Palisades.Services
     </C:comp-filter>
   </C:filter>
 </C:calendar-query>";
-                var request = new HttpRequestMessage(new HttpMethod("REPORT"), calendarUrl);
-                request.Content = new StringContent(requestBody, Encoding.UTF8, "application/xml");
-                var response = await _httpClient.SendAsync(request);
-                response.EnsureSuccessStatusCode();
-                var body = await response.Content.ReadAsStringAsync();
-                ParseEventsFromMultistatus(body, calendarIdOrHref, "Calendar", System.Windows.Media.Colors.SlateGray, events);
-            }
-            catch { }
+
+            var doc = await _client.ReportAsync(calendarHref, requestBody).ConfigureAwait(false);
+            ParseEventsFromMultistatus(doc, calendarHref, "Calendar", Colors.SlateGray, events);
             return events;
         }
 
-        /// <summary>
-        /// Parse une réponse multistatus CalDAV et remplit la liste d'événements.
-        /// </summary>
-        private static void ParseEventsFromMultistatus(string multistatusXml, string calendarId, string calendarName, System.Windows.Media.Color defaultColor, List<Palisades.Model.CalendarEvent> events)
+        private static void ParseEventsFromMultistatus(XDocument xdoc, string calendarId, string calendarName, Color defaultColor, List<Model.CalendarEvent> events)
         {
-            var dav = XNamespace.Get("DAV:");
-            var caldav = XNamespace.Get("urn:ietf:params:xml:ns:caldav");
-            try
+            var responses = CalDAVClient.ParseMultistatus(xdoc);
+            foreach (var (href, props, _) in responses)
             {
-                var xdoc = XDocument.Parse(multistatusXml);
-                foreach (var response in xdoc.Descendants(dav + "response"))
+                if (string.IsNullOrEmpty(href))
+                    continue;
+                if (!props.TryGetValue("getetag", out var etag))
+                    etag = "";
+                etag = etag.Trim('"');
+                if (!props.TryGetValue("calendar-data", out var calendarData) || string.IsNullOrWhiteSpace(calendarData))
+                    continue;
+                try
                 {
-                    var href = response.Descendants(dav + "href").FirstOrDefault()?.Value?.TrimEnd('/');
-                    if (string.IsNullOrEmpty(href)) continue;
-                    var propstat = response.Descendants(dav + "propstat").FirstOrDefault(p => p.Element(dav + "status")?.Value?.Contains("200") == true);
-                    var prop = propstat?.Element(dav + "prop");
-                    if (prop == null) continue;
-                    var etag = prop.Element(dav + "getetag")?.Value?.Trim('"') ?? "";
-                    var calendarDataEl = prop.Element(caldav + "calendar-data");
-                    var calendarData = calendarDataEl?.Value;
-                    if (string.IsNullOrWhiteSpace(calendarData)) continue;
-                    try
-                    {
-                        var calendar = Ical.Net.Calendar.Load(calendarData);
-                        foreach (var evt in calendar.Events)
-                        {
-                            events.Add(MapIcalEventToCalendarEvent(evt, href, etag, calendarName, defaultColor));
-                        }
-                    }
-                    catch { }
+                    var calendar = Ical.Net.Calendar.Load(calendarData);
+                    foreach (var evt in calendar.Events)
+                        events.Add(MapIcalEventToCalendarEvent(evt, href, etag, calendarName, defaultColor));
+                }
+                catch
+                {
+                    /* ignorer un bloc calendar invalide */
                 }
             }
-            catch { }
         }
 
-        private static Palisades.Model.CalendarEvent MapIcalEventToCalendarEvent(Ical.Net.CalendarComponents.CalendarEvent evt, string caldavHref, string etag, string calendarName, System.Windows.Media.Color color)
+        private static Model.CalendarEvent MapIcalEventToCalendarEvent(Ical.Net.CalendarComponents.CalendarEvent evt, string caldavHref, string etag, string calendarName, Color color)
         {
             var start = evt.Start?.Value ?? DateTime.MinValue;
             var end = evt.End?.Value ?? evt.Start?.Value ?? DateTime.MinValue;
-            return new Palisades.Model.CalendarEvent
+            return new Model.CalendarEvent
             {
                 Uid = evt.Uid ?? "",
                 Summary = evt.Summary ?? "",

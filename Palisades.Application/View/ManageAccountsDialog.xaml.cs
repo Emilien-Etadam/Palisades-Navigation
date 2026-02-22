@@ -73,7 +73,8 @@ namespace Palisades.View
                 // Test CalDAV
                 if (!string.IsNullOrEmpty(acc.CalDAVBaseUrl))
                 {
-                    var caldav = new Services.CalDAVService(acc.CalDAVBaseUrl, acc.Email, password);
+                    using var client = new CalDAVClient(acc.CalDAVBaseUrl, acc.Email ?? "", password);
+                    var caldav = new Services.CalDAVService(client);
                     await caldav.GetTaskListsAsync();
                 }
                 // Test IMAP if host set

@@ -91,8 +91,8 @@ Les erreurs de synchronisation sont affichées dans l'interface utilisateur de l
 - `CredentialEncryptor.cs` : Gère le chiffrement des informations d'identification
 
 ### Dépendances
-- DDay.iCal : Pour la manipulation des données iCalendar
-- CalDAVSharp : Pour la communication CalDAV (optionnel, peut utiliser des requêtes HTTP directes)
+- Ical.Net : Pour la manipulation des données iCalendar (RFC 5545)
+- Communication CalDAV : Requêtes HTTP directes (PROPFIND, REPORT, PUT, DELETE)
 
 ### Tests
 Des tests unitaires sont disponibles dans `CalDAVServiceTests.cs`. Pour exécuter les tests avec un serveur CalDAV réel, vous devrez configurer un serveur de test et mettre à jour les informations d'identification dans les tests.

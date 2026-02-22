@@ -1,5 +1,8 @@
+using System.Xml.Serialization;
+
 namespace Palisades.Model
 {
+    [XmlType(Namespace = "io.stouder")]
     public class FolderPortalModel : PalisadeModelBase
     {
         private string _rootPath = "";
