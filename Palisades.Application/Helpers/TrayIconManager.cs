@@ -1,7 +1,6 @@
 using System;
 using System.Drawing;
 using System.IO;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Forms;
 using Palisades.View;
@@ -18,24 +17,13 @@ namespace Palisades.Helpers
             _notifyIcon = new NotifyIcon();
 
             Icon? icon = null;
+            var iconPath = System.IO.Path.Combine(AppContext.BaseDirectory, "Ressources", "icon.ico");
             try
             {
-                var exePath = Assembly.GetExecutingAssembly().Location;
-                if (!string.IsNullOrEmpty(exePath))
-                    icon = Icon.ExtractAssociatedIcon(exePath);
+                if (File.Exists(iconPath))
+                    icon = new Icon(iconPath);
             }
             catch { }
-
-            if (icon == null)
-            {
-                try
-                {
-                    var iconPath = Path.Combine(AppContext.BaseDirectory, "Ressources", "icon.ico");
-                    if (File.Exists(iconPath))
-                        icon = new Icon(iconPath);
-                }
-                catch { }
-            }
 
             if (icon == null)
                 icon = SystemIcons.Application;

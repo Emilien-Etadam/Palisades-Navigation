@@ -13,7 +13,6 @@
     <SignAssembly>False</SignAssembly>
     <PackageId>Palisades</PackageId>
     <Version>0.4.0</Version>
-    <InformationalVersion>0.4.0</InformationalVersion>
     <Authors>Xavier Stouder</Authors>
     <Company>StouderIO</Company>
     <Product>Palisades</Product>
