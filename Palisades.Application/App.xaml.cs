@@ -149,7 +149,19 @@ namespace Palisades
 
             try
             {
-                await UpdateChecker.ApplyUpdateAsync(update);
+                var progressHandler = new Progress<double>(percent =>
+                {
+                    Current.Dispatcher.Invoke(() =>
+                    {
+                        try
+                        {
+                            if (Application.Current.MainWindow != null)
+                                Application.Current.MainWindow.Title = $"Palisades — Downloading update: {percent:F0}%";
+                        }
+                        catch { }
+                    });
+                });
+                await UpdateChecker.ApplyUpdateAsync(update, progressHandler);
                 Current.Dispatcher.Invoke(() => Current.Shutdown());
             }
             catch (Exception ex)

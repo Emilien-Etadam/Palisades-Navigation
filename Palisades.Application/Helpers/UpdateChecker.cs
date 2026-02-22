@@ -62,15 +62,29 @@ namespace Palisades.Helpers
             }
         }
 
-        public static async Task ApplyUpdateAsync(UpdateInfo update)
+        public static async Task ApplyUpdateAsync(UpdateInfo update, IProgress<double>? progress = null)
         {
             var tempInstaller = Path.Combine(Path.GetTempPath(), $"Palisades-{update.Version}-setup.exe");
 
             using (var client = CreateClient())
             {
-                client.Timeout = TimeSpan.FromMinutes(10);
-                var bytes = await client.GetByteArrayAsync(update.AssetUrl).ConfigureAwait(false);
-                await File.WriteAllBytesAsync(tempInstaller, bytes).ConfigureAwait(false);
+                using var response = await client.GetAsync(update.AssetUrl, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+                response.EnsureSuccessStatusCode();
+                var totalBytes = response.Content.Headers.ContentLength ?? -1L;
+
+                await using var contentStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                await using var fileStream = new FileStream(tempInstaller, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true);
+
+                var buffer = new byte[8192];
+                long totalRead = 0;
+                int bytesRead;
+                while ((bytesRead = await contentStream.ReadAsync(buffer).ConfigureAwait(false)) > 0)
+                {
+                    await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead)).ConfigureAwait(false);
+                    totalRead += bytesRead;
+                    if (totalBytes > 0)
+                        progress?.Report((double)totalRead / totalBytes * 100);
+                }
             }
 
             Process.Start(new ProcessStartInfo
