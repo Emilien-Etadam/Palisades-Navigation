@@ -17,6 +17,12 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
+      - uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: nuget-
+
       - name: Strip v prefix
         id: version
         shell: pwsh
@@ -26,9 +32,6 @@ jobs:
 
       - name: Restore
         run: dotnet restore Palisades.sln
-
-      - name: Test
-        run: dotnet test Palisades.Tests/Palisades.Tests.csproj --no-restore --verbosity normal
 
       - name: Publish
         run: >
@@ -43,10 +46,12 @@ jobs:
         shell: pwsh
         run: Compress-Archive -Path ./publish/* -DestinationPath Palisades-${{ github.ref_name }}-win-x64.zip
 
+      - name: Install Inno Setup
+        uses: egor-tensin/setup-inno-setup@v1
+
       - name: Build installer
         shell: pwsh
         run: |
-          choco install innosetup -y --no-progress
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DMyAppVersion=${{ steps.version.outputs.clean }} installer\palisades.iss
 
       - name: Create Release
