@@ -65,7 +65,7 @@
             </ContextMenu>
         </Grid.ContextMenu>
         <Border x:Name="Header" Background="{DynamicResource PalisadeWindowBrush}" CornerRadius="0" 
-                Height="30" VerticalAlignment="Top" MouseLeftButtonDown="Header_MouseLeftButtonDown">
+                Height="32" VerticalAlignment="Top" MouseLeftButtonDown="Header_MouseLeftButtonDown">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="{Binding Name, Mode=OneWay}" Foreground="{DynamicResource PalisadeTextBrush}" 
                            VerticalAlignment="Center" Margin="10,0,0,0" FontWeight="Bold"/>

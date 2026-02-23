@@ -274,8 +274,8 @@
     </Window.Resources>
     <Border x:Name="LayoutRoot" CornerRadius="0" ClipToBounds="True">
         <DockPanel>
-            <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource PalisadeWindowBrush}" ColumnDefinitions="80,*,80">
-                <Label Grid.Column="1" Content="{Binding SelectedItem.Name, ElementName=TabControl}" Margin="5" FontSize="28" Foreground="{DynamicResource PalisadeTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <Grid DockPanel.Dock="Top" x:Name="Header" Height="32" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource PalisadeWindowBrush}" ColumnDefinitions="80,*,80">
+                <Label Grid.Column="1" Content="{Binding SelectedItem.Name, ElementName=TabControl}" Margin="5,0" FontSize="16" Foreground="{DynamicResource PalisadeTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
             </Grid>
             <TabControl x:Name="TabControl" ItemsSource="{Binding Members}" Style="{StaticResource FlatTabStyle}"
                         ItemContainerStyle="{StaticResource FlatTabItemStyle}"

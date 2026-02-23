@@ -70,15 +70,15 @@
                         <MenuItem Header="About" Command="{Binding Path=Data.OpenAboutCommand, Source={StaticResource proxy}}" />
                     </ContextMenu>
                 </Grid.ContextMenu>
-                <Grid Grid.Row="0" Background="{DynamicResource PalisadeWindowBrush}" ColumnDefinitions="Auto,*,Auto">
+                <Grid Grid.Row="0" Height="32" Background="{DynamicResource PalisadeWindowBrush}" ColumnDefinitions="Auto,*,Auto">
                     <Button Grid.Column="0"
                             Command="{Binding NavigateBackCommand}"
                             Background="Transparent"
                             BorderBrush="Transparent"
                             Foreground="{DynamicResource PalisadeTextBrush}"
-                            FontSize="18"
+                            FontSize="14"
                             FontWeight="Bold"
-                            Padding="10,5"
+                            Padding="6,2"
                             Cursor="Hand"
                             ToolTip="Navigate back"
                             Visibility="{Binding CanNavigateBack, Converter={StaticResource BoolToVis}}">
@@ -102,7 +102,7 @@
                         </Button.Style>
                         &#x2190;
                     </Button>
-                    <Label Grid.Column="1" Content="{Binding Name, Mode=OneWay}" Margin="5" FontSize="28" Foreground="{DynamicResource PalisadeTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <Label Grid.Column="1" Content="{Binding Name, Mode=OneWay}" Margin="5,0" FontSize="16" Foreground="{DynamicResource PalisadeTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
 
                     <!-- Home button -->
                     <Button Grid.Column="2"
@@ -110,8 +110,8 @@
                             Background="Transparent"
                             BorderBrush="Transparent"
                             Foreground="{DynamicResource PalisadeTextBrush}"
-                            FontSize="16"
-                            Padding="10,5"
+                            FontSize="14"
+                            Padding="6,2"
                             Cursor="Hand"
                             ToolTip="Go to root folder"
                             Visibility="{Binding CanNavigateBack, Converter={StaticResource BoolToVis}}">

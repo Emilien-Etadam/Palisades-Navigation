@@ -121,26 +121,24 @@ namespace Palisades
                 var caldavService = new Services.CalDAVService(client);
                 return new TaskPalisadeViewModel(taskModel, caldavService);
             }
-            if (concrete is CalendarPalisadeModel calendarModel)
+            if (concrete is CalendarPalisadeModel calModel)
             {
-                string caldavUrl;
-                string username;
-                string password;
-                if (calendarModel.ZimbraAccountId is Guid accountId && ZimbraAccountStore.GetById(accountId) is ZimbraAccount account)
+                string calUrl = calModel.CalDAVBaseUrl ?? "";
+                string calUser = calModel.CalDAVUsername ?? "";
+                string calPass = "";
+                if (calModel.ZimbraAccountId is Guid zimbraId && ZimbraAccountStore.GetById(zimbraId) is ZimbraAccount zimbraAcc)
                 {
-                    caldavUrl = account.CalDAVBaseUrl ?? string.Empty;
-                    username = account.Email ?? string.Empty;
-                    password = CredentialEncryptor.Decrypt(account.EncryptedPassword ?? "");
+                    calUrl = !string.IsNullOrEmpty(zimbraAcc.CalDAVBaseUrl) ? zimbraAcc.CalDAVBaseUrl : calUrl;
+                    calUser = !string.IsNullOrEmpty(zimbraAcc.Email) ? zimbraAcc.Email : calUser;
+                    calPass = CredentialEncryptor.Decrypt(zimbraAcc.EncryptedPassword ?? "");
                 }
                 else
                 {
-                    caldavUrl = calendarModel.CalDAVBaseUrl ?? string.Empty;
-                    username = calendarModel.CalDAVUsername ?? string.Empty;
-                    password = CredentialEncryptor.Decrypt(calendarModel.CalDAVPassword ?? "");
+                    calPass = CredentialEncryptor.Decrypt(calModel.CalDAVPassword ?? "");
                 }
-                var client = new CalDAVClient(caldavUrl, username, password);
-                var calendarService = new CalendarCalDAVService(client);
-                return new CalendarPalisadeViewModel(calendarModel, calendarService);
+                var calClient = new CalDAVClient(calUrl, calUser, calPass);
+                var calService = new CalendarCalDAVService(calClient);
+                return new CalendarPalisadeViewModel(calModel, calService);
             }
             if (concrete is MailPalisadeModel mailModel)
                 return new MailPalisadeViewModel(mailModel);
@@ -264,7 +262,7 @@ namespace Palisades
 
             var client = new CalDAVClient(model.CalDAVBaseUrl, model.CalDAVUsername, CredentialEncryptor.Decrypt(model.CalDAVPassword));
             var service = new CalendarCalDAVService(client);
-            var vm = new CalendarPalisadeViewModel(model, service);
+            var vm = new ViewModel.CalendarPalisadeViewModel(model, service);
             vm.Save();
 
             var window = new View.CalendarPalisade(vm);

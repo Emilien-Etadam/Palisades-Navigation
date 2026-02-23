@@ -32,7 +32,7 @@
     </Window.Resources>
     <Border x:Name="LayoutRoot" CornerRadius="0" ClipToBounds="True">
         <DockPanel>
-            <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource PalisadeWindowBrush}" ColumnDefinitions="*,Auto">
+            <Grid DockPanel.Dock="Top" x:Name="Header" Height="32" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource PalisadeWindowBrush}" ColumnDefinitions="*,Auto">
                 <Grid.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Refresh" Command="{Binding RefreshCommand}" CommandParameter="{Binding}" />
@@ -67,8 +67,8 @@
                         <MenuItem Header="About" Command="{Binding Path=Data.OpenAboutCommand, Source={StaticResource proxy}}" />
                     </ContextMenu>
                 </Grid.ContextMenu>
-                <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="8" VerticalAlignment="Center">
-                    <TextBlock Text="{Binding Name, Mode=OneWay}" FontSize="16" Foreground="{DynamicResource PalisadeTextBrush}" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="8,0" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Name, Mode=OneWay}" FontSize="14" Foreground="{DynamicResource PalisadeTextBrush}" VerticalAlignment="Center" FontWeight="SemiBold"/>
                     <Border Background="{DynamicResource PalisadeHighlightBrush}" CornerRadius="12" Padding="8,2" Margin="10,0,0,0" VerticalAlignment="Center">
                         <TextBlock Text="{Binding TotalUnreadCount, Mode=OneWay}" FontWeight="Bold" Foreground="{DynamicResource PalisadeHighlightTextBrush}"/>
                     </Border>

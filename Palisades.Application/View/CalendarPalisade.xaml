@@ -32,7 +32,7 @@
     </Window.Resources>
     <Border x:Name="LayoutRoot" CornerRadius="0" ClipToBounds="True">
         <DockPanel>
-            <Grid DockPanel.Dock="Top" x:Name="Header" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource PalisadeWindowBrush}" ColumnDefinitions="*,Auto">
+            <Grid DockPanel.Dock="Top" x:Name="Header" Height="32" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource PalisadeWindowBrush}" ColumnDefinitions="*,Auto">
                 <Grid.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Edit" Command="{Binding Path=Data.EditCalendarPalisadeCommand, Source={StaticResource proxy}}" CommandParameter="{Binding}" />
@@ -67,7 +67,7 @@
                         <MenuItem Header="About" Command="{Binding Path=Data.OpenAboutCommand, Source={StaticResource proxy}}" />
                     </ContextMenu>
                 </Grid.ContextMenu>
-                <Label Grid.Column="0" Content="{Binding Name, Mode=OneWay}" Margin="8" FontSize="18" Foreground="{DynamicResource PalisadeTextBrush}" VerticalAlignment="Center" />
+                <Label Grid.Column="0" Content="{Binding Name, Mode=OneWay}" Margin="8,0" FontSize="14" Foreground="{DynamicResource PalisadeTextBrush}" VerticalAlignment="Center" />
                 <Button Grid.Column="1" Content="🔄" ToolTip="Refresh" Command="{Binding RefreshCommand}" CommandParameter="{Binding}"
                         Style="{StaticResource CircleButton}" Width="28" Height="28" Margin="0,0,8,0" VerticalAlignment="Center"/>
             </Grid>
