@@ -77,69 +77,20 @@
                 </Grid.ContextMenu>
                 <Grid Grid.Row="0" Height="32" Background="{DynamicResource PalisadeWindowBrush}" ColumnDefinitions="Auto,*,Auto">
                     <Button Grid.Column="0"
+                            Content="&#x2190;"
                             Command="{Binding NavigateBackCommand}"
-                            Background="Transparent"
-                            BorderBrush="Transparent"
-                            Foreground="{DynamicResource PalisadeTextBrush}"
-                            FontSize="14"
-                            FontWeight="Bold"
-                            Padding="6,2"
-                            Cursor="Hand"
                             ToolTip="Navigate back"
-                            Visibility="{Binding CanNavigateBack, Converter={StaticResource BoolToVis}}">
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="Button">
-                                            <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" CornerRadius="4">
-                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                            </Border>
-                                            <ControlTemplate.Triggers>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter Property="Background" Value="{DynamicResource PalisadeCardPressedBrush}" />
-                                                </Trigger>
-                                            </ControlTemplate.Triggers>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </Button.Style>
-                        &#x2190;
-                    </Button>
+                            Style="{StaticResource PalisadeNavButton}"
+                            Visibility="{Binding CanNavigateBack, Converter={StaticResource BoolToVis}}"/>
                     <TextBlock Grid.Column="1" Text="{Binding Name, Mode=OneWay}" Margin="5,0" Style="{StaticResource PalisadeHeaderText}" HorizontalAlignment="Center"/>
 
                     <!-- Home button -->
                     <Button Grid.Column="2"
+                            Content="&#x2302;"
                             Command="{Binding NavigateToRootCommand}"
-                            Background="Transparent"
-                            BorderBrush="Transparent"
-                            Foreground="{DynamicResource PalisadeTextBrush}"
-                            FontSize="14"
-                            Padding="6,2"
-                            Cursor="Hand"
                             ToolTip="Go to root folder"
-                            Visibility="{Binding CanNavigateBack, Converter={StaticResource BoolToVis}}">
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="Button">
-                                            <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" CornerRadius="4">
-                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                            </Border>
-                                            <ControlTemplate.Triggers>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter Property="Background" Value="{DynamicResource PalisadeCardPressedBrush}" />
-                                                </Trigger>
-                                            </ControlTemplate.Triggers>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </Button.Style>
-                        &#x2302;
-                    </Button>
+                            Style="{StaticResource PalisadeNavButton}"
+                            Visibility="{Binding CanNavigateBack, Converter={StaticResource BoolToVis}}"/>
                 </Grid>
                 <Grid Grid.Row="1" Background="{DynamicResource PalisadeWindowBrush}">
                     <TextBlock Text="{Binding Breadcrumb, Mode=OneWay}"

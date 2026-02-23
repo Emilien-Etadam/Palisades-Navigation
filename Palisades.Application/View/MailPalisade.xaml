@@ -136,13 +136,18 @@
                         </ListBox.ItemContainerStyle>
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <Border BorderBrush="{DynamicResource PalisadeBorderBrush}" BorderThickness="0,0,0,1" Padding="6" Margin="0,0,0,4" Background="{DynamicResource PalisadeCardBrush}">
+                                <Border x:Name="MailCard" BorderBrush="{DynamicResource PalisadeBorderBrush}" BorderThickness="0,0,0,1" Padding="6" Margin="0,0,0,4" Background="{DynamicResource PalisadeCardBrush}">
                                     <Grid RowDefinitions="Auto,Auto">
                                         <TextBlock Grid.Row="0" Text="{Binding Subject, Mode=OneWay}" FontWeight="SemiBold" Foreground="{DynamicResource PalisadeTextBrush}" TextTrimming="CharacterEllipsis"/>
                                         <TextBlock Grid.Row="1" Text="{Binding Sender, Mode=OneWay}" FontSize="11" Margin="0,2,0,0" Foreground="{DynamicResource PalisadeTextBrush}" TextTrimming="CharacterEllipsis"/>
                                         <TextBlock Grid.Row="1" HorizontalAlignment="Right" Text="{Binding Date, StringFormat='{}{0:g}', Mode=OneWay}" FontSize="11" Margin="0,2,0,0" Foreground="{DynamicResource PalisadeTextBrush}"/>
                                     </Grid>
                                 </Border>
+                                <DataTemplate.Triggers>
+                                    <Trigger SourceName="MailCard" Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="MailCard" Property="Background" Value="{DynamicResource PalisadeCardHoverBrush}"/>
+                                    </Trigger>
+                                </DataTemplate.Triggers>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
