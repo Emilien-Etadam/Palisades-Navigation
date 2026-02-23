@@ -11,6 +11,7 @@ namespace Palisades.Model
         public DateTime DtEnd { get; set; }
         public string Location { get; set; } = string.Empty;
         public bool IsAllDay { get; set; }
+        public string DayHeader { get; set; } = string.Empty;
         public string CalendarName { get; set; } = string.Empty;
         public string Color { get; set; } = "#708090";
         public string CalDAVHref { get; set; } = string.Empty;

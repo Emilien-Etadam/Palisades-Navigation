@@ -53,6 +53,13 @@ namespace Palisades.Services
             return events;
         }
 
+        public async Task<string?> CreateEventAsync(string calendarHref, string icalData)
+        {
+            var uid = Guid.NewGuid().ToString();
+            var resourceHref = calendarHref.TrimEnd('/') + "/" + uid + ".ics";
+            return await _client.PutAsync(resourceHref, icalData).ConfigureAwait(false);
+        }
+
         private static void ParseEventsFromMultistatus(XDocument xdoc, string calendarId, string calendarName, string defaultColorHex, List<Model.CalendarEvent> events)
         {
             var responses = CalDAVClient.ParseMultistatus(xdoc);

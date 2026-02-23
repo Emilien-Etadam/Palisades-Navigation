@@ -72,14 +72,20 @@
                         Style="{StaticResource CircleButton}" Width="28" Height="28" Margin="0,0,8,0" VerticalAlignment="Center"/>
             </Grid>
             <Border DockPanel.Dock="Top" Background="{DynamicResource PalisadeControlBrush}" CornerRadius="0" Padding="12">
-                <Grid RowDefinitions="Auto,*,Auto">
+                <Grid RowDefinitions="Auto,Auto,*,Auto">
                     <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}" Foreground="{DynamicResource PalisadeErrorBrush}" Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}" Grid.Row="0" Margin="0,0,0,8"/>
-                    <StackPanel Grid.Row="1" Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}"
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,8">
+                        <Button Content="&lt;" Command="{Binding PreviousDayCommand}" Style="{StaticResource CircleButton}" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding DateRangeDisplay}" FontWeight="SemiBold" Foreground="{DynamicResource PalisadeTextBrush}" VerticalAlignment="Center" Margin="8,0"/>
+                        <Button Content="&gt;" Command="{Binding NextDayCommand}" Style="{StaticResource CircleButton}" VerticalAlignment="Center"/>
+                        <Button Content="⌂" ToolTip="Today" Command="{Binding TodayCommand}" Style="{StaticResource CircleButton}" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="2" Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}"
                                 HorizontalAlignment="Center" VerticalAlignment="Center">
                         <ProgressBar IsIndeterminate="True" Width="120" Height="8"/>
                         <TextBlock Text="Chargement..." HorizontalAlignment="Center" Margin="0,8,0,0" Foreground="{DynamicResource PalisadeTextBrush}"/>
                     </StackPanel>
-                    <ListBox Grid.Row="1" ItemsSource="{Binding Events}"
+                    <ListBox Grid.Row="2" ItemsSource="{Binding Events}"
                              VirtualizingPanel.IsVirtualizing="True"
                              VirtualizingPanel.VirtualizationMode="Recycling"
                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -104,9 +110,11 @@
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Border BorderBrush="{DynamicResource PalisadeAccentBrush}" BorderThickness="3,0,0,0" Padding="8,6" Margin="0,0,0,4" Background="#15FFFFFF">
-                                    <Grid RowDefinitions="Auto,Auto">
-                                        <TextBlock Grid.Row="0" Text="{Binding Summary, Mode=OneWay}" FontWeight="SemiBold" Foreground="{DynamicResource PalisadeTextBrush}" TextTrimming="CharacterEllipsis"/>
-                                        <TextBlock Grid.Row="1" Margin="0,2,0,0" Foreground="{DynamicResource PalisadeTextBrush}" FontSize="12">
+                                    <Grid RowDefinitions="Auto,Auto,Auto,Auto">
+                                        <TextBlock Grid.Row="0" Text="{Binding DayHeader}" Visibility="{Binding DayHeader, Converter={StaticResource StringToVisibilityConverter}}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource PalisadeAccentBrush}" Margin="0,8,0,4"/>
+                                        <TextBlock Grid.Row="1" Text="{Binding Summary, Mode=OneWay}" FontWeight="SemiBold" Foreground="{DynamicResource PalisadeTextBrush}" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Grid.Row="2" Margin="0,2,0,0" Foreground="{DynamicResource PalisadeTextBrush}" FontSize="12" Text="Toute la journée" Visibility="{Binding IsAllDay, Converter={StaticResource BoolToVis}}"/>
+                                        <TextBlock Grid.Row="2" Margin="0,2,0,0" Foreground="{DynamicResource PalisadeTextBrush}" FontSize="12" Visibility="{Binding IsAllDay, Converter={StaticResource InverseBoolToVis}}">
                                             <TextBlock.Text>
                                                 <MultiBinding StringFormat="{}{0:g} → {1:g}">
                                                     <Binding Path="DtStart" Mode="OneWay"/>
@@ -114,11 +122,13 @@
                                                 </MultiBinding>
                                             </TextBlock.Text>
                                         </TextBlock>
+                                        <TextBlock Grid.Row="3" Text="{Binding Location}" Visibility="{Binding Location, Converter={StaticResource StringToVisibilityConverter}}" FontSize="11" Foreground="{DynamicResource PalisadeSubtleBrush}" Margin="0,2,0,0"/>
                                     </Grid>
                                 </Border>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
+                    <Button Grid.Row="3" Content="+ Event" Command="{Binding AddEventCommand}" Style="{StaticResource CircleButton}" HorizontalAlignment="Left" Margin="0,8,0,0"/>
                 </Grid>
             </Border>
         </DockPanel>

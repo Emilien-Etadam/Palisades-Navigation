@@ -1,3 +1,8 @@
+using Ical.Net;
+using Ical.Net.CalendarComponents;
+using Ical.Net.DataTypes;
+using Ical.Net.Serialization;
+using Palisades;
 using Palisades.Helpers;
 using Palisades.Model;
 using Palisades.Services;
@@ -36,12 +41,16 @@ namespace Palisades.ViewModel
         {
             _model = model;
             _calendarService = calendarService;
-            Events = new ObservableCollection<CalendarEvent>();
+            Events = new ObservableCollection<Model.CalendarEvent>();
+            PreviousDayCommand = new RelayCommand(() => SelectedDate = SelectedDate.AddDays(-DaysToShow));
+            NextDayCommand = new RelayCommand(() => SelectedDate = SelectedDate.AddDays(DaysToShow));
+            TodayCommand = new RelayCommand(() => SelectedDate = DateTime.Today);
+            AddEventCommand = new RelayCommand(() => ShowAddEventDialog());
             _ = LoadEventsAsync();
             StartRefreshTimer();
         }
 
-        public ObservableCollection<CalendarEvent> Events { get; }
+        public ObservableCollection<Model.CalendarEvent> Events { get; }
 
         public CalendarViewMode ViewMode
         {
@@ -52,14 +61,16 @@ namespace Palisades.ViewModel
         public DateTime SelectedDate
         {
             get => _selectedDate;
-            set { _selectedDate = value; OnPropertyChanged(); _ = LoadEventsAsync(); }
+            set { _selectedDate = value; OnPropertyChanged(); OnPropertyChanged(nameof(DateRangeDisplay)); _ = LoadEventsAsync(); }
         }
 
         public int DaysToShow
         {
             get => _model.DaysToShow;
-            set { _model.DaysToShow = value; OnPropertyChanged(); Save(); _ = LoadEventsAsync(); }
+            set { _model.DaysToShow = value; OnPropertyChanged(); OnPropertyChanged(nameof(DateRangeDisplay)); Save(); _ = LoadEventsAsync(); }
         }
+
+        public string DateRangeDisplay => SelectedDate.ToString("ddd dd MMM") + " → " + SelectedDate.AddDays(DaysToShow - 1).ToString("ddd dd MMM yyyy");
 
         public string ErrorMessage
         {
@@ -86,13 +97,23 @@ namespace Palisades.ViewModel
             {
                 var start = SelectedDate.Date;
                 var end = start.AddDays(DaysToShow);
-                var allEvents = new List<CalendarEvent>();
+                var allEvents = new List<Model.CalendarEvent>();
                 foreach (var calId in _model.CalendarIds)
                 {
                     var list = await _calendarService.GetEventsAsync(calId, start, end);
                     allEvents.AddRange(list);
                 }
                 var ordered = allEvents.OrderBy(e => e.DtStart).ToList();
+                DateTime? prevDate = null;
+                foreach (var evt in ordered)
+                {
+                    var evtDate = evt.DtStart.Date;
+                    if (evtDate != prevDate)
+                    {
+                        evt.DayHeader = evt.DtStart.ToString("ddd dd MMM");
+                        prevDate = evtDate;
+                    }
+                }
                 Dispatch(() =>
                 {
                     Events.Clear();
@@ -123,6 +144,42 @@ namespace Palisades.ViewModel
             _refreshTimer = new Timer(async _ => await LoadEventsAsync(), null, TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(5));
         }
 
+        private async void ShowAddEventDialog()
+        {
+            var dialog = new AddCalendarEventDialog();
+            try { dialog.Owner = PalisadesManager.GetWindow(Identifier); } catch { }
+            if (dialog.ShowDialog() == true && dialog.NewEvent != null)
+            {
+                await CreateEventAsync(dialog.NewEvent);
+                await LoadEventsAsync();
+            }
+        }
+
+        private async Task CreateEventAsync(Model.CalendarEvent evt)
+        {
+            if (_model.CalendarIds == null || _model.CalendarIds.Count == 0) return;
+            var calendar = new Ical.Net.Calendar();
+            var dtStart = evt.IsAllDay
+                ? new CalDateTime(evt.DtStart.Year, evt.DtStart.Month, evt.DtStart.Day)
+                : new CalDateTime(evt.DtStart);
+            var dtEnd = evt.IsAllDay
+                ? new CalDateTime(evt.DtEnd.Year, evt.DtEnd.Month, evt.DtEnd.Day)
+                : new CalDateTime(evt.DtEnd);
+            var vevent = new Ical.Net.CalendarComponents.CalendarEvent
+            {
+                Uid = Guid.NewGuid().ToString(),
+                Summary = evt.Summary,
+                Description = evt.Description ?? "",
+                Location = evt.Location ?? "",
+                DtStart = dtStart,
+                DtEnd = dtEnd
+            };
+            calendar.Events.Add(vevent);
+            var serializer = new CalendarSerializer();
+            var icalData = serializer.SerializeToString(calendar);
+            await _calendarService.CreateEventAsync(_model.CalendarIds[0], icalData ?? "");
+        }
+
         private static void Dispatch(Action action)
         {
             if (Application.Current?.Dispatcher != null)
@@ -131,16 +188,18 @@ namespace Palisades.ViewModel
                 action();
         }
 
-        #region Commands
-
+        public ICommand PreviousDayCommand { get; }
+        public ICommand NextDayCommand { get; }
+        public ICommand TodayCommand { get; }
+        public ICommand AddEventCommand { get; }
         public ICommand RefreshCommand { get; } = new RelayCommand<CalendarPalisadeViewModel>(async vm => { if (vm != null) await vm.LoadEventsAsync(); });
 
         public ICommand EditCalendarPalisadeCommand { get; } = new RelayCommand<CalendarPalisadeViewModel>(vm =>
         {
             if (vm == null) return;
-            // TODO Phase 5.6+: EditCalendarPalisadeDialog
+            var edit = new EditCalendarPalisade(vm);
+            edit.Owner = PalisadesManager.GetWindow(vm.Identifier);
+            edit.ShowDialog();
         });
-
-        #endregion
     }
 }

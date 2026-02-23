@@ -1,0 +1,25 @@
+<Window x:Class="Palisades.View.AddCalendarEventDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Add Event" Width="400" Height="380" MinWidth="380" MinHeight="360"
+        WindowStartupLocation="CenterOwner" ResizeMode="CanResize">
+    <Grid Margin="12" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+        <TextBlock Text="Summary *" Grid.Row="0" Margin="0,0,0,4"/>
+        <TextBox x:Name="SummaryTextBox" Grid.Row="1" Margin="0,0,0,8" Text="{Binding Summary, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Text="Start date" Grid.Row="2" Margin="0,0,0,4"/>
+        <DatePicker x:Name="StartDatePicker" Grid.Row="3" Margin="0,0,0,8" SelectedDate="{Binding StartDate, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Text="Start time (HH:mm)" Grid.Row="4" Margin="0,0,0,4"/>
+        <TextBox x:Name="StartTimeTextBox" Grid.Row="5" Margin="0,0,0,8" Text="{Binding StartTime, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Text="End date" Grid.Row="6" Margin="0,0,0,4"/>
+        <DatePicker x:Name="EndDatePicker" Grid.Row="7" Margin="0,0,0,8" SelectedDate="{Binding EndDate, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Text="End time (HH:mm)" Grid.Row="8" Margin="0,0,0,4"/>
+        <TextBox x:Name="EndTimeTextBox" Grid.Row="9" Margin="0,0,0,8" Text="{Binding EndTime, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Text="Location" Grid.Row="10" Margin="0,0,0,4"/>
+        <TextBox x:Name="LocationTextBox" Grid.Row="11" Margin="0,0,0,8" Text="{Binding Location, UpdateSourceTrigger=PropertyChanged}"/>
+        <CheckBox x:Name="IsAllDayCheckBox" Grid.Row="12" Content="All day" IsChecked="{Binding IsAllDay, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8"/>
+        <StackPanel Grid.Row="13" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <Button Content="Cancel" Width="80" Margin="0,0,10,0" Click="CancelButton_Click"/>
+            <Button x:Name="CreateButton" Content="Create" Width="80" IsDefault="True" Click="CreateButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>
