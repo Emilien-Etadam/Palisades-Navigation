@@ -16,5 +16,9 @@ namespace Palisades.Model
         public string Color { get; set; } = "#708090";
         public string CalDAVHref { get; set; } = string.Empty;
         public string ETag { get; set; } = string.Empty;
+
+        public string TimeDisplay => IsAllDay
+            ? "Toute la journée"
+            : DtStart.ToString("t") + " → " + DtEnd.ToString("t");
     }
 }

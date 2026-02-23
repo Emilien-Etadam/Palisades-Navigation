@@ -52,10 +52,24 @@ namespace Palisades.ViewModel
 
         public ObservableCollection<Model.CalendarEvent> Events { get; }
 
+        public CalendarViewMode[] ViewModes { get; } = Enum.GetValues<CalendarViewMode>();
+
         public CalendarViewMode ViewMode
         {
             get => _model.ViewMode;
-            set { _model.ViewMode = value; OnPropertyChanged(); Save(); _ = LoadEventsAsync(); }
+            set
+            {
+                _model.ViewMode = value;
+                OnPropertyChanged();
+                Save();
+                DaysToShow = value switch
+                {
+                    CalendarViewMode.Day => 1,
+                    CalendarViewMode.Week => 7,
+                    CalendarViewMode.Agenda => 14,
+                    _ => 7
+                };
+            }
         }
 
         public DateTime SelectedDate
@@ -67,10 +81,12 @@ namespace Palisades.ViewModel
         public int DaysToShow
         {
             get => _model.DaysToShow;
-            set { _model.DaysToShow = value; OnPropertyChanged(); OnPropertyChanged(nameof(DateRangeDisplay)); Save(); _ = LoadEventsAsync(); }
+            set { _model.DaysToShow = value; OnPropertyChanged(); Save(); OnPropertyChanged(nameof(DateRangeDisplay)); _ = LoadEventsAsync(); }
         }
 
-        public string DateRangeDisplay => SelectedDate.ToString("ddd dd MMM") + " → " + SelectedDate.AddDays(DaysToShow - 1).ToString("ddd dd MMM yyyy");
+        public string DateRangeDisplay => DaysToShow == 1
+            ? SelectedDate.ToString("ddd dd MMM yyyy")
+            : SelectedDate.ToString("ddd dd MMM") + " → " + SelectedDate.AddDays(DaysToShow - 1).ToString("ddd dd MMM yyyy");
 
         public string ErrorMessage
         {
@@ -103,6 +119,7 @@ namespace Palisades.ViewModel
                     var list = await _calendarService.GetEventsAsync(calId, start, end);
                     allEvents.AddRange(list);
                 }
+                allEvents = allEvents.Where(e => e.DtEnd > start && e.DtStart < end).ToList();
                 var ordered = allEvents.OrderBy(e => e.DtStart).ToList();
                 DateTime? prevDate = null;
                 foreach (var evt in ordered)

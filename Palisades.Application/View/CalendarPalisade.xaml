@@ -79,6 +79,11 @@
                         <TextBlock Text="{Binding DateRangeDisplay}" FontWeight="SemiBold" Foreground="{DynamicResource PalisadeTextBrush}" VerticalAlignment="Center" Margin="8,0"/>
                         <Button Content="&gt;" Command="{Binding NextDayCommand}" Style="{StaticResource CircleButton}" VerticalAlignment="Center"/>
                         <Button Content="⌂" ToolTip="Today" Command="{Binding TodayCommand}" Style="{StaticResource CircleButton}" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                        <ComboBox SelectedItem="{Binding ViewMode}" ItemsSource="{Binding ViewModes}"
+                                  Width="70" Height="24" Margin="8,0,0,0" VerticalAlignment="Center"
+                                  FontSize="11" Background="{DynamicResource PalisadeControlBrush}"
+                                  Foreground="{DynamicResource PalisadeTextBrush}" BorderThickness="1"
+                                  BorderBrush="{DynamicResource PalisadeBorderBrush}"/>
                     </StackPanel>
                     <StackPanel Grid.Row="2" Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}"
                                 HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -109,20 +114,12 @@
                         </ListBox.ItemContainerStyle>
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <Border BorderBrush="{DynamicResource PalisadeAccentBrush}" BorderThickness="3,0,0,0" Padding="8,6" Margin="0,0,0,4" Background="#15FFFFFF">
+                                <Border BorderBrush="{DynamicResource PalisadeAccentBrush}" BorderThickness="3,0,0,0" Padding="10,8" Margin="0,0,0,2" Background="#10FFFFFF" CornerRadius="0,4,4,0">
                                     <Grid RowDefinitions="Auto,Auto,Auto,Auto">
-                                        <TextBlock Grid.Row="0" Text="{Binding DayHeader}" Visibility="{Binding DayHeader, Converter={StaticResource StringToVisibilityConverter}}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource PalisadeAccentBrush}" Margin="0,8,0,4"/>
-                                        <TextBlock Grid.Row="1" Text="{Binding Summary, Mode=OneWay}" FontWeight="SemiBold" Foreground="{DynamicResource PalisadeTextBrush}" TextTrimming="CharacterEllipsis"/>
-                                        <TextBlock Grid.Row="2" Margin="0,2,0,0" Foreground="{DynamicResource PalisadeTextBrush}" FontSize="12" Text="Toute la journée" Visibility="{Binding IsAllDay, Converter={StaticResource BoolToVis}}"/>
-                                        <TextBlock Grid.Row="2" Margin="0,2,0,0" Foreground="{DynamicResource PalisadeTextBrush}" FontSize="12" Visibility="{Binding IsAllDay, Converter={StaticResource InverseBoolToVis}}">
-                                            <TextBlock.Text>
-                                                <MultiBinding StringFormat="{}{0:g} → {1:g}">
-                                                    <Binding Path="DtStart" Mode="OneWay"/>
-                                                    <Binding Path="DtEnd" Mode="OneWay"/>
-                                                </MultiBinding>
-                                            </TextBlock.Text>
-                                        </TextBlock>
-                                        <TextBlock Grid.Row="3" Text="{Binding Location}" Visibility="{Binding Location, Converter={StaticResource StringToVisibilityConverter}}" FontSize="11" Foreground="{DynamicResource PalisadeSubtleBrush}" Margin="0,2,0,0"/>
+                                        <TextBlock Grid.Row="0" Text="{Binding DayHeader}" Visibility="{Binding DayHeader, Converter={StaticResource StringToVisibilityConverter}}" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PalisadeAccentBrush}" Margin="0,12,0,4"/>
+                                        <TextBlock Grid.Row="1" Text="{Binding Summary, Mode=OneWay}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource PalisadeTextBrush}" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Grid.Row="2" Text="{Binding TimeDisplay, Mode=OneWay}" Margin="0,2,0,0" Foreground="{DynamicResource PalisadeSubtleBrush}" FontSize="11"/>
+                                        <TextBlock Grid.Row="3" Text="{Binding Location}" Visibility="{Binding Location, Converter={StaticResource StringToVisibilityConverter}}" FontSize="11" Foreground="{DynamicResource PalisadeSubtleBrush}" FontStyle="Italic" Margin="0,2,0,0"/>
                                     </Grid>
                                 </Border>
                             </DataTemplate>
