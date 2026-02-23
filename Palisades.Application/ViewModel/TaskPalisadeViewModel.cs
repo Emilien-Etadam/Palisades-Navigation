@@ -11,7 +11,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
 
 namespace Palisades.ViewModel
 {
@@ -81,14 +80,18 @@ namespace Palisades.ViewModel
 
         public ObservableCollection<CalDAVTask> Tasks { get; set; } = new ObservableCollection<CalDAVTask>();
 
+        public ObservableCollection<CalDAVTask> ActiveTasks =>
+            HasMultipleLists && SelectedTaskTab != null ? SelectedTaskTab.Tasks : Tasks;
+
         public ObservableCollection<TaskTabItem> TaskTabs { get; } = new ObservableCollection<TaskTabItem>();
         public bool HasMultipleLists => TaskTabs.Count > 1;
+        public bool HasNoTasks => !IsLoading && ActiveTasks.Count == 0;
 
         private TaskTabItem? _selectedTaskTab;
         public TaskTabItem? SelectedTaskTab
         {
             get => _selectedTaskTab;
-            set { _selectedTaskTab = value; OnPropertyChanged(); }
+            set { _selectedTaskTab = value; OnPropertyChanged(); OnPropertyChanged(nameof(ActiveTasks)); OnPropertyChanged(nameof(HasNoTasks)); }
         }
 
         public CalDAVTask? SelectedTask
@@ -131,6 +134,91 @@ namespace Palisades.ViewModel
 
             Tasks.CollectionChanged += Tasks_CollectionChanged;
 
+            SelectTabCommand = new RelayCommand<TaskTabItem>(tab => { if (tab != null) SelectedTaskTab = tab; });
+            ForceSyncCommand = new RelayCommand(async () => await ForceSyncAsync());
+            AddTaskCommand = new RelayCommand(() =>
+            {
+                var newTask = new CalDAVTask("New Task")
+                {
+                    Description = "Task description",
+                    DueDate = DateTime.Today.AddDays(1)
+                };
+                if (HasMultipleLists && SelectedTaskTab != null)
+                {
+                    SelectedTaskTab.Tasks.Add(newTask);
+                }
+                else
+                {
+                    Tasks.Add(newTask);
+                }
+                SelectedTask = newTask;
+            });
+            DeleteTaskCommand = new RelayCommand<CalDAVTask>(async task =>
+            {
+                var t = task ?? SelectedTask;
+                if (t == null) return;
+                var listId = GetListIdForTask(t);
+                try
+                {
+                    if (!string.IsNullOrEmpty(t.CalDAVId))
+                        await _caldavService.DeleteTaskAsync(listId, t.CalDAVId);
+                    if (HasMultipleLists && SelectedTaskTab != null && SelectedTaskTab.Tasks.Contains(t))
+                        SelectedTaskTab.Tasks.Remove(t);
+                    else
+                        Tasks.Remove(t);
+                    if (SelectedTask == t) SelectedTask = null;
+                }
+                catch (Exception ex)
+                {
+                    ErrorMessage = $"Failed to delete task: {ex.Message}";
+                }
+            });
+            ToggleTaskCompletedCommand = new RelayCommand<CalDAVTask>(async task =>
+            {
+                var t = task ?? SelectedTask;
+                if (t == null) return;
+                var listId = GetListIdForTask(t);
+                t.Completed = !t.Completed;
+                t.CompletedDate = t.Completed ? DateTime.Now : null;
+                t.LastModified = DateTime.Now;
+                try
+                {
+                    if (!string.IsNullOrEmpty(t.CalDAVId))
+                        await _caldavService.UpdateTaskAsync(listId, t);
+                }
+                catch (Exception ex)
+                {
+                    ErrorMessage = $"Failed to update task: {ex.Message}";
+                    t.Completed = !t.Completed;
+                    t.CompletedDate = t.Completed ? DateTime.Now : null;
+                }
+            });
+            SaveTaskCommand = new RelayCommand<CalDAVTask>(async task =>
+            {
+                var t = task ?? SelectedTask;
+                if (t == null) return;
+                var listId = GetListIdForTask(t);
+                try
+                {
+                    t.LastModified = DateTime.Now;
+                    if (string.IsNullOrEmpty(t.CalDAVId))
+                    {
+                        var createdTask = await _caldavService.CreateTaskAsync(listId, t);
+                        t.CalDAVId = createdTask.CalDAVId;
+                        t.CalDAVEtag = createdTask.CalDAVEtag;
+                    }
+                    else
+                    {
+                        await _caldavService.UpdateTaskAsync(listId, t);
+                    }
+                    SyncStatus = "Task saved successfully";
+                }
+                catch (Exception ex)
+                {
+                    ErrorMessage = $"Failed to save task: {ex.Message}";
+                }
+            });
+
             var hasListIds = _model.TaskListIds != null && _model.TaskListIds.Count > 0;
             var hasLegacyId = !string.IsNullOrEmpty(_model.TaskListId);
             if (!string.IsNullOrEmpty(_model.CalDAVUrl) && (hasListIds || hasLegacyId))
@@ -139,6 +227,18 @@ namespace Palisades.ViewModel
             }
 
             StartSyncTimer();
+        }
+
+        private string GetListIdForSelectedTask()
+        {
+            if (SelectedTask == null) return TaskListId;
+            if (TaskTabs.Count > 1)
+            {
+                foreach (var tab in TaskTabs)
+                    if (tab.Tasks.Contains(SelectedTask))
+                        return tab.ListId;
+            }
+            return TaskListId;
         }
 
         private IEnumerable<string> GetListIds()

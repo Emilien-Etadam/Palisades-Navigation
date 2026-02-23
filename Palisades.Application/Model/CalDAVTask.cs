@@ -19,6 +19,23 @@ namespace Palisades.Model
         /// <summary>Uid iCalendar (identifiant interne du VTODO).</summary>
         public string Uid { get; set; } = string.Empty;
         public string CalDAVEtag { get; set; } = string.Empty;
+
+        [XmlIgnore]
+        public string DueDateDisplay => DueDate.HasValue
+            ? DueDate.Value.ToString("ddd dd MMM")
+            : string.Empty;
+
+        [XmlIgnore]
+        public string DueDateColor
+        {
+            get
+            {
+                if (!DueDate.HasValue || Completed) return "#A0A0A0";
+                if (DueDate.Value.Date < DateTime.Today) return "#FF6B6B";
+                if (DueDate.Value.Date == DateTime.Today) return "#60CDFF";
+                return "#A0A0A0";
+            }
+        }
         
         public CalDAVTask() { }
         

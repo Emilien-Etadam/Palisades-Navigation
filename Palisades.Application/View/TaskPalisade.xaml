@@ -26,76 +26,156 @@
             <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
             <BooleanToVisibilityConverter x:Key="BoolToVis"/>
             <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVis"/>
+            <converters:MultiValueEqualityConverter x:Key="MultiValueEqualityConverter"/>
             <helpers:BindingProxy x:Key="proxy" Data="{Binding}"/>
         </ResourceDictionary>
     </Window.Resources>
 
     <Border x:Name="LayoutRoot" CornerRadius="0" ClipToBounds="True">
-    <Grid>
-        <Grid.ContextMenu>
-            <ContextMenu>
-                <MenuItem Header="Edit" Command="{Binding Path=Data.EditTaskPalisadeCommand, Source={StaticResource proxy}}" CommandParameter="{Binding}"/>
-                <MenuItem Header="Delete" Command="{Binding Path=Data.DeletePalisadeCommand, Source={StaticResource proxy}}" CommandParameter="{Binding Identifier}"/>
-                <Separator/>
-                <MenuItem Header="New fence" Command="{Binding Path=Data.NewPalisadeCommand, Source={StaticResource proxy}}"/>
-                <MenuItem Header="New Folder Portal" Command="{Binding Path=Data.NewFolderPortalCommand, Source={StaticResource proxy}}"/>
-                <MenuItem Header="New Task Palisade" Command="{Binding Path=Data.NewTaskPalisadeCommand, Source={StaticResource proxy}}"/>
-                <MenuItem Header="New Calendar Palisade" Command="{Binding Path=Data.NewCalendarPalisadeCommand, Source={StaticResource proxy}}"/>
-                <MenuItem Header="New Mail Palisade" Command="{Binding Path=Data.NewMailPalisadeCommand, Source={StaticResource proxy}}"/>
-                <Separator/>
-                <MenuItem Header="Manage Zimbra Accounts" Command="{Binding Path=Data.ManageZimbraAccountsCommand, Source={StaticResource proxy}}"/>
-                <Separator/>
-                <MenuItem Header="Layouts" SubmenuOpened="LayoutsSubmenu_SubmenuOpened">
-                    <MenuItem Header="Save current layout..." Command="{Binding Path=Data.SaveSnapshotCommand, Source={StaticResource proxy}}"/>
+    <DockPanel>
+        <!-- Header : tabs if multi-list, else just sync status + buttons -->
+        <Grid DockPanel.Dock="Top" x:Name="Header" Height="32" MouseLeftButtonDown="Header_MouseLeftButtonDown"
+              IsHitTestVisible="True" Background="{DynamicResource PalisadeWindowBrush}"
+              ColumnDefinitions="*,Auto,Auto,Auto">
+            <Grid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Edit" Command="{Binding Path=Data.EditTaskPalisadeCommand, Source={StaticResource proxy}}" CommandParameter="{Binding}"/>
+                    <MenuItem Header="Delete" Command="{Binding Path=Data.DeletePalisadeCommand, Source={StaticResource proxy}}" CommandParameter="{Binding Identifier}"/>
                     <Separator/>
-                    <MenuItem ItemsSource="{Binding Path=Data.RecentSnapshots, Source={StaticResource proxy}}">
-                        <MenuItem.ItemContainerStyle>
-                            <Style TargetType="MenuItem">
-                                <Setter Property="Header" Value="{Binding Name}"/>
-                                <Setter Property="Command" Value="{Binding Path=Data.RestoreSnapshotCommand, Source={StaticResource proxy}}"/>
-                                <Setter Property="CommandParameter" Value="{Binding Id}"/>
-                            </Style>
-                        </MenuItem.ItemContainerStyle>
+                    <MenuItem Header="New fence" Command="{Binding Path=Data.NewPalisadeCommand, Source={StaticResource proxy}}"/>
+                    <MenuItem Header="New Folder Portal" Command="{Binding Path=Data.NewFolderPortalCommand, Source={StaticResource proxy}}"/>
+                    <MenuItem Header="New Task Palisade" Command="{Binding Path=Data.NewTaskPalisadeCommand, Source={StaticResource proxy}}"/>
+                    <MenuItem Header="New Calendar Palisade" Command="{Binding Path=Data.NewCalendarPalisadeCommand, Source={StaticResource proxy}}"/>
+                    <MenuItem Header="New Mail Palisade" Command="{Binding Path=Data.NewMailPalisadeCommand, Source={StaticResource proxy}}"/>
+                    <Separator/>
+                    <MenuItem Header="Manage Zimbra Accounts" Command="{Binding Path=Data.ManageZimbraAccountsCommand, Source={StaticResource proxy}}"/>
+                    <Separator/>
+                    <MenuItem Header="Layouts" SubmenuOpened="LayoutsSubmenu_SubmenuOpened">
+                        <MenuItem Header="Save current layout..." Command="{Binding Path=Data.SaveSnapshotCommand, Source={StaticResource proxy}}"/>
+                        <Separator/>
+                        <MenuItem ItemsSource="{Binding Path=Data.RecentSnapshots, Source={StaticResource proxy}}">
+                            <MenuItem.ItemContainerStyle>
+                                <Style TargetType="MenuItem">
+                                    <Setter Property="Header" Value="{Binding Name}"/>
+                                    <Setter Property="Command" Value="{Binding Path=Data.RestoreSnapshotCommand, Source={StaticResource proxy}}"/>
+                                    <Setter Property="CommandParameter" Value="{Binding Id}"/>
+                                </Style>
+                            </MenuItem.ItemContainerStyle>
+                        </MenuItem>
+                        <Separator/>
+                        <MenuItem Header="Manage layouts..." Command="{Binding Path=Data.ManageSnapshotsCommand, Source={StaticResource proxy}}"/>
                     </MenuItem>
                     <Separator/>
-                    <MenuItem Header="Manage layouts..." Command="{Binding Path=Data.ManageSnapshotsCommand, Source={StaticResource proxy}}"/>
-                </MenuItem>
-                <Separator/>
-                <MenuItem Header="About" Command="{Binding Path=Data.OpenAboutCommand, Source={StaticResource proxy}}"/>
-            </ContextMenu>
-        </Grid.ContextMenu>
-        <Border x:Name="Header" Background="{DynamicResource PalisadeWindowBrush}" CornerRadius="0" 
-                Height="32" VerticalAlignment="Top" MouseLeftButtonDown="Header_MouseLeftButtonDown">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="{Binding Name, Mode=OneWay}" Foreground="{DynamicResource PalisadeTextBrush}" 
-                           VerticalAlignment="Center" Margin="10,0,0,0" FontWeight="Bold"/>
-                <TextBlock Text="{Binding SyncStatus, Mode=OneWay}" Foreground="{DynamicResource PalisadeTextBrush}" 
-                           VerticalAlignment="Center" Margin="20,0,0,0" FontSize="12"/>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,10,0">
-                    <Button Content="🔄" ToolTip="Force Sync" Command="{Binding ForceSyncCommand}" 
-                            Style="{StaticResource CircleButton}" 
-                            Margin="0,0,5,0" Width="24" Height="24"/>
-                    <Button Content="⚙" ToolTip="Settings" Command="{Binding ShowSettingsCommand}" 
-                            CommandParameter="{Binding}" Style="{StaticResource CircleButton}" 
-                            Width="24" Height="24"/>
-                </StackPanel>
-            </StackPanel>
-        </Border>
-        <Border Background="{DynamicResource PalisadeControlBrush}" CornerRadius="0" 
-                Margin="0,30,0,0" Padding="10">
-            <Grid RowDefinitions="Auto,*,Auto">
-                <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}" Foreground="{DynamicResource PalisadeErrorBrush}" 
-                           Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}" 
-                           Grid.Row="0" Margin="0,10"/>
+                    <MenuItem Header="About" Command="{Binding Path=Data.OpenAboutCommand, Source={StaticResource proxy}}"/>
+                </ContextMenu>
+            </Grid.ContextMenu>
 
-                <ListBox Grid.Row="1" ItemsSource="{Binding Tasks}" x:Name="TasksList"
-                         Visibility="{Binding HasMultipleLists, Converter={StaticResource InverseBoolToVis}}"
+            <!-- Col 0 : Tab buttons OR sync status -->
+            <ItemsControl Grid.Column="0" ItemsSource="{Binding TaskTabs}"
+                          Visibility="{Binding HasMultipleLists, Converter={StaticResource BoolToVis}}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Content="{Binding DisplayName}" Margin="0,0,1,0" Padding="10,0" Height="32"
+                                FontSize="12" Cursor="Hand"
+                                Foreground="{DynamicResource PalisadeTextBrush}"
+                                Command="{Binding DataContext.SelectTabCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                CommandParameter="{Binding}">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="BorderThickness" Value="0,0,0,2"/>
+                                    <Setter Property="BorderBrush" Value="Transparent"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Background" Value="#15FFFFFF"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <MultiBinding Converter="{StaticResource MultiValueEqualityConverter}">
+                                                    <Binding/>
+                                                    <Binding Path="DataContext.SelectedTaskTab" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                                </MultiBinding>
+                                            </DataTrigger.Binding>
+                                            <Setter Property="BorderBrush" Value="{DynamicResource PalisadeAccentBrush}"/>
+                                            <Setter Property="Background" Value="#10FFFFFF"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- Fallback single-list : sync status text -->
+            <TextBlock Grid.Column="0" Text="{Binding SyncStatus, Mode=OneWay}" FontSize="11"
+                       Foreground="{DynamicResource PalisadeSubtleBrush}" VerticalAlignment="Center" Margin="10,0"
+                       Visibility="{Binding HasMultipleLists, Converter={StaticResource InverseBoolToVis}}" TextTrimming="CharacterEllipsis"/>
+
+            <!-- Col 1,2,3 : action buttons -->
+            <Button Grid.Column="1" Content="⟳" ToolTip="Force Sync" Command="{Binding ForceSyncCommand}"
+                    Style="{StaticResource CircleButton}" Width="24" Height="24" VerticalAlignment="Center"/>
+            <Button Grid.Column="2" Content="⚙" ToolTip="Settings" Command="{Binding ShowSettingsCommand}" CommandParameter="{Binding}"
+                    Style="{StaticResource CircleButton}" Width="24" Height="24" VerticalAlignment="Center" Margin="2,0"/>
+            <Button Grid.Column="3" Content="✎" ToolTip="Edit" Command="{Binding EditTaskPalisadeCommand}" CommandParameter="{Binding}"
+                    Style="{StaticResource CircleButton}" Width="24" Height="24" VerticalAlignment="Center" Margin="0,0,8,0"/>
+        </Grid>
+
+        <!-- Content area -->
+        <Border DockPanel.Dock="Top" Background="{DynamicResource PalisadeControlBrush}" Padding="10">
+            <Grid RowDefinitions="Auto,*,Auto">
+                <!-- Row 0 : Error -->
+                <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}" Foreground="{DynamicResource PalisadeErrorBrush}"
+                           Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}"
+                           Grid.Row="0" Margin="0,0,0,8" FontSize="11"/>
+
+                <!-- Row 1 : Loading -->
+                <StackPanel Grid.Row="1" Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}"
+                            HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <ProgressBar IsIndeterminate="True" Width="120" Height="8"/>
+                    <TextBlock Text="Loading..." HorizontalAlignment="Center" Margin="0,8,0,0" Foreground="{DynamicResource PalisadeTextBrush}" FontSize="11"/>
+                </StackPanel>
+
+                <!-- Row 1 : Syncing indicator (subtle, non-blocking) -->
+                <TextBlock Grid.Row="1" Text="{Binding SyncStatus}" FontSize="10" Foreground="{DynamicResource PalisadeSubtleBrush}"
+                           HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,0,4"
+                           Visibility="{Binding IsSyncing, Converter={StaticResource BoolToVis}}"/>
+
+                <!-- Row 1 : Empty state -->
+                <TextBlock Grid.Row="1" Text="Aucune tâche" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           FontSize="13" Foreground="{DynamicResource PalisadeSubtleBrush}" FontStyle="Italic"
+                           Visibility="{Binding HasNoTasks, Converter={StaticResource BoolToVis}}"/>
+
+                <!-- Row 1 : Task list (single or selected tab) -->
+                <ListBox Grid.Row="1" ItemsSource="{Binding ActiveTasks}"
                          VirtualizingPanel.IsVirtualizing="True"
                          VirtualizingPanel.VirtualizationMode="Recycling"
                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                          ScrollViewer.VerticalScrollBarVisibility="Auto"
-                         Background="Transparent"
-                         BorderThickness="0">
+                         Background="Transparent" BorderThickness="0"
+                         Visibility="{Binding IsLoading, Converter={StaticResource InverseBoolToVis}}">
+                    <ListBox.Resources>
+                        <Style TargetType="ScrollBar">
+                            <Setter Property="Width" Value="4"/>
+                            <Setter Property="Background" Value="Transparent"/>
+                        </Style>
+                    </ListBox.Resources>
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
                             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
@@ -112,109 +192,69 @@
                     </ListBox.ItemContainerStyle>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <Border BorderBrush="Gray" BorderThickness="0,0,0,1" Padding="5">
-                                    <Grid ColumnDefinitions="Auto,*,Auto">
-                                    <CheckBox IsChecked="{Binding Completed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                              VerticalAlignment="Center" Grid.Column="0" 
-                                              Command="{Binding DataContext.ToggleTaskCompletedCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" 
+                            <Border Padding="8,6" Margin="0,0,0,2" CornerRadius="4"
+                                    Background="#10FFFFFF" x:Name="TaskCard">
+                                <Grid ColumnDefinitions="Auto,*,Auto">
+                                    <CheckBox Grid.Column="0" IsChecked="{Binding Completed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              VerticalAlignment="Top" Margin="0,2,0,0"
+                                              Command="{Binding DataContext.ToggleTaskCompletedCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
                                               CommandParameter="{Binding}"/>
-                                    <StackPanel Grid.Column="1" Margin="10,0,0,0">
-                                        <TextBlock Text="{Binding Title, Mode=OneWay}" FontWeight="Bold" 
-                                                   Foreground="{DynamicResource PalisadeTextBrush}"/>
-                                        <TextBlock Text="{Binding Description, Mode=OneWay}" TextWrapping="Wrap" 
-                                                   Foreground="{DynamicResource PalisadeTextBrush}" 
+                                    <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                                        <TextBlock Text="{Binding Title, Mode=OneWay}" FontSize="13" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource PalisadeTextBrush}" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{Binding Description, Mode=OneWay}" FontSize="11" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"
+                                                   Foreground="{DynamicResource PalisadeSubtleBrush}"
                                                    Visibility="{Binding Description, Converter={StaticResource StringToVisibilityConverter}}"/>
-                                        <TextBlock Text="{Binding DueDate, StringFormat='Due: {0:d}', Mode=OneWay}" 
-                                                   Foreground="{DynamicResource PalisadeTextBrush}" 
-                                                   Visibility="{Binding DueDate, Converter={StaticResource StringToVisibilityConverter}}"/>
+                                        <TextBlock Text="{Binding DueDateDisplay, Mode=OneWay}" FontSize="11"
+                                                   Foreground="{Binding DueDateColor}"
+                                                   Visibility="{Binding DueDateDisplay, Converter={StaticResource StringToVisibilityConverter}}"/>
                                     </StackPanel>
-                                    <StackPanel Grid.Column="2" Orientation="Horizontal">
-                                        <Button Content="📝" ToolTip="Edit" 
-                                                Command="{Binding DataContext.SaveTaskCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" 
-                                                CommandParameter="{Binding}" 
-                                                Style="{StaticResource CircleButton}" 
-                                                Width="24" Height="24" Margin="0,0,5,0"/>
-                                        <Button Content="🗑" ToolTip="Delete" 
-                                                Command="{Binding DataContext.DeleteTaskCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" 
-                                                CommandParameter="{Binding}" 
-                                                Style="{StaticResource CircleButton}" 
-                                                Width="24" Height="24"/>
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Button Content="💾" ToolTip="Save" Style="{StaticResource CircleButton}" Width="22" Height="22" Margin="0,0,2,0"
+                                                Command="{Binding DataContext.SaveTaskCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}"/>
+                                        <Button Content="🗑" ToolTip="Delete" Style="{StaticResource CircleButton}" Width="22" Height="22"
+                                                Command="{Binding DataContext.DeleteTaskCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}"/>
                                     </StackPanel>
                                 </Grid>
                             </Border>
+                            <DataTemplate.Triggers>
+                                <Trigger SourceName="TaskCard" Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="TaskCard" Property="Background" Value="#20FFFFFF"/>
+                                </Trigger>
+                                <DataTrigger Binding="{Binding Completed}" Value="True">
+                                    <Setter TargetName="TaskCard" Property="Opacity" Value="0.5"/>
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
-                <TabControl Grid.Row="1" ItemsSource="{Binding TaskTabs}" SelectedItem="{Binding SelectedTaskTab, Mode=TwoWay}"
-                            Visibility="{Binding HasMultipleLists, Converter={StaticResource BoolToVis}}"
-                            Background="Transparent" BorderThickness="0">
-                    <TabControl.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding DisplayName}" Foreground="{DynamicResource PalisadeTextBrush}"/>
-                        </DataTemplate>
-                    </TabControl.ItemTemplate>
-                    <TabControl.ContentTemplate>
-                        <DataTemplate>
-                            <ListBox ItemsSource="{Binding Tasks}"
-                                     VirtualizingPanel.IsVirtualizing="True"
-                                     VirtualizingPanel.VirtualizationMode="Recycling"
-                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                     ScrollViewer.VerticalScrollBarVisibility="Auto"
-                                     Background="Transparent" BorderThickness="0">
-                                <ListBox.ItemContainerStyle>
-                                    <Style TargetType="ListBoxItem">
-                                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                                        <Setter Property="Padding" Value="0"/>
-                                        <Setter Property="Margin" Value="0"/>
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="ListBoxItem">
-                                                    <ContentPresenter/>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </ListBox.ItemContainerStyle>
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border BorderBrush="{DynamicResource PalisadeBorderBrush}" BorderThickness="0,0,0,1" Padding="5">
-                                            <Grid ColumnDefinitions="Auto,*,Auto">
-                                                <CheckBox IsChecked="{Binding Completed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                          VerticalAlignment="Center" Grid.Column="0"/>
-                                                <StackPanel Grid.Column="1" Margin="10,0,0,0">
-                                                    <TextBlock Text="{Binding Title, Mode=OneWay}" FontWeight="Bold"
-                                                               Foreground="{DynamicResource PalisadeTextBrush}"/>
-                                                    <TextBlock Text="{Binding Description, Mode=OneWay}" TextWrapping="Wrap"
-                                                               Foreground="{DynamicResource PalisadeSubtleBrush}"
-                                                               Visibility="{Binding Description, Converter={StaticResource StringToVisibilityConverter}}"/>
-                                                    <TextBlock Text="{Binding DueDate, StringFormat='Due: {0:d}', Mode=OneWay}"
-                                                               Foreground="{DynamicResource PalisadeSubtleBrush}"
-                                                               Visibility="{Binding DueDate, Converter={StaticResource StringToVisibilityConverter}}"/>
-                                                </StackPanel>
-                                            </Grid>
+
+                <!-- Row 2 : Add task button (same style as calendar) -->
+                <Button Grid.Row="2" Content="+ Task" Command="{Binding AddTaskCommand}"
+                        Height="28" Padding="12,0" HorizontalAlignment="Left" Margin="0,8,0,0"
+                        FontSize="12" Foreground="{DynamicResource PalisadeTextBrush}"
+                        Background="#25FFFFFF" BorderThickness="1" BorderBrush="{DynamicResource PalisadeBorderBrush}" Cursor="Hand">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </Border>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
-                        </DataTemplate>
-                    </TabControl.ContentTemplate>
-                </TabControl>
-                <StackPanel Grid.Row="1" Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}" 
-                           HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <ProgressBar IsIndeterminate="True" Width="100" Height="20"/>
-                    <TextBlock Text="Loading tasks..." HorizontalAlignment="Center" Margin="0,10,0,0"/>
-                </StackPanel>
-                <StackPanel Grid.Row="1" Visibility="{Binding IsSyncing, Converter={StaticResource BoolToVis}}" 
-                           HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <ProgressBar IsIndeterminate="True" Width="100" Height="20"/>
-                    <TextBlock Text="Syncing with CalDAV..." HorizontalAlignment="Center" Margin="0,10,0,0"/>
-                </StackPanel>
-                <Button Grid.Row="2" Content="➕ Add Task" Command="{Binding AddTaskCommand}" 
-                        HorizontalAlignment="Right" Margin="0,10,0,0" 
-                        Style="{StaticResource CircleButtonLarge}" 
-                        Width="48" Height="48"/>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#35FFFFFF"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                </Button>
             </Grid>
         </Border>
-    </Grid>
+    </DockPanel>
     </Border>
 </Window>
