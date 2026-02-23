@@ -30,9 +30,6 @@ jobs:
           $v = "${{ github.ref_name }}" -replace '^v',''
           echo "clean=$v" >> $env:GITHUB_OUTPUT
 
-      - name: Restore
-        run: dotnet restore Palisades.sln
-
       - name: Publish
         run: >
           dotnet publish Palisades.Application/Palisades.Application.csproj
