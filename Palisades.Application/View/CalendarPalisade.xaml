@@ -73,23 +73,30 @@
             </Grid>
             <Border DockPanel.Dock="Top" Background="{DynamicResource PalisadeControlBrush}" CornerRadius="0" Padding="12">
                 <Grid RowDefinitions="Auto,Auto,*,Auto">
+                    <!-- Row 0 : Error -->
                     <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}" Foreground="{DynamicResource PalisadeErrorBrush}" Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}" Grid.Row="0" Margin="0,0,0,8"/>
-                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,8">
-                        <Button Content="&lt;" Command="{Binding PreviousDayCommand}" Style="{StaticResource CircleButton}" VerticalAlignment="Center"/>
-                        <TextBlock Text="{Binding DateRangeDisplay}" FontWeight="SemiBold" Foreground="{DynamicResource PalisadeTextBrush}" VerticalAlignment="Center" Margin="8,0"/>
-                        <Button Content="&gt;" Command="{Binding NextDayCommand}" Style="{StaticResource CircleButton}" VerticalAlignment="Center"/>
-                        <Button Content="⌂" ToolTip="Today" Command="{Binding TodayCommand}" Style="{StaticResource CircleButton}" VerticalAlignment="Center" Margin="8,0,0,0"/>
-                        <ComboBox SelectedItem="{Binding ViewMode}" ItemsSource="{Binding ViewModes}"
-                                  Width="70" Height="24" Margin="8,0,0,0" VerticalAlignment="Center"
+
+                    <!-- Row 1 : Navigation bar — use Grid not StackPanel -->
+                    <Grid Grid.Row="1" Margin="0,0,0,8" ColumnDefinitions="Auto,Auto,*,Auto,Auto">
+                        <Button Grid.Column="0" Content="&lt;" Command="{Binding PreviousDayCommand}" Style="{StaticResource CircleButton}" VerticalAlignment="Center"/>
+                        <Button Grid.Column="1" Content="&gt;" Command="{Binding NextDayCommand}" Style="{StaticResource CircleButton}" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                        <TextBlock Grid.Column="2" Text="{Binding DateRangeDisplay}" FontWeight="SemiBold" FontSize="12" Foreground="{DynamicResource PalisadeTextBrush}" VerticalAlignment="Center" HorizontalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                        <Button Grid.Column="3" Content="⌂" ToolTip="Today" Command="{Binding TodayCommand}" Style="{StaticResource CircleButton}" VerticalAlignment="Center" Margin="4,0,4,0"/>
+                        <ComboBox Grid.Column="4" SelectedItem="{Binding ViewMode}" ItemsSource="{Binding ViewModes}"
+                                  Width="75" Height="24" VerticalAlignment="Center"
                                   FontSize="11" Background="{DynamicResource PalisadeControlBrush}"
                                   Foreground="{DynamicResource PalisadeTextBrush}" BorderThickness="1"
                                   BorderBrush="{DynamicResource PalisadeBorderBrush}"/>
-                    </StackPanel>
+                    </Grid>
+
+                    <!-- Row 2 : Loading -->
                     <StackPanel Grid.Row="2" Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}"
                                 HorizontalAlignment="Center" VerticalAlignment="Center">
                         <ProgressBar IsIndeterminate="True" Width="120" Height="8"/>
                         <TextBlock Text="Chargement..." HorizontalAlignment="Center" Margin="0,8,0,0" Foreground="{DynamicResource PalisadeTextBrush}"/>
                     </StackPanel>
+
+                    <!-- Row 2 : Event list -->
                     <ListBox Grid.Row="2" ItemsSource="{Binding Events}"
                              VirtualizingPanel.IsVirtualizing="True"
                              VirtualizingPanel.VirtualizationMode="Recycling"
@@ -98,6 +105,12 @@
                              Background="Transparent"
                              BorderThickness="0"
                              Visibility="{Binding IsLoading, Converter={StaticResource InverseBoolToVis}}">
+                        <ListBox.Resources>
+                            <Style TargetType="ScrollBar">
+                                <Setter Property="Width" Value="4"/>
+                                <Setter Property="Background" Value="Transparent"/>
+                            </Style>
+                        </ListBox.Resources>
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem">
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
@@ -114,18 +127,73 @@
                         </ListBox.ItemContainerStyle>
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <Border BorderBrush="{DynamicResource PalisadeAccentBrush}" BorderThickness="3,0,0,0" Padding="10,8" Margin="0,0,0,2" Background="#10FFFFFF" CornerRadius="0,4,4,0">
-                                    <Grid RowDefinitions="Auto,Auto,Auto,Auto">
-                                        <TextBlock Grid.Row="0" Text="{Binding DayHeader}" Visibility="{Binding DayHeader, Converter={StaticResource StringToVisibilityConverter}}" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PalisadeAccentBrush}" Margin="0,12,0,4"/>
-                                        <TextBlock Grid.Row="1" Text="{Binding Summary, Mode=OneWay}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource PalisadeTextBrush}" TextTrimming="CharacterEllipsis"/>
-                                        <TextBlock Grid.Row="2" Text="{Binding TimeDisplay, Mode=OneWay}" Margin="0,2,0,0" Foreground="{DynamicResource PalisadeSubtleBrush}" FontSize="11"/>
-                                        <TextBlock Grid.Row="3" Text="{Binding Location}" Visibility="{Binding Location, Converter={StaticResource StringToVisibilityConverter}}" FontSize="11" Foreground="{DynamicResource PalisadeSubtleBrush}" FontStyle="Italic" Margin="0,2,0,0"/>
-                                    </Grid>
-                                </Border>
+                                <StackPanel>
+                                    <!-- Day header OUTSIDE the event card -->
+                                    <Border Visibility="{Binding DayHeader, Converter={StaticResource StringToVisibilityConverter}}"
+                                            Margin="0,12,0,4" Padding="4,4"
+                                            CornerRadius="3">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsToday}" Value="True">
+                                                        <Setter Property="Background" Value="#20FFFFFF"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <TextBlock Text="{Binding DayHeaderDisplay}" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PalisadeAccentBrush}"/>
+                                    </Border>
+                                    <!-- Event card -->
+                                    <Border BorderBrush="{DynamicResource PalisadeAccentBrush}" BorderThickness="3,0,0,0"
+                                            Padding="10,8" Margin="0,0,0,2" Background="#10FFFFFF" CornerRadius="0,4,4,0"
+                                            x:Name="EventCard">
+                                        <Grid RowDefinitions="Auto,Auto,Auto">
+                                            <TextBlock Grid.Row="0" Text="{Binding Summary, Mode=OneWay}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource PalisadeTextBrush}" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Grid.Row="1" Text="{Binding TimeDisplay, Mode=OneWay}" Margin="0,2,0,0" Foreground="{DynamicResource PalisadeSubtleBrush}" FontSize="11"/>
+                                            <TextBlock Grid.Row="2" Text="{Binding Location}" Visibility="{Binding Location, Converter={StaticResource StringToVisibilityConverter}}" FontSize="11" Foreground="{DynamicResource PalisadeSubtleBrush}" FontStyle="Italic" Margin="0,2,0,0"/>
+                                        </Grid>
+                                    </Border>
+                                </StackPanel>
+                                <DataTemplate.Triggers>
+                                    <Trigger SourceName="EventCard" Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="EventCard" Property="Background" Value="#20FFFFFF"/>
+                                    </Trigger>
+                                </DataTemplate.Triggers>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
-                    <Button Grid.Row="3" Content="+ Event" Command="{Binding AddEventCommand}" Style="{StaticResource CircleButton}" HorizontalAlignment="Left" Margin="0,8,0,0"/>
+
+                    <!-- Row 2 : Empty state (on top when no events) -->
+                    <TextBlock Grid.Row="2" Text="Aucun événement" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               FontSize="13" Foreground="{DynamicResource PalisadeSubtleBrush}" FontStyle="Italic"
+                               Visibility="{Binding HasNoEvents, Converter={StaticResource BoolToVis}}"/>
+
+                    <!-- Row 3 : Add event button — rectangular, not CircleButton -->
+                    <Button Grid.Row="3" Content="+ Event" Command="{Binding AddEventCommand}"
+                            Height="28" Padding="12,0" HorizontalAlignment="Left" Margin="0,8,0,0"
+                            FontSize="12" Foreground="{DynamicResource PalisadeTextBrush}"
+                            Background="#25FFFFFF" BorderThickness="1" BorderBrush="{DynamicResource PalisadeBorderBrush}"
+                            Cursor="Hand">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="#35FFFFFF"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                    </Button>
                 </Grid>
             </Border>
         </DockPanel>

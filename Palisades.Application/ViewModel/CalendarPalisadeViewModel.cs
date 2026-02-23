@@ -100,11 +100,14 @@ namespace Palisades.ViewModel
             set { _isLoading = value; OnPropertyChanged(); }
         }
 
+        public bool HasNoEvents => !IsLoading && Events.Count == 0;
+
         public async Task LoadEventsAsync()
         {
             if (_model.CalendarIds == null || _model.CalendarIds.Count == 0)
             {
                 Dispatch(() => { Events.Clear(); ErrorMessage = "No calendars configured. Right-click > Edit to configure."; });
+                Dispatch(() => OnPropertyChanged(nameof(HasNoEvents)));
                 return;
             }
             IsLoading = true;
@@ -125,6 +128,7 @@ namespace Palisades.ViewModel
                 foreach (var evt in ordered)
                 {
                     var evtDate = evt.DtStart.Date;
+                    evt.IsToday = evtDate == DateTime.Today;
                     if (evtDate != prevDate)
                     {
                         evt.DayHeader = evt.DtStart.ToString("ddd dd MMM");
@@ -136,6 +140,7 @@ namespace Palisades.ViewModel
                     Events.Clear();
                     foreach (var evt in ordered)
                         Events.Add(evt);
+                    OnPropertyChanged(nameof(HasNoEvents));
                     var now = DateTime.Now;
                     var threshold = now.AddMinutes(15);
                     foreach (var evt in Events)
@@ -151,7 +156,7 @@ namespace Palisades.ViewModel
             }
             finally
             {
-                Dispatch(() => IsLoading = false);
+                Dispatch(() => { IsLoading = false; OnPropertyChanged(nameof(HasNoEvents)); });
             }
         }
 
