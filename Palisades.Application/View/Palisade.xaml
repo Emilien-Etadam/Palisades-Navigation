@@ -27,9 +27,14 @@
         <viewModel:PalisadeViewModel />
     </Window.DataContext>
     <Window.Resources>
-        <converters:PathToImageConverter x:Key="PathToImage" />
-        <converters:MultiValueEqualityConverter x:Key="MultiValueEqualityConverter" />
-        <helpers:BindingProxy x:Key="proxy" Data="{Binding}" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/View/Styles/PalisadeStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <converters:PathToImageConverter x:Key="PathToImage" />
+            <converters:MultiValueEqualityConverter x:Key="MultiValueEqualityConverter" />
+            <helpers:BindingProxy x:Key="proxy" Data="{Binding}" />
+        </ResourceDictionary>
     </Window.Resources>
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="KeyDown" >
@@ -71,7 +76,7 @@
                         <MenuItem Header="About" Command="{Binding Path=Data.OpenAboutCommand, Source={StaticResource proxy}}" />
                     </ContextMenu>
                 </Grid.ContextMenu>
-                <Label Grid.Column="1"  Content="{Binding Name, Mode=OneWay}" Margin="8,0" FontSize="16" Foreground="{DynamicResource PalisadeTextBrush}"  HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="1" Text="{Binding Name, Mode=OneWay}" Margin="8,0" Style="{StaticResource PalisadeHeaderText}" HorizontalAlignment="Center"/>
             </Grid>
             <Border x:Name="drag" CornerRadius="0" Background="{DynamicResource PalisadeControlBrush}" AllowDrop="True" Drop="OnExternalFileDrop" DragOver="OnExternalFileDragOver">
                 <Border.ContextMenu>
@@ -114,7 +119,7 @@
                                             <Style>
                                                 <Style.Triggers>
                                                     <Trigger Property="Border.IsMouseOver" Value="True" >
-                                                        <Setter Property="Border.Background" Value="#20FFFFFF" />
+                                                        <Setter Property="Border.Background" Value="{DynamicResource PalisadeCardHoverBrush}" />
                                                     </Trigger>
                                                     <DataTrigger Value="True">
                                                         <DataTrigger.Binding>
@@ -123,7 +128,7 @@
                                                                 <Binding Path="Data.SelectedShortcut" Source="{StaticResource proxy}" Mode="OneWay" />
                                                             </MultiBinding>
                                                         </DataTrigger.Binding>
-                                                        <Setter Property="Border.Background" Value="#20FFFFFF" />
+                                                        <Setter Property="Border.Background" Value="{DynamicResource PalisadeCardHoverBrush}" />
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>

@@ -27,10 +27,15 @@
         <viewModel:FolderPortalViewModel />
     </Window.DataContext>
     <Window.Resources>
-        <converters:PathToImageConverter x:Key="PathToImage" />
-        <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
-        <helpers:BindingProxy x:Key="proxy" Data="{Binding}" />
-        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/View/Styles/PalisadeStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <converters:PathToImageConverter x:Key="PathToImage" />
+            <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
+            <helpers:BindingProxy x:Key="proxy" Data="{Binding}" />
+            <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        </ResourceDictionary>
     </Window.Resources>
     <Border x:Name="LayoutRoot" CornerRadius="0" ClipToBounds="True">
         <DockPanel>
@@ -92,7 +97,7 @@
                                             </Border>
                                             <ControlTemplate.Triggers>
                                                 <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter Property="Background" Value="#30FFFFFF" />
+                                                    <Setter Property="Background" Value="{DynamicResource PalisadeCardPressedBrush}" />
                                                 </Trigger>
                                             </ControlTemplate.Triggers>
                                         </ControlTemplate>
@@ -102,7 +107,7 @@
                         </Button.Style>
                         &#x2190;
                     </Button>
-                    <Label Grid.Column="1" Content="{Binding Name, Mode=OneWay}" Margin="5,0" FontSize="16" Foreground="{DynamicResource PalisadeTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="{Binding Name, Mode=OneWay}" Margin="5,0" Style="{StaticResource PalisadeHeaderText}" HorizontalAlignment="Center"/>
 
                     <!-- Home button -->
                     <Button Grid.Column="2"
@@ -125,7 +130,7 @@
                                             </Border>
                                             <ControlTemplate.Triggers>
                                                 <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter Property="Background" Value="#30FFFFFF" />
+                                                    <Setter Property="Background" Value="{DynamicResource PalisadeCardPressedBrush}" />
                                                 </Trigger>
                                             </ControlTemplate.Triggers>
                                         </ControlTemplate>
@@ -190,7 +195,7 @@
                                             <Style>
                                                 <Style.Triggers>
                                                     <Trigger Property="Border.IsMouseOver" Value="True">
-                                                        <Setter Property="Border.Background" Value="#20FFFFFF" />
+                                                        <Setter Property="Border.Background" Value="{DynamicResource PalisadeCardHoverBrush}" />
                                                     </Trigger>
                                                 </Style.Triggers>
                                             </Style>

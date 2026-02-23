@@ -67,7 +67,7 @@
                         <MenuItem Header="About" Command="{Binding Path=Data.OpenAboutCommand, Source={StaticResource proxy}}" />
                     </ContextMenu>
                 </Grid.ContextMenu>
-                <Label Grid.Column="0" Content="{Binding Name, Mode=OneWay}" Margin="8,0" FontSize="14" Foreground="{DynamicResource PalisadeTextBrush}" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="0" Text="{Binding Name, Mode=OneWay}" Margin="8,0" Style="{StaticResource PalisadeHeaderText}"/>
                 <Button Grid.Column="1" Content="🔄" ToolTip="Refresh" Command="{Binding RefreshCommand}" CommandParameter="{Binding}"
                         Style="{StaticResource CircleButton}" Width="28" Height="28" Margin="0,0,8,0" VerticalAlignment="Center"/>
             </Grid>
@@ -92,7 +92,7 @@
                     <!-- Row 2 : Loading -->
                     <StackPanel Grid.Row="2" Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}"
                                 HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <ProgressBar IsIndeterminate="True" Width="120" Height="8"/>
+                        <ProgressBar Style="{StaticResource PalisadeProgressBar}"/>
                         <TextBlock Text="Chargement..." HorizontalAlignment="Center" Margin="0,8,0,0" Foreground="{DynamicResource PalisadeTextBrush}"/>
                     </StackPanel>
 
@@ -106,24 +106,10 @@
                              BorderThickness="0"
                              Visibility="{Binding IsLoading, Converter={StaticResource InverseBoolToVis}}">
                         <ListBox.Resources>
-                            <Style TargetType="ScrollBar">
-                                <Setter Property="Width" Value="4"/>
-                                <Setter Property="Background" Value="Transparent"/>
-                            </Style>
+                            <Style TargetType="ScrollBar" BasedOn="{StaticResource PalisadeScrollBarStyle}"/>
                         </ListBox.Resources>
                         <ListBox.ItemContainerStyle>
-                            <Style TargetType="ListBoxItem">
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                                <Setter Property="Padding" Value="0"/>
-                                <Setter Property="Margin" Value="0"/>
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="ListBoxItem">
-                                            <ContentPresenter/>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
+                            <Style TargetType="ListBoxItem" BasedOn="{StaticResource PalisadeListBoxItemStyle}"/>
                         </ListBox.ItemContainerStyle>
                         <ListBox.ItemTemplate>
                             <DataTemplate>
@@ -137,7 +123,7 @@
                                                 <Setter Property="Background" Value="Transparent"/>
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding IsToday}" Value="True">
-                                                        <Setter Property="Background" Value="#20FFFFFF"/>
+                                                        <Setter Property="Background" Value="{DynamicResource PalisadeCardHoverBrush}"/>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
@@ -146,7 +132,7 @@
                                     </Border>
                                     <!-- Event card -->
                                     <Border BorderBrush="{DynamicResource PalisadeAccentBrush}" BorderThickness="3,0,0,0"
-                                            Padding="10,8" Margin="0,0,0,2" Background="#10FFFFFF" CornerRadius="0,4,4,0"
+                                            Padding="10,8" Margin="0,0,0,2" Background="{DynamicResource PalisadeCardBrush}" CornerRadius="0,4,4,0"
                                             x:Name="EventCard">
                                         <Grid RowDefinitions="Auto,Auto,Auto">
                                             <TextBlock Grid.Row="0" Text="{Binding Summary, Mode=OneWay}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource PalisadeTextBrush}" TextTrimming="CharacterEllipsis"/>
@@ -157,7 +143,7 @@
                                 </StackPanel>
                                 <DataTemplate.Triggers>
                                     <Trigger SourceName="EventCard" Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="EventCard" Property="Background" Value="#20FFFFFF"/>
+                                        <Setter TargetName="EventCard" Property="Background" Value="{DynamicResource PalisadeCardHoverBrush}"/>
                                     </Trigger>
                                 </DataTemplate.Triggers>
                             </DataTemplate>
@@ -171,29 +157,7 @@
 
                     <!-- Row 3 : Add event button — rectangular, not CircleButton -->
                     <Button Grid.Row="3" Content="+ Event" Command="{Binding AddEventCommand}"
-                            Height="28" Padding="12,0" HorizontalAlignment="Left" Margin="0,8,0,0"
-                            FontSize="12" Foreground="{DynamicResource PalisadeTextBrush}"
-                            Background="#25FFFFFF" BorderThickness="1" BorderBrush="{DynamicResource PalisadeBorderBrush}"
-                            Cursor="Hand">
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="Button">
-                                            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4" Padding="{TemplateBinding Padding}">
-                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                            </Border>
-                                            <ControlTemplate.Triggers>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter Property="Background" Value="#35FFFFFF"/>
-                                                </Trigger>
-                                            </ControlTemplate.Triggers>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </Button.Style>
-                    </Button>
+                            Style="{StaticResource PalisadeActionButton}" HorizontalAlignment="Left" Margin="0,8,0,0"/>
                 </Grid>
             </Border>
         </DockPanel>

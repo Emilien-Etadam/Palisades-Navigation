@@ -98,7 +98,7 @@
                                                 </Border>
                                                 <ControlTemplate.Triggers>
                                                     <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter Property="Background" Value="#15FFFFFF"/>
+                                                        <Setter Property="Background" Value="{DynamicResource PalisadeHoverSubtleBrush}"/>
                                                     </Trigger>
                                                 </ControlTemplate.Triggers>
                                             </ControlTemplate>
@@ -113,7 +113,7 @@
                                                 </MultiBinding>
                                             </DataTrigger.Binding>
                                             <Setter Property="BorderBrush" Value="{DynamicResource PalisadeAccentBrush}"/>
-                                            <Setter Property="Background" Value="#10FFFFFF"/>
+                                            <Setter Property="Background" Value="{DynamicResource PalisadeCardBrush}"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -148,7 +148,7 @@
                 <!-- Row 1 : Loading -->
                 <StackPanel Grid.Row="1" Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}"
                             HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <ProgressBar IsIndeterminate="True" Width="120" Height="8"/>
+                    <ProgressBar Style="{StaticResource PalisadeProgressBar}"/>
                     <TextBlock Text="Loading..." HorizontalAlignment="Center" Margin="0,8,0,0" Foreground="{DynamicResource PalisadeTextBrush}" FontSize="11"/>
                 </StackPanel>
 
@@ -171,29 +171,15 @@
                          Background="Transparent" BorderThickness="0"
                          Visibility="{Binding IsLoading, Converter={StaticResource InverseBoolToVis}}">
                     <ListBox.Resources>
-                        <Style TargetType="ScrollBar">
-                            <Setter Property="Width" Value="4"/>
-                            <Setter Property="Background" Value="Transparent"/>
-                        </Style>
+                        <Style TargetType="ScrollBar" BasedOn="{StaticResource PalisadeScrollBarStyle}"/>
                     </ListBox.Resources>
                     <ListBox.ItemContainerStyle>
-                        <Style TargetType="ListBoxItem">
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                            <Setter Property="Padding" Value="0"/>
-                            <Setter Property="Margin" Value="0"/>
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="ListBoxItem">
-                                        <ContentPresenter/>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
+                        <Style TargetType="ListBoxItem" BasedOn="{StaticResource PalisadeListBoxItemStyle}"/>
                     </ListBox.ItemContainerStyle>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Border Padding="8,6" Margin="0,0,0,2" CornerRadius="4"
-                                    Background="#10FFFFFF" x:Name="TaskCard">
+                                    Background="{DynamicResource PalisadeCardBrush}" x:Name="TaskCard">
                                 <Grid ColumnDefinitions="Auto,*,Auto">
                                     <CheckBox Grid.Column="0" IsChecked="{Binding Completed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                               VerticalAlignment="Top" Margin="0,2,0,0"
@@ -219,7 +205,7 @@
                             </Border>
                             <DataTemplate.Triggers>
                                 <Trigger SourceName="TaskCard" Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="TaskCard" Property="Background" Value="#20FFFFFF"/>
+                                    <Setter TargetName="TaskCard" Property="Background" Value="{DynamicResource PalisadeCardHoverBrush}"/>
                                 </Trigger>
                                 <DataTrigger Binding="{Binding Completed}" Value="True">
                                     <Setter TargetName="TaskCard" Property="Opacity" Value="0.5"/>
@@ -231,28 +217,7 @@
 
                 <!-- Row 2 : Add task button (same style as calendar) -->
                 <Button Grid.Row="2" Content="+ Task" Command="{Binding AddTaskCommand}"
-                        Height="28" Padding="12,0" HorizontalAlignment="Left" Margin="0,8,0,0"
-                        FontSize="12" Foreground="{DynamicResource PalisadeTextBrush}"
-                        Background="#25FFFFFF" BorderThickness="1" BorderBrush="{DynamicResource PalisadeBorderBrush}" Cursor="Hand">
-                    <Button.Style>
-                        <Style TargetType="Button">
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4" Padding="{TemplateBinding Padding}">
-                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                        </Border>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Background" Value="#35FFFFFF"/>
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </Button.Style>
-                </Button>
+                        Style="{StaticResource PalisadeActionButton}" HorizontalAlignment="Left" Margin="0,8,0,0"/>
             </Grid>
         </Border>
     </DockPanel>
