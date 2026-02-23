@@ -25,7 +25,8 @@
                 <ResourceDictionary Source="/View/Styles/PalisadeStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
-            <converters:MultiValueEqualityConverter x:Key="MultiValueEqualityConverter" />
+            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+            <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVis"/>
             <helpers:BindingProxy x:Key="proxy" Data="{Binding}" />
         </ResourceDictionary>
     </Window.Resources>
@@ -73,7 +74,7 @@
             <Border DockPanel.Dock="Top" Background="{DynamicResource PalisadeControlBrush}" CornerRadius="0" Padding="12">
                 <Grid RowDefinitions="Auto,*,Auto">
                     <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}" Foreground="{DynamicResource PalisadeErrorBrush}" Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}" Grid.Row="0" Margin="0,0,0,8"/>
-                    <StackPanel Grid.Row="1" Visibility="{Binding IsLoading, Converter={StaticResource MultiValueEqualityConverter}, ConverterParameter='True,Visible;False,Collapsed'}"
+                    <StackPanel Grid.Row="1" Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}"
                                 HorizontalAlignment="Center" VerticalAlignment="Center">
                         <ProgressBar IsIndeterminate="True" Width="120" Height="8"/>
                         <TextBlock Text="Chargement..." HorizontalAlignment="Center" Margin="0,8,0,0" Foreground="{DynamicResource PalisadeTextBrush}"/>
@@ -85,7 +86,7 @@
                              ScrollViewer.VerticalScrollBarVisibility="Auto"
                              Background="Transparent"
                              BorderThickness="0"
-                             Visibility="{Binding IsLoading, Converter={StaticResource MultiValueEqualityConverter}, ConverterParameter='False,Visible;True,Collapsed'}">
+                             Visibility="{Binding IsLoading, Converter={StaticResource InverseBoolToVis}}">
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem">
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
