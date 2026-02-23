@@ -26,7 +26,6 @@
             </ResourceDictionary.MergedDictionaries>
             <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
             <converters:MultiValueEqualityConverter x:Key="MultiValueEqualityConverter" />
-            <converters:ColorToBrushConverter x:Key="ColorToBrushConverter" />
             <helpers:BindingProxy x:Key="proxy" Data="{Binding}" />
         </ResourceDictionary>
     </Window.Resources>
@@ -103,7 +102,7 @@
                         </ListBox.ItemContainerStyle>
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <Border BorderBrush="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" BorderThickness="3,0,0,0" Padding="8,6" Margin="0,0,0,4" Background="#15FFFFFF">
+                                <Border BorderBrush="{DynamicResource PalisadeAccentBrush}" BorderThickness="3,0,0,0" Padding="8,6" Margin="0,0,0,4" Background="#15FFFFFF">
                                     <Grid RowDefinitions="Auto,Auto">
                                         <TextBlock Grid.Row="0" Text="{Binding Summary, Mode=OneWay}" FontWeight="SemiBold" Foreground="{DynamicResource PalisadeTextBrush}" TextTrimming="CharacterEllipsis"/>
                                         <TextBlock Grid.Row="1" Margin="0,2,0,0" Foreground="{DynamicResource PalisadeTextBrush}" FontSize="12">
