@@ -1,5 +1,4 @@
 using System;
-using System.Windows.Media;
 
 namespace Palisades.Model
 {
@@ -13,7 +12,7 @@ namespace Palisades.Model
         public string Location { get; set; } = string.Empty;
         public bool IsAllDay { get; set; }
         public string CalendarName { get; set; } = string.Empty;
-        public Color Color { get; set; }
+        public string Color { get; set; } = "#708090";
         public string CalDAVHref { get; set; } = string.Empty;
         public string ETag { get; set; } = string.Empty;
     }

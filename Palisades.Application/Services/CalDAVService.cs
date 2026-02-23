@@ -162,10 +162,16 @@ namespace Palisades.Services
         public async Task<List<CalDAVTask>> SyncTasksAsync(string taskListHref, List<CalDAVTask> localTasks)
         {
             var remoteTasks = await GetTasksAsync(taskListHref).ConfigureAwait(false);
+            var remoteByUid = remoteTasks.Where(r => !string.IsNullOrEmpty(r.Uid)).ToDictionary(r => r.Uid);
+            var remoteById = remoteTasks.Where(r => !string.IsNullOrEmpty(r.CalDAVId)).ToDictionary(r => r.CalDAVId);
             var merged = new List<CalDAVTask>();
             foreach (var local in localTasks)
             {
-                var remote = remoteTasks.FirstOrDefault(r => r.CalDAVId == local.CalDAVId || (!string.IsNullOrEmpty(local.Uid) && r.Uid == local.Uid));
+                CalDAVTask? remote = null;
+                if (!string.IsNullOrEmpty(local.CalDAVId) && remoteById.TryGetValue(local.CalDAVId, out var byId))
+                    remote = byId;
+                if (remote == null && !string.IsNullOrEmpty(local.Uid) && remoteByUid.TryGetValue(local.Uid, out var byUid))
+                    remote = byUid;
                 if (remote == null)
                 {
                     var created = await CreateTaskAsync(taskListHref, local).ConfigureAwait(false);
@@ -180,7 +186,9 @@ namespace Palisades.Services
             }
             foreach (var remote in remoteTasks)
             {
-                if (!merged.Any(m => m.CalDAVId == remote.CalDAVId || m.Uid == remote.Uid))
+                bool alreadyMerged = (!string.IsNullOrEmpty(remote.CalDAVId) && merged.Any(m => m.CalDAVId == remote.CalDAVId))
+                    || (!string.IsNullOrEmpty(remote.Uid) && merged.Any(m => m.Uid == remote.Uid));
+                if (!alreadyMerged)
                     merged.Add(remote);
             }
             return merged;

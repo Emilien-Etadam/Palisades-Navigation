@@ -50,7 +50,7 @@ namespace Palisades.View
                 FoldersListBox.SelectedItems.Clear();
                 if (folders.Contains("INBOX"))
                     FoldersListBox.SelectedItems.Add("INBOX");
-                await service.DisconnectAsync();
+                service.Disconnect();
                 MessageBox.Show("Connection successful. Select folders to monitor.", "Mail", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (System.Exception ex)

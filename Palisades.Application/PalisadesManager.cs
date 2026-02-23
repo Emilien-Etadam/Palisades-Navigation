@@ -311,6 +311,7 @@ namespace Palisades
             {
                 var member = group.Members.FirstOrDefault(m => m.Identifier == identifier);
                 if (member == null) return;
+                (member as IDisposable)?.Dispose();
                 DeleteViewModel(member);
                 group.RemoveMember(member);
                 foreach (var m in group.Members)
@@ -348,6 +349,7 @@ namespace Palisades
             else if (window.DataContext is MailPalisadeViewModel mailPalisadeVm)
                 mailPalisadeVm.Delete();
 
+            (window.DataContext as IDisposable)?.Dispose();
             window.Close();
             palisades.Remove(identifier);
         }

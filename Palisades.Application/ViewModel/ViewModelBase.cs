@@ -4,6 +4,7 @@ using Palisades.Helpers;
 using Palisades.Model;
 using Palisades.Services;
 using Palisades.View;
+using System;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -13,7 +14,7 @@ using System.Xml.Serialization;
 
 namespace Palisades.ViewModel
 {
-    public abstract class ViewModelBase : INotifyPropertyChanged, IPalisadeViewModel
+    public abstract class ViewModelBase : INotifyPropertyChanged, IPalisadeViewModel, IDisposable
     {
         /// <summary>Sérialiseur partagé pour garantir un format XML compatible avec LoadPalisades (root/namespace cohérents).</summary>
         public static readonly XmlSerializer SharedSerializer = new XmlSerializer(
@@ -189,6 +190,12 @@ namespace Palisades.ViewModel
         }
 
         #endregion
+
+        public virtual void Dispose()
+        {
+            _saveTimer.Dispose();
+            if (ShouldSave) SaveAsync();
+        }
 
         #region INotifyPropertyChanged
 

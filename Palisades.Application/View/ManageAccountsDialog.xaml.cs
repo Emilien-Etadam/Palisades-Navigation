@@ -83,7 +83,7 @@ namespace Palisades.View
                     var host = !string.IsNullOrEmpty(acc.ImapHost) ? acc.ImapHost : acc.Server;
                     var imap = new ImapMailService(host, 993, acc.Email, password);
                     await imap.ConnectAsync();
-                    await imap.DisconnectAsync();
+                    imap.Disconnect();
                 }
                 acc.LastTestStatus = "OK";
             }

@@ -7,8 +7,20 @@ namespace Palisades.Helpers
 {
     public static class ThemeWatcher
     {
+        private static ResourceDictionary? _resources;
+
+        static ThemeWatcher()
+        {
+            Microsoft.Win32.SystemEvents.UserPreferenceChanged += (_, e) =>
+            {
+                if (e.Category == Microsoft.Win32.UserPreferenceCategory.General && _resources != null)
+                    Application.Current?.Dispatcher.Invoke(() => Apply(_resources));
+            };
+        }
+
         public static void Apply(ResourceDictionary resources)
         {
+            _resources = resources;
             bool dark = IsDarkMode();
             resources["PalisadeWindowBrush"] = new SolidColorBrush(dark ? Color.FromRgb(0x1E, 0x1E, 0x1E) : Color.FromRgb(0xF3, 0xF3, 0xF3));
             resources["PalisadeControlBrush"] = new SolidColorBrush(dark ? Color.FromRgb(0x2D, 0x2D, 0x2D) : Color.FromRgb(0xFF, 0xFF, 0xFF));

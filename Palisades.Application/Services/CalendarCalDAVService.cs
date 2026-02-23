@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Ical.Net;
 using Ical.Net.CalendarComponents;
-using System.Windows.Media;
 
 namespace Palisades.Services
 {
@@ -50,11 +49,11 @@ namespace Palisades.Services
 </c:calendar-query>";
 
             var doc = await _client.ReportAsync(calendarHref, requestBody).ConfigureAwait(false);
-            ParseEventsFromMultistatus(doc, calendarHref, "Calendar", Colors.SlateGray, events);
+            ParseEventsFromMultistatus(doc, calendarHref, "Calendar", "#708090", events);
             return events;
         }
 
-        private static void ParseEventsFromMultistatus(XDocument xdoc, string calendarId, string calendarName, Color defaultColor, List<Model.CalendarEvent> events)
+        private static void ParseEventsFromMultistatus(XDocument xdoc, string calendarId, string calendarName, string defaultColorHex, List<Model.CalendarEvent> events)
         {
             var responses = CalDAVClient.ParseMultistatus(xdoc);
             foreach (var (href, props, _) in responses)
@@ -70,7 +69,7 @@ namespace Palisades.Services
                 {
                     var calendar = Ical.Net.Calendar.Load(calendarData);
                     foreach (var evt in calendar.Events)
-                        events.Add(MapIcalEventToCalendarEvent(evt, href, etag, calendarName, defaultColor));
+                        events.Add(MapIcalEventToCalendarEvent(evt, href, etag, calendarName, defaultColorHex));
                 }
                 catch
                 {
@@ -79,7 +78,7 @@ namespace Palisades.Services
             }
         }
 
-        private static Model.CalendarEvent MapIcalEventToCalendarEvent(Ical.Net.CalendarComponents.CalendarEvent evt, string caldavHref, string etag, string calendarName, Color color)
+        private static Model.CalendarEvent MapIcalEventToCalendarEvent(Ical.Net.CalendarComponents.CalendarEvent evt, string caldavHref, string etag, string calendarName, string colorHex)
         {
             var start = evt.Start?.Value ?? DateTime.MinValue;
             var end = evt.End?.Value ?? evt.Start?.Value ?? DateTime.MinValue;
@@ -93,7 +92,7 @@ namespace Palisades.Services
                 Location = evt.Location ?? "",
                 IsAllDay = evt.IsAllDay,
                 CalendarName = calendarName,
-                Color = color,
+                Color = colorHex,
                 CalDAVHref = caldavHref,
                 ETag = etag
             };

@@ -41,18 +41,20 @@ namespace Palisades.Services
         {
             if (string.IsNullOrWhiteSpace(_host))
                 throw new InvalidOperationException("IMAP host is required.");
+            ImapClient localClient;
             lock (_clientLock)
             {
                 if (_client?.IsConnected == true)
                     return;
                 _client?.Dispose();
                 _client = new ImapClient();
+                localClient = _client;
             }
-            await _client.ConnectAsync(_host, _port, SecureSocketOptions.SslOnConnect).ConfigureAwait(false);
-            await _client.AuthenticateAsync(_username, _password).ConfigureAwait(false);
+            await localClient.ConnectAsync(_host, _port, SecureSocketOptions.SslOnConnect).ConfigureAwait(false);
+            await localClient.AuthenticateAsync(_username, _password).ConfigureAwait(false);
         }
 
-        public async Task DisconnectAsync()
+        public void Disconnect()
         {
             lock (_clientLock)
             {
@@ -62,7 +64,6 @@ namespace Palisades.Services
                 _client.Dispose();
                 _client = null;
             }
-            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         /// <summary>Retourne le nombre de messages non lus dans le dossier (IMAP STATUS).</summary>

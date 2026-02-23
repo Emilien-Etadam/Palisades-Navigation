@@ -10,10 +10,10 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
-using Color = System.Windows.Media.Color;
 
 namespace Palisades.ViewModel
 {
@@ -156,6 +156,66 @@ namespace Palisades.ViewModel
                 }
                 RefreshCommand.Execute(null);
             });
+
+            NavigateIntoFolderCommand = new RelayCommand<FolderPortalItem>(item =>
+            {
+                if (item == null) return;
+                if (item.IsDirectory)
+                    LoadFolder(item.FullPath);
+                else
+                {
+                    try
+                    {
+                        Process.Start(new ProcessStartInfo { FileName = item.FullPath, UseShellExecute = true });
+                    }
+                    catch (Exception ex)
+                    {
+                        ErrorMessage = "Cannot open file: " + ex.Message;
+                    }
+                }
+            });
+
+            NavigateBackCommand = new RelayCommand(() =>
+            {
+                if (!CanNavigateBack) return;
+                string? parent = Directory.GetParent(CurrentPath)?.FullName;
+                if (parent != null)
+                {
+                    string rootFull = Path.GetFullPath(RootPath).TrimEnd(Path.DirectorySeparatorChar);
+                    string parentFull = Path.GetFullPath(parent).TrimEnd(Path.DirectorySeparatorChar);
+                    if (parentFull.Length >= rootFull.Length)
+                        LoadFolder(parent);
+                }
+            });
+
+            OpenInExplorerCommand = new RelayCommand(() =>
+            {
+                if (string.IsNullOrEmpty(CurrentPath) || !Directory.Exists(CurrentPath)) return;
+                try
+                {
+                    Process.Start(new ProcessStartInfo { FileName = "explorer.exe", Arguments = CurrentPath, UseShellExecute = true });
+                }
+                catch { }
+            });
+
+            RefreshCommand = new RelayCommand(() =>
+            {
+                if (!string.IsNullOrEmpty(CurrentPath))
+                    LoadFolder(CurrentPath);
+            });
+
+            NavigateToRootCommand = new RelayCommand(() =>
+            {
+                if (!string.IsNullOrEmpty(RootPath) && Directory.Exists(RootPath))
+                    LoadFolder(RootPath);
+            });
+
+            EditFolderPortalCommand = new RelayCommand<FolderPortalViewModel>(viewModel =>
+            {
+                var edit = new EditFolderPortal { DataContext = viewModel };
+                try { edit.Owner = PalisadesManager.GetWindow(viewModel.Identifier); } catch { }
+                edit.ShowDialog();
+            });
         }
 
         public void LoadFolder(string path)
@@ -245,11 +305,18 @@ namespace Palisades.ViewModel
             catch { return false; }
         }
 
+        private static string StableHash(string input)
+        {
+            var bytes = Encoding.UTF8.GetBytes(input);
+            var hash = SHA256.HashData(bytes);
+            return Convert.ToHexString(hash, 0, 4);
+        }
+
         private string GetOrCreateFolderIcon(string folderPath)
         {
             string iconsDir = PDirectory.GetPalisadeIconsDirectory(Identifier);
             PDirectory.EnsureExists(iconsDir);
-            string hashName = "folder_" + folderPath.GetHashCode().ToString("X") + ".png";
+            string hashName = "folder_" + StableHash(folderPath) + ".png";
             string iconPath = Path.Combine(iconsDir, hashName);
             if (File.Exists(iconPath))
                 return iconPath;
@@ -271,7 +338,7 @@ namespace Palisades.ViewModel
         {
             string iconsDir = PDirectory.GetPalisadeIconsDirectory(Identifier);
             PDirectory.EnsureExists(iconsDir);
-            string hashName = "file_" + filePath.GetHashCode().ToString("X") + ".png";
+            string hashName = "file_" + StableHash(filePath) + ".png";
             string iconPath = Path.Combine(iconsDir, hashName);
             if (File.Exists(iconPath))
                 return iconPath;
@@ -430,66 +497,12 @@ namespace Palisades.ViewModel
         public ICommand CreateNewFolderCommand { get; }
         public ICommand CreateNewFileCommand { get; }
         public ICommand PasteFromClipboardCommand { get; }
-
-        public ICommand NavigateIntoFolderCommand => new RelayCommand<FolderPortalItem>(item =>
-        {
-            if (item == null) return;
-            if (item.IsDirectory)
-                LoadFolder(item.FullPath);
-            else
-            {
-                try
-                {
-                    Process.Start(new ProcessStartInfo { FileName = item.FullPath, UseShellExecute = true });
-                }
-                catch (Exception ex)
-                {
-                    ErrorMessage = "Cannot open file: " + ex.Message;
-                }
-            }
-        });
-
-        public ICommand NavigateBackCommand => new RelayCommand(() =>
-        {
-            if (!CanNavigateBack) return;
-            string? parent = Directory.GetParent(CurrentPath)?.FullName;
-            if (parent != null)
-            {
-                string rootFull = Path.GetFullPath(RootPath).TrimEnd(Path.DirectorySeparatorChar);
-                string parentFull = Path.GetFullPath(parent).TrimEnd(Path.DirectorySeparatorChar);
-                if (parentFull.Length >= rootFull.Length)
-                    LoadFolder(parent);
-            }
-        });
-
-        public ICommand OpenInExplorerCommand => new RelayCommand(() =>
-        {
-            if (string.IsNullOrEmpty(CurrentPath) || !Directory.Exists(CurrentPath)) return;
-            try
-            {
-                Process.Start(new ProcessStartInfo { FileName = "explorer.exe", Arguments = CurrentPath, UseShellExecute = true });
-            }
-            catch { }
-        });
-
-        public ICommand RefreshCommand => new RelayCommand(() =>
-        {
-            if (!string.IsNullOrEmpty(CurrentPath))
-                LoadFolder(CurrentPath);
-        });
-
-        public ICommand NavigateToRootCommand => new RelayCommand(() =>
-        {
-            if (!string.IsNullOrEmpty(RootPath) && Directory.Exists(RootPath))
-                LoadFolder(RootPath);
-        });
-
-        public ICommand EditFolderPortalCommand => new RelayCommand<FolderPortalViewModel>(viewModel =>
-        {
-            var edit = new EditFolderPortal { DataContext = viewModel };
-            try { edit.Owner = PalisadesManager.GetWindow(viewModel.Identifier); } catch { }
-            edit.ShowDialog();
-        });
+        public ICommand NavigateIntoFolderCommand { get; }
+        public ICommand NavigateBackCommand { get; }
+        public ICommand OpenInExplorerCommand { get; }
+        public ICommand RefreshCommand { get; }
+        public ICommand NavigateToRootCommand { get; }
+        public ICommand EditFolderPortalCommand { get; }
         #endregion
     }
 }
