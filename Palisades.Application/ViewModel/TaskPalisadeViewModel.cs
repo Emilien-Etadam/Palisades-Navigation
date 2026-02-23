@@ -232,10 +232,15 @@ namespace Palisades.ViewModel
         private string GetListIdForSelectedTask()
         {
             if (SelectedTask == null) return TaskListId;
+            return GetListIdForTask(SelectedTask);
+        }
+
+        private string GetListIdForTask(CalDAVTask task)
+        {
             if (TaskTabs.Count > 1)
             {
                 foreach (var tab in TaskTabs)
-                    if (tab.Tasks.Contains(SelectedTask))
+                    if (tab.Tasks.Contains(task))
                         return tab.ListId;
             }
             return TaskListId;
@@ -287,9 +292,11 @@ namespace Palisades.ViewModel
                         {
                             TaskTabs.Add(tab);
                             OnPropertyChanged(nameof(HasMultipleLists));
+                            if (SelectedTaskTab == null && TaskTabs.Count > 0)
+                                SelectedTaskTab = TaskTabs[0];
                         });
                     }
-                    Dispatch(() => { SyncStatus = "Tasks loaded successfully"; });
+                    Dispatch(() => { SyncStatus = "Tasks loaded successfully"; OnPropertyChanged(nameof(ActiveTasks)); OnPropertyChanged(nameof(HasNoTasks)); });
                 }
                 else
                 {
