@@ -38,7 +38,7 @@
     </Window.Resources>
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="KeyDown" >
-            <i:InvokeCommandAction Command="{Binding DelKeyPressed}" CommandParameter="{Binding}" />
+            <i:InvokeCommandAction Command="{Binding DelKeyPressedCommand}" CommandParameter="{Binding}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Border x:Name="LayoutRoot" CornerRadius="0" ClipToBounds="True">
@@ -111,7 +111,7 @@
                                             <i:LaunchUriOrFileAction Path="{Binding UriOrFileAction}" />
                                         </i:EventTrigger>
                                         <i:EventTrigger EventName="MouseDown" >
-                                            <i:InvokeCommandAction Command="{Binding Path=Data.ClickShortcut, Source={StaticResource proxy}}" CommandParameter="{Binding}" />
+                                            <i:InvokeCommandAction Command="{Binding Path=Data.ClickShortcutCommand, Source={StaticResource proxy}}" CommandParameter="{Binding}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                     <Border Margin="0,10" CornerRadius="4" Width="100">

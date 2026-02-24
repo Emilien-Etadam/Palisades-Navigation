@@ -53,11 +53,16 @@ namespace Palisades.ViewModel
             {
                 if (sc != null && Shortcuts.Remove(sc)) Save();
             });
+
+            ClickShortcutCommand = new RelayCommand<Shortcut>(SelectShortcut);
+            DelKeyPressedCommand = new RelayCommand(DeleteShortcut);
         }
 
         public ICommand PasteShortcutCommand { get; }
         public ICommand SortByNameCommand { get; }
         public ICommand RemoveSelectedShortcutCommand { get; }
+        public ICommand ClickShortcutCommand { get; }
+        public ICommand DelKeyPressedCommand { get; }
 
         public ObservableCollection<Shortcut> Shortcuts
         {
@@ -151,8 +156,6 @@ namespace Palisades.ViewModel
             }
         }
 
-        public ICommand ClickShortcut => new RelayCommand<Shortcut>(SelectShortcut);
-
         public void SelectShortcut(Shortcut shortcut)
         {
             if (SelectedShortcut == shortcut)
@@ -162,8 +165,6 @@ namespace Palisades.ViewModel
             }
             SelectedShortcut = shortcut;
         }
-
-        public ICommand DelKeyPressed => new RelayCommand(DeleteShortcut);
 
         public void DeleteShortcut()
         {

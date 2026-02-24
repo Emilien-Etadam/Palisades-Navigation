@@ -6,6 +6,7 @@
         xmlns:converters="clr-namespace:Palisades.Converters"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
+        xmlns:model="clr-namespace:Palisades.Model"
         helpers:WindowBackdrop.IsEnabled="True"
         helpers:WindowSinker.AlwaysOnBottom="True"
         ShowInTaskbar="False"
@@ -23,78 +24,16 @@
         <WindowChrome CaptionHeight="0" ResizeBorderThickness="5" CornerRadius="0" GlassFrameThickness="0" NonClientFrameEdges="None" UseAeroCaptionButtons="False" />
     </WindowChrome.WindowChrome>
     <Window.Resources>
-        <converters:PathToImageConverter x:Key="PathToImage" />
-        <converters:MultiValueEqualityConverter x:Key="MultiValueEqualityConverter" />
-        <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
-        <BooleanToVisibilityConverter x:Key="BoolToVis" />
-        <helpers:BindingProxy x:Key="proxy" Data="{Binding}" />
-
-        <!-- Style Flat : barre d'onglets uniforme -->
-        <Style x:Key="FlatTabStyle" TargetType="TabControl">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="TabControl">
-                        <DockPanel>
-                            <Border DockPanel.Dock="Top" Background="#E0202020" Padding="0,4,0,0">
-                                <ItemsPresenter />
-                            </Border>
-                            <ContentPresenter Content="{TemplateBinding SelectedContent}" ContentTemplate="{TemplateBinding SelectedContentTemplate}"
-                                              ContentTemplateSelector="{TemplateBinding SelectedContentTemplateSelector}" Margin="0" />
-                        </DockPanel>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style x:Key="FlatTabItemStyle" TargetType="TabItem">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="TabItem">
-                        <Border x:Name="Border" Background="Transparent" Padding="12,6" Margin="2,0,0,0" Cursor="Hand">
-                            <ContentPresenter ContentSource="Header" />
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="#30FFFFFF" />
-                                        </Trigger>
-                                        <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=TabItem}}" Value="True">
-                                            <Setter Property="Background" Value="#40FFFFFF" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Border.Style>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Border" Property="Background" Value="#35FFFFFF" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- Style Rounded : onglets avec coins arrondis -->
-        <Style x:Key="RoundedTabStyle" TargetType="TabControl" BasedOn="{StaticResource FlatTabStyle}" />
-        <Style x:Key="RoundedTabItemStyle" TargetType="TabItem">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="TabItem">
-                        <Border x:Name="Border" Background="#25FFFFFF" CornerRadius="6,6,0,0" Padding="12,6" Margin="2,0,0,0" Cursor="Hand">
-                            <ContentPresenter ContentSource="Header" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Border" Property="Background" Value="#30FFFFFF" />
-                            </Trigger>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Border" Property="Background" Value="#50FFFFFF" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/View/Styles/PalisadeStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <converters:PathToImageConverter x:Key="PathToImage" />
+            <converters:MultiValueEqualityConverter x:Key="MultiValueEqualityConverter" />
+            <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
+            <BooleanToVisibilityConverter x:Key="BoolToVis" />
+            <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVis" />
+            <helpers:BindingProxy x:Key="proxy" Data="{Binding}" />
 
         <!-- Standard -->
         <DataTemplate DataType="{x:Type viewModel:PalisadeViewModel}">
@@ -102,6 +41,12 @@
                 <Grid.Resources>
                     <helpers:BindingProxy x:Key="tabProxy" Data="{Binding}" />
                 </Grid.Resources>
+                <Grid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Paste" Command="{Binding PasteShortcutCommand}"/>
+                        <MenuItem Header="Sort by name" Command="{Binding SortByNameCommand}"/>
+                    </ContextMenu>
+                </Grid.ContextMenu>
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="Drop">
                         <i:InvokeCommandAction Command="{Binding DropShortcut}" PassEventArgsToCommand="True" />
@@ -125,7 +70,7 @@
                                             <i:LaunchUriOrFileAction Path="{Binding UriOrFileAction}" />
                                         </i:EventTrigger>
                                         <i:EventTrigger EventName="MouseDown">
-                                            <i:InvokeCommandAction Command="{Binding Path=Data.ClickShortcut, Source={StaticResource tabProxy}}" CommandParameter="{Binding}" />
+                                            <i:InvokeCommandAction Command="{Binding Path=Data.ClickShortcutCommand, Source={StaticResource tabProxy}}" CommandParameter="{Binding}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                     <Border Margin="0,10" CornerRadius="4" Width="100">
@@ -133,7 +78,7 @@
                                             <Style>
                                                 <Style.Triggers>
                                                     <Trigger Property="Border.IsMouseOver" Value="True">
-                                                        <Setter Property="Border.Background" Value="#20FFFFFF" />
+                                                        <Setter Property="Border.Background" Value="{DynamicResource PalisadeCardHoverBrush}" />
                                                     </Trigger>
                                                     <DataTrigger Value="True">
                                                         <DataTrigger.Binding>
@@ -142,7 +87,7 @@
                                                                 <Binding Path="Data.SelectedShortcut" Source="{StaticResource tabProxy}" Mode="OneWay" />
                                                             </MultiBinding>
                                                         </DataTrigger.Binding>
-                                                        <Setter Property="Border.Background" Value="#20FFFFFF" />
+                                                        <Setter Property="Border.Background" Value="{DynamicResource PalisadeCardHoverBrush}" />
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
@@ -164,118 +109,317 @@
 
         <!-- FolderPortal -->
         <DataTemplate DataType="{x:Type viewModel:FolderPortalViewModel}">
-            <Grid Background="{DynamicResource PalisadeControlBrush}">
-                <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}" Foreground="{DynamicResource PalisadeErrorBrush}" Margin="15,10" Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}" />
-                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="10">
-                    <ItemsControl ItemsSource="{Binding Items}"
-                                 VirtualizingPanel.IsVirtualizing="True"
-                                 VirtualizingPanel.VirtualizationMode="Recycling">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Margin="0,0,0,10" CornerRadius="4" Width="100" Cursor="Hand">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="MouseDoubleClick">
-                                            <i:InvokeCommandAction Command="{Binding DataContext.NavigateIntoFolderCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                    <StackPanel>
-                                        <Image Source="{Binding IconPath, Converter={StaticResource PathToImage}}" Width="48" Height="48" Stretch="UniformToFill" Margin="5" />
-                                        <TextBlock Text="{Binding Name, Mode=OneWay}" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource PalisadeTextBrush}" Margin="5,0,5,5" />
-                                    </StackPanel>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
-            </Grid>
+            <Border CornerRadius="0" ClipToBounds="True" Background="{DynamicResource PalisadeControlBrush}">
+                <Grid>
+                    <Grid.Resources>
+                        <helpers:BindingProxy x:Key="folderProxy" Data="{Binding}" />
+                    </Grid.Resources>
+                    <Grid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="New folder" Command="{Binding CreateNewFolderCommand}"/>
+                            <MenuItem Header="New text file" Command="{Binding CreateNewFileCommand}"/>
+                            <MenuItem Header="Paste" Command="{Binding PasteFromClipboardCommand}"/>
+                            <Separator/>
+                            <MenuItem Header="Refresh" Command="{Binding RefreshCommand}"/>
+                            <MenuItem Header="Open in Explorer" Command="{Binding OpenInExplorerCommand}"/>
+                        </ContextMenu>
+                    </Grid.ContextMenu>
+                    <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}"
+                               Foreground="{DynamicResource PalisadeErrorBrush}"
+                               FontSize="13"
+                               Margin="15,10"
+                               TextWrapping="Wrap"
+                               Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}, FallbackValue=Collapsed}" />
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl ItemsSource="{Binding Items}" Margin="10"
+                                      VirtualizingPanel.IsVirtualizing="True"
+                                      VirtualizingPanel.VirtualizationMode="Recycling"
+                                      dd:DragDrop.IsDragSource="True"
+                                      dd:DragDrop.IsDropTarget="True"
+                                      dd:DragDrop.DropHandler="{Binding}"
+                                      dd:DragDrop.DragHandler="{Binding}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <ContentControl>
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseDoubleClick">
+                                                <i:InvokeCommandAction Command="{Binding Path=Data.NavigateIntoFolderCommand, Source={StaticResource folderProxy}}" CommandParameter="{Binding}" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                        <Border Margin="0,10" CornerRadius="4" Width="100">
+                                            <Border.Style>
+                                                <Style>
+                                                    <Style.Triggers>
+                                                        <Trigger Property="Border.IsMouseOver" Value="True">
+                                                            <Setter Property="Border.Background" Value="{DynamicResource PalisadeCardHoverBrush}" />
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <StackPanel VerticalAlignment="Top" HorizontalAlignment="Center" Cursor="Hand">
+                                                <Image Source="{Binding IconPath, Converter={StaticResource PathToImage}}" Width="48" Height="48" Stretch="UniformToFill" Margin="5" />
+                                                <TextBlock TextWrapping="NoWrap" TextAlignment="Center" TextTrimming="CharacterEllipsis" Text="{Binding Name, Mode=OneWay}"
+                                                           Foreground="{DynamicResource PalisadeTextBrush}" HorizontalAlignment="Center" Margin="5,0,5,5" ToolTip="{Binding Name, Mode=OneWay}" />
+                                            </StackPanel>
+                                        </Border>
+                                    </ContentControl>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
         </DataTemplate>
 
         <!-- Task -->
         <DataTemplate DataType="{x:Type viewModel:TaskPalisadeViewModel}">
-            <Grid Background="{DynamicResource PalisadeControlBrush}">
-                <Grid.Resources>
-                    <ResourceDictionary>
-                        <ResourceDictionary.MergedDictionaries>
-                            <ResourceDictionary Source="/View/Styles/PalisadeStyles.xaml"/>
-                        </ResourceDictionary.MergedDictionaries>
-                    </ResourceDictionary>
-                </Grid.Resources>
-                <Grid Margin="10" RowDefinitions="Auto,*,Auto">
-                    <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}" Foreground="{DynamicResource PalisadeErrorBrush}" Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}" Margin="0,0,0,10"/>
-                    <ListBox Grid.Row="1" ItemsSource="{Binding Tasks}"
+            <Border Background="{DynamicResource PalisadeControlBrush}" Padding="10">
+                <Grid RowDefinitions="Auto,*,Auto">
+                    <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}" Foreground="{DynamicResource PalisadeErrorBrush}"
+                               Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}"
+                               Grid.Row="0" Margin="0,0,0,8" FontSize="11"/>
+                    <StackPanel Grid.Row="1" Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}"
+                                HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <ProgressBar Style="{StaticResource PalisadeProgressBar}"/>
+                        <TextBlock Text="Loading..." HorizontalAlignment="Center" Margin="0,8,0,0" Foreground="{DynamicResource PalisadeTextBrush}" FontSize="11"/>
+                    </StackPanel>
+                    <TextBlock Grid.Row="1" Text="{Binding SyncStatus}" FontSize="10" Foreground="{DynamicResource PalisadeSubtleBrush}"
+                               HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,0,4"
+                               Visibility="{Binding IsSyncing, Converter={StaticResource BoolToVis}}"/>
+                    <TextBlock Grid.Row="1" Text="Aucune tâche" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               FontSize="13" Foreground="{DynamicResource PalisadeSubtleBrush}" FontStyle="Italic"
+                               Visibility="{Binding HasNoTasks, Converter={StaticResource BoolToVis}}"/>
+                    <ListBox Grid.Row="1" ItemsSource="{Binding ActiveTasks}"
+                             VirtualizingPanel.IsVirtualizing="True"
+                             VirtualizingPanel.VirtualizationMode="Recycling"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             ScrollViewer.VerticalScrollBarVisibility="Auto"
+                             Background="Transparent" BorderThickness="0"
+                             Visibility="{Binding IsLoading, Converter={StaticResource InverseBoolToVis}}">
+                        <ListBox.Resources>
+                            <Style TargetType="ScrollBar" BasedOn="{StaticResource PalisadeScrollBarStyle}"/>
+                        </ListBox.Resources>
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem" BasedOn="{StaticResource PalisadeListBoxItemStyle}"/>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border Padding="8,6" Margin="0,0,0,2" CornerRadius="4"
+                                        Background="{DynamicResource PalisadeCardBrush}" x:Name="TaskCard">
+                                    <Grid ColumnDefinitions="Auto,*,Auto">
+                                        <CheckBox Grid.Column="0" IsChecked="{Binding Completed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                  VerticalAlignment="Top" Margin="0,2,0,0"
+                                                  Command="{Binding DataContext.ToggleTaskCompletedCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                                  CommandParameter="{Binding}"/>
+                                        <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                                            <TextBlock Text="{Binding Title, Mode=OneWay}" FontSize="13" FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource PalisadeTextBrush}" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Text="{Binding Description, Mode=OneWay}" FontSize="11" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"
+                                                       Foreground="{DynamicResource PalisadeSubtleBrush}"
+                                                       Visibility="{Binding Description, Converter={StaticResource StringToVisibilityConverter}}"/>
+                                            <TextBlock Text="{Binding DueDateDisplay, Mode=OneWay}" FontSize="11"
+                                                       Foreground="{Binding DueDateColor}"
+                                                       Visibility="{Binding DueDateDisplay, Converter={StaticResource StringToVisibilityConverter}}"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Button Content="💾" ToolTip="Save" Style="{StaticResource CircleButton}" Width="22" Height="22" Margin="0,0,2,0"
+                                                    Command="{Binding DataContext.SaveTaskCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}"/>
+                                            <Button Content="🗑" ToolTip="Delete" Style="{StaticResource CircleButton}" Width="22" Height="22"
+                                                    Command="{Binding DataContext.DeleteTaskCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                                <DataTemplate.Triggers>
+                                    <Trigger SourceName="TaskCard" Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="TaskCard" Property="Background" Value="{DynamicResource PalisadeCardHoverBrush}"/>
+                                    </Trigger>
+                                    <DataTrigger Binding="{Binding Completed}" Value="True">
+                                        <Setter TargetName="TaskCard" Property="Opacity" Value="0.5"/>
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <Button Grid.Row="2" Content="+ Task" Command="{Binding AddTaskCommand}"
+                            Style="{StaticResource PalisadeActionButton}" HorizontalAlignment="Left" Margin="0,8,0,0"/>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <!-- Calendar -->
+        <DataTemplate DataType="{x:Type viewModel:CalendarPalisadeViewModel}">
+            <Border Background="{DynamicResource PalisadeControlBrush}" CornerRadius="0" Padding="12">
+                <Grid RowDefinitions="Auto,Auto,*,Auto">
+                    <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}" Foreground="{DynamicResource PalisadeErrorBrush}" Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}" Grid.Row="0" Margin="0,0,0,8"/>
+                    <Grid Grid.Row="1" Margin="0,0,0,8" ColumnDefinitions="Auto,Auto,*,Auto,Auto">
+                        <Button Grid.Column="0" Content="&lt;" Command="{Binding PreviousDayCommand}" Style="{StaticResource CircleButton}" VerticalAlignment="Center"/>
+                        <Button Grid.Column="1" Content="&gt;" Command="{Binding NextDayCommand}" Style="{StaticResource CircleButton}" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                        <TextBlock Grid.Column="2" Text="{Binding DateRangeDisplay}" FontWeight="SemiBold" FontSize="12" Foreground="{DynamicResource PalisadeTextBrush}" VerticalAlignment="Center" HorizontalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                        <Button Grid.Column="3" Content="⌂" ToolTip="Today" Command="{Binding TodayCommand}" Style="{StaticResource CircleButton}" VerticalAlignment="Center" Margin="4,0,4,0"/>
+                        <ComboBox Grid.Column="4" SelectedItem="{Binding ViewMode}" ItemsSource="{Binding ViewModes}"
+                                  Width="75" Height="24" VerticalAlignment="Center"
+                                  FontSize="11" Background="{DynamicResource PalisadeControlBrush}"
+                                  Foreground="{DynamicResource PalisadeTextBrush}" BorderThickness="1"
+                                  BorderBrush="{DynamicResource PalisadeBorderBrush}"/>
+                    </Grid>
+                    <StackPanel Grid.Row="2" Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}"
+                                HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <ProgressBar Style="{StaticResource PalisadeProgressBar}"/>
+                        <TextBlock Text="Chargement..." HorizontalAlignment="Center" Margin="0,8,0,0" Foreground="{DynamicResource PalisadeTextBrush}"/>
+                    </StackPanel>
+                    <ListBox Grid.Row="2" ItemsSource="{Binding Events}"
+                             VirtualizingPanel.IsVirtualizing="True"
+                             VirtualizingPanel.VirtualizationMode="Recycling"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             ScrollViewer.VerticalScrollBarVisibility="Auto"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             Visibility="{Binding IsLoading, Converter={StaticResource InverseBoolToVis}}">
+                        <ListBox.Resources>
+                            <Style TargetType="ScrollBar" BasedOn="{StaticResource PalisadeScrollBarStyle}"/>
+                        </ListBox.Resources>
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem" BasedOn="{StaticResource PalisadeListBoxItemStyle}"/>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <Border Visibility="{Binding DayHeader, Converter={StaticResource StringToVisibilityConverter}}"
+                                            Margin="0,12,0,4" Padding="4,4"
+                                            CornerRadius="3">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsToday}" Value="True">
+                                                        <Setter Property="Background" Value="{DynamicResource PalisadeCardHoverBrush}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <TextBlock Text="{Binding DayHeaderDisplay}" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PalisadeAccentBrush}"/>
+                                    </Border>
+                                    <Border BorderBrush="{DynamicResource PalisadeAccentBrush}" BorderThickness="3,0,0,0"
+                                            Padding="10,8" Margin="0,0,0,2" Background="{DynamicResource PalisadeCardBrush}" CornerRadius="0,4,4,0"
+                                            x:Name="EventCard">
+                                        <Grid RowDefinitions="Auto,Auto,Auto">
+                                            <TextBlock Grid.Row="0" Text="{Binding Summary, Mode=OneWay}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource PalisadeTextBrush}" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Grid.Row="1" Text="{Binding TimeDisplay, Mode=OneWay}" Margin="0,2,0,0" Foreground="{DynamicResource PalisadeSubtleBrush}" FontSize="11"/>
+                                            <TextBlock Grid.Row="2" Text="{Binding Location}" Visibility="{Binding Location, Converter={StaticResource StringToVisibilityConverter}}" FontSize="11" Foreground="{DynamicResource PalisadeSubtleBrush}" FontStyle="Italic" Margin="0,2,0,0"/>
+                                        </Grid>
+                                    </Border>
+                                </StackPanel>
+                                <DataTemplate.Triggers>
+                                    <Trigger SourceName="EventCard" Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="EventCard" Property="Background" Value="{DynamicResource PalisadeCardHoverBrush}"/>
+                                    </Trigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <TextBlock Grid.Row="2" Text="Aucun événement" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               FontSize="13" Foreground="{DynamicResource PalisadeSubtleBrush}" FontStyle="Italic"
+                               Visibility="{Binding HasNoEvents, Converter={StaticResource BoolToVis}}"/>
+                    <Button Grid.Row="3" Content="+ Event" Command="{Binding AddEventCommand}"
+                            Style="{StaticResource PalisadeActionButton}" HorizontalAlignment="Left" Margin="0,8,0,0"/>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <!-- Mail -->
+        <DataTemplate DataType="{x:Type viewModel:MailPalisadeViewModel}">
+            <Border Background="{DynamicResource PalisadeControlBrush}" CornerRadius="0" Padding="12">
+                <Grid RowDefinitions="Auto,*">
+                    <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}" Foreground="{DynamicResource PalisadeErrorBrush}" Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}" Grid.Row="0" Margin="0,0,0,8"/>
+                    <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="LoadingPanel">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsLoading}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <ProgressBar Style="{StaticResource PalisadeProgressBar}"/>
+                    </StackPanel>
+                    <Grid Grid.Row="1" x:Name="CountOnlyPanel">
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding IsLoading}" Value="False"/>
+                                            <Condition Binding="{Binding DisplayMode}" Value="{x:Static model:MailDisplayMode.CountOnly}"/>
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <TextBlock Text="{Binding TotalUnreadCount, Mode=OneWay}" FontSize="48" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource PalisadeTextBrush}"/>
+                        <TextBlock Text="{Binding UnreadCountsDisplay, Mode=OneWay}" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,20" Foreground="{DynamicResource PalisadeTextBrush}"/>
+                    </Grid>
+                    <ListBox Grid.Row="1" ItemsSource="{Binding RecentSubjects}" x:Name="SubjectsPanel"
                              VirtualizingPanel.IsVirtualizing="True"
                              VirtualizingPanel.VirtualizationMode="Recycling"
                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                              ScrollViewer.VerticalScrollBarVisibility="Auto"
                              Background="Transparent"
                              BorderThickness="0">
-                        <ListBox.ItemContainerStyle>
-                            <Style TargetType="ListBoxItem">
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                                <Setter Property="Padding" Value="0"/>
-                                <Setter Property="Margin" Value="0"/>
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="ListBoxItem">
-                                            <ContentPresenter/>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
+                        <ListBox.Style>
+                            <Style TargetType="ListBox">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding IsLoading}" Value="False"/>
+                                            <Condition Binding="{Binding DisplayMode}" Value="{x:Static model:MailDisplayMode.CountAndSubjects}"/>
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
                             </Style>
+                        </ListBox.Style>
+                        <ListBox.Resources>
+                            <Style TargetType="ScrollBar" BasedOn="{StaticResource PalisadeScrollBarStyle}"/>
+                        </ListBox.Resources>
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem" BasedOn="{StaticResource PalisadeListBoxItemStyle}"/>
                         </ListBox.ItemContainerStyle>
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <Border BorderBrush="Gray" BorderThickness="0,0,0,1" Padding="5">
-                                    <Grid ColumnDefinitions="Auto,*,Auto">
-                                        <CheckBox IsChecked="{Binding Completed, Mode=TwoWay}" VerticalAlignment="Center" Grid.Column="0"
-                                                  Command="{Binding DataContext.ToggleTaskCompletedCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}"/>
-                                        <StackPanel Grid.Column="1" Margin="10,0,0,0">
-                                            <TextBlock Text="{Binding Title, Mode=OneWay}" FontWeight="Bold" Foreground="{DynamicResource PalisadeTextBrush}"/>
-                                            <TextBlock Text="{Binding Description, Mode=OneWay}" TextWrapping="Wrap" Foreground="{DynamicResource PalisadeTextBrush}"
-                                                       Visibility="{Binding Description, Converter={StaticResource StringToVisibilityConverter}}"/>
-                                            <TextBlock Text="{Binding DueDate, StringFormat='Due: {0:d}', Mode=OneWay}" Foreground="{DynamicResource PalisadeTextBrush}"
-                                                       Visibility="{Binding DueDate, Converter={StaticResource StringToVisibilityConverter}}"/>
-                                        </StackPanel>
-                                        <StackPanel Grid.Column="2" Orientation="Horizontal">
-                                            <Button Content="📝" ToolTip="Edit" Command="{Binding DataContext.SaveTaskCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}"
-                                                    Style="{StaticResource CircleButton}" Width="24" Height="24" Margin="0,0,5,0"/>
-                                            <Button Content="🗑" ToolTip="Delete" Command="{Binding DataContext.DeleteTaskCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}"
-                                                    Style="{StaticResource CircleButton}" Width="24" Height="24"/>
-                                        </StackPanel>
+                                <Border x:Name="MailCard" BorderBrush="{DynamicResource PalisadeBorderBrush}" BorderThickness="0,0,0,1" Padding="6" Margin="0,0,0,4" Background="{DynamicResource PalisadeCardBrush}">
+                                    <Grid RowDefinitions="Auto,Auto">
+                                        <TextBlock Grid.Row="0" Text="{Binding Subject, Mode=OneWay}" FontWeight="SemiBold" Foreground="{DynamicResource PalisadeTextBrush}" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Grid.Row="1" Text="{Binding Sender, Mode=OneWay}" FontSize="11" Margin="0,2,0,0" Foreground="{DynamicResource PalisadeTextBrush}" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Grid.Row="1" HorizontalAlignment="Right" Text="{Binding Date, StringFormat='{}{0:g}', Mode=OneWay}" FontSize="11" Margin="0,2,0,0" Foreground="{DynamicResource PalisadeTextBrush}"/>
                                     </Grid>
                                 </Border>
+                                <DataTemplate.Triggers>
+                                    <Trigger SourceName="MailCard" Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="MailCard" Property="Background" Value="{DynamicResource PalisadeCardHoverBrush}"/>
+                                    </Trigger>
+                                </DataTemplate.Triggers>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
-                    <Button Grid.Row="2" Content="➕ Add Task" Command="{Binding AddTaskCommand}" HorizontalAlignment="Right" Margin="0,10,0,0"
-                            Style="{StaticResource CircleButtonLarge}" Width="48" Height="48"/>
                 </Grid>
-            </Grid>
+            </Border>
         </DataTemplate>
-
-        <!-- Contenu Calendar (placeholder dans onglet) -->
-        <DataTemplate DataType="{x:Type viewModel:CalendarPalisadeViewModel}">
-            <Grid Background="{DynamicResource PalisadeControlBrush}">
-                <TextBlock Text="Calendar" Foreground="{DynamicResource PalisadeTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" />
-            </Grid>
-        </DataTemplate>
-
-        <!-- Mail -->
-        <DataTemplate DataType="{x:Type viewModel:MailPalisadeViewModel}">
-            <Grid Background="{DynamicResource PalisadeControlBrush}">
-                <TextBlock Text="Mail" Foreground="{DynamicResource PalisadeTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" />
-            </Grid>
-        </DataTemplate>
+        </ResourceDictionary>
     </Window.Resources>
     <Border x:Name="LayoutRoot" CornerRadius="0" ClipToBounds="True">
         <DockPanel>
             <Grid DockPanel.Dock="Top" x:Name="Header" Height="32" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource PalisadeWindowBrush}" ColumnDefinitions="80,*,80">
-                <Label Grid.Column="1" Content="{Binding SelectedItem.Name, ElementName=TabControl}" Margin="5,0" FontSize="16" Foreground="{DynamicResource PalisadeTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="1" Text="{Binding SelectedItem.Name, ElementName=TabControl}" Margin="5,0" Style="{StaticResource PalisadeHeaderText}" HorizontalAlignment="Center" VerticalAlignment="Center" />
             </Grid>
             <TabControl x:Name="TabControl" ItemsSource="{Binding Members}" Style="{StaticResource FlatTabStyle}"
                         ItemContainerStyle="{StaticResource FlatTabItemStyle}"
