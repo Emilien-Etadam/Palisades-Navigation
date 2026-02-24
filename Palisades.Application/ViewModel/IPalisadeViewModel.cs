@@ -10,5 +10,7 @@ namespace Palisades.ViewModel
         int Height { get; set; }
         string? GroupId { get; set; }
         int TabOrder { get; set; }
+        void Delete();
+        void Save();
     }
 }

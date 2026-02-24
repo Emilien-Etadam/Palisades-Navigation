@@ -85,14 +85,7 @@ namespace Palisades
             {
                 var vm = CreateViewModel(concrete);
                 if (vm == null) continue;
-                Window window = concrete switch
-                {
-                    FolderPortalModel _ => new FolderPortal((FolderPortalViewModel)vm),
-                    TaskPalisadeModel _ => new TaskPalisade((TaskPalisadeViewModel)vm),
-                    CalendarPalisadeModel _ => new CalendarPalisade((CalendarPalisadeViewModel)vm),
-                    MailPalisadeModel _ => new MailPalisade((MailPalisadeViewModel)vm),
-                    _ => (Window)new Palisade((PalisadeViewModel)vm)
-                };
+                var window = CreateWindowFor(vm);
                 palisades.Add(concrete.Identifier, window);
             }
         }
@@ -325,43 +318,24 @@ namespace Palisades
                 return;
             }
 
-            if (window.DataContext is PalisadeViewModel palisadeVm)
-                palisadeVm.Delete();
-            else if (window.DataContext is FolderPortalViewModel folderPortalVm)
-                folderPortalVm.Delete();
-            else if (window.DataContext is TaskPalisadeViewModel taskPalisadeVm)
-                taskPalisadeVm.Delete();
-            else if (window.DataContext is CalendarPalisadeViewModel calendarPalisadeVm)
-                calendarPalisadeVm.Delete();
-            else if (window.DataContext is MailPalisadeViewModel mailPalisadeVm)
-                mailPalisadeVm.Delete();
-
+            if (window.DataContext is IPalisadeViewModel vm)
+                vm.Delete();
             (window.DataContext as IDisposable)?.Dispose();
             window.Close();
             palisades.Remove(identifier);
         }
 
-        private static void DeleteViewModel(IPalisadeViewModel vm)
-        {
-            if (vm is PalisadeViewModel p) p.Delete();
-            else if (vm is FolderPortalViewModel f) f.Delete();
-            else if (vm is TaskPalisadeViewModel t) t.Delete();
-            else if (vm is CalendarPalisadeViewModel c) c.Delete();
-            else if (vm is MailPalisadeViewModel m) m.Delete();
-        }
+        private static void DeleteViewModel(IPalisadeViewModel vm) => vm.Delete();
 
-        private static Window CreateWindowFor(IPalisadeViewModel vm)
+        private static Window CreateWindowFor(IPalisadeViewModel vm) => vm switch
         {
-            return vm switch
-            {
-                PalisadeViewModel p => new Palisade(p),
-                FolderPortalViewModel f => new FolderPortal(f),
-                TaskPalisadeViewModel t => new TaskPalisade(t),
-                CalendarPalisadeViewModel c => new CalendarPalisade(c),
-                MailPalisadeViewModel m => new MailPalisade(m),
-                _ => throw new NotSupportedException()
-            };
-        }
+            PalisadeViewModel p => new Palisade(p),
+            FolderPortalViewModel f => new FolderPortal(f),
+            TaskPalisadeViewModel t => new TaskPalisade(t),
+            CalendarPalisadeViewModel c => new CalendarPalisade(c),
+            MailPalisadeViewModel m => new MailPalisade(m),
+            _ => throw new NotSupportedException($"No window for {vm.GetType().Name}")
+        };
 
         public static Window GetWindow(string identifier)
         {
