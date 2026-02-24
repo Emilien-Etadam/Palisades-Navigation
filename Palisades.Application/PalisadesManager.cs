@@ -291,7 +291,7 @@ namespace Palisades
                 var member = group.Members.FirstOrDefault(m => m.Identifier == identifier);
                 if (member == null) return;
                 (member as IDisposable)?.Dispose();
-                DeleteViewModel(member);
+                member.Delete();
                 group.RemoveMember(member);
 
                 palisades.Remove(identifier);
@@ -310,6 +310,7 @@ namespace Palisades
                     palisades[single.Identifier] = standalone;
                     standalone.Show();
                     single.GroupId = null;
+                    single.Save();
                     return;
                 }
 
@@ -324,8 +325,6 @@ namespace Palisades
             window.Close();
             palisades.Remove(identifier);
         }
-
-        private static void DeleteViewModel(IPalisadeViewModel vm) => vm.Delete();
 
         private static Window CreateWindowFor(IPalisadeViewModel vm) => vm switch
         {
