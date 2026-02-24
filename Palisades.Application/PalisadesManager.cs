@@ -16,21 +16,22 @@ namespace Palisades
     {
         public static readonly Dictionary<string, Window> palisades = new();
 
+        private static readonly XmlSerializer _baseSerializer = new(typeof(PalisadeModelBase), new[]
+        {
+            typeof(PalisadeModel),
+            typeof(StandardPalisadeModel),
+            typeof(FolderPortalModel),
+            typeof(TaskPalisadeModel),
+            typeof(CalendarPalisadeModel),
+            typeof(MailPalisadeModel)
+        });
+
         public static void LoadPalisades()
         {
             string saveDirectory = PDirectory.GetPalisadesDirectory();
             PDirectory.EnsureExists(saveDirectory);
 
             var loadedConcrete = new List<PalisadeModelBase>();
-            var baseSerializer = new XmlSerializer(typeof(PalisadeModelBase), new[]
-            {
-                typeof(PalisadeModel),
-                typeof(StandardPalisadeModel),
-                typeof(FolderPortalModel),
-                typeof(TaskPalisadeModel),
-                typeof(CalendarPalisadeModel),
-                typeof(MailPalisadeModel)
-            });
 
             foreach (string identifierDirname in Directory.GetDirectories(saveDirectory))
             {
@@ -41,7 +42,7 @@ namespace Palisades
                 try
                 {
                     using var reader = new StreamReader(stateFile);
-                    var obj = baseSerializer.Deserialize(reader);
+                    var obj = _baseSerializer.Deserialize(reader);
                     if (obj is PalisadeModel legacy)
                     {
                         loadedConcrete.Add(PalisadeModelMigration.ToConcreteModel(legacy));
@@ -51,9 +52,9 @@ namespace Palisades
                         loadedConcrete.Add(concrete);
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // Skip corrupted state files
+                    System.Diagnostics.Debug.WriteLine($"[PalisadesManager] Failed to load {stateFile}: {ex.Message}");
                 }
             }
 
@@ -157,6 +158,7 @@ namespace Palisades
             var viewModel = new PalisadeViewModel(model);
             palisades.Add(viewModel.Identifier, new Palisade(viewModel));
             viewModel.Save();
+            palisades[viewModel.Identifier].Show();
         }
 
         public static void CreateFolderPortal(string rootPath, string title, int? x = null, int? y = null, int? width = null, int? height = null)
@@ -174,6 +176,7 @@ namespace Palisades
             var viewModel = new FolderPortalViewModel(model);
             palisades.Add(viewModel.Identifier, new FolderPortal(viewModel));
             viewModel.Save();
+            palisades[viewModel.Identifier].Show();
         }
 
         public static void CreateTaskPalisade(string caldavUrl, string username, string password, List<string> taskListIds, string title, int? x = null, int? y = null, int? width = null, int? height = null)
@@ -197,6 +200,7 @@ namespace Palisades
             var viewModel = new TaskPalisadeViewModel(model, caldavService);
             palisades.Add(viewModel.Identifier, new TaskPalisade(viewModel));
             viewModel.Save();
+            palisades[viewModel.Identifier].Show();
         }
 
         public static void ShowCreateFolderPortalDialog()
@@ -239,35 +243,16 @@ namespace Palisades
             var viewModel = new CalendarPalisadeViewModel(model, calendarService);
             palisades.Add(viewModel.Identifier, new CalendarPalisade(viewModel));
             viewModel.Save();
+            palisades[viewModel.Identifier].Show();
         }
 
         public static void ShowCreateCalendarPalisadeDialog()
         {
             var dialog = new CreateCalendarPalisadeDialog();
-            try { dialog.Owner = System.Windows.Application.Current.MainWindow; } catch { }
+            try { dialog.Owner = Application.Current.MainWindow; } catch { }
             if (dialog.ShowDialog() != true) return;
-
-            var model = new CalendarPalisadeModel
-            {
-                Name = dialog.PalisadeTitle,
-                CalDAVBaseUrl = dialog.CalDAVUrl,
-                CalDAVUsername = dialog.Username,
-                CalDAVPassword = CredentialEncryptor.Encrypt(dialog.Password),
-                CalendarIds = dialog.SelectedCalendarIds,
-                ViewMode = dialog.ViewMode,
-                DaysToShow = dialog.DaysToShow,
-                Width = 500,
-                Height = 400
-            };
-
-            var client = new CalDAVClient(model.CalDAVBaseUrl, model.CalDAVUsername, CredentialEncryptor.Decrypt(model.CalDAVPassword));
-            var service = new CalendarCalDAVService(client);
-            var vm = new ViewModel.CalendarPalisadeViewModel(model, service);
-            vm.Save();
-
-            var window = new View.CalendarPalisade(vm);
-            palisades[vm.Identifier] = window;
-            window.Show();
+            CreateCalendarPalisade(dialog.CalDAVUrl, dialog.Username, dialog.Password,
+                dialog.SelectedCalendarIds, dialog.PalisadeTitle, dialog.ViewMode, dialog.DaysToShow);
         }
 
         public static void CreateMailPalisade(string imapHost, int imapPort, string username, string password, List<string> monitoredFolders, string title, MailDisplayMode displayMode, int pollIntervalMinutes, string? webmailUrl = null, int? x = null, int? y = null, int? width = null, int? height = null)
@@ -291,6 +276,7 @@ namespace Palisades
             var viewModel = new MailPalisadeViewModel(model);
             palisades.Add(viewModel.Identifier, new MailPalisade(viewModel));
             viewModel.Save();
+            palisades[viewModel.Identifier].Show();
         }
 
         public static void ShowCreateMailPalisadeDialog()
@@ -314,27 +300,28 @@ namespace Palisades
                 (member as IDisposable)?.Dispose();
                 DeleteViewModel(member);
                 group.RemoveMember(member);
-                foreach (var m in group.Members)
-                    palisades.Remove(m.Identifier);
+
                 palisades.Remove(identifier);
+
                 if (group.Members.Count == 0)
                 {
                     tabbed.Close();
                     return;
                 }
+
                 if (group.Members.Count == 1)
                 {
                     var single = group.Members[0];
                     tabbed.Close();
-                    palisades.Remove(identifier);
                     var standalone = CreateWindowFor(single);
                     palisades[single.Identifier] = standalone;
+                    standalone.Show();
+                    single.GroupId = null;
+                    return;
                 }
-                else
-                {
-                    foreach (var m in group.Members)
-                        palisades[m.Identifier] = tabbed;
-                }
+
+                foreach (var m in group.Members)
+                    palisades[m.Identifier] = tabbed;
                 return;
             }
 
