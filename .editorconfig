@@ -1,0 +1,48 @@
+# https://editorconfig.org
+root = true
+
+[*]
+indent_style = space
+indent_size = 4
+end_of_line = lf
+charset = utf-8-bom
+trim_trailing_whitespace = true
+
+[*.cs]
+# Analyseurs : défaut Warning
+dotnet_analyzer_diagnostic.severity = warning
+
+# StyleCop — désactivations
+dotnet_diagnostic.SA1200.severity = none
+dotnet_diagnostic.SA1633.severity = none
+dotnet_diagnostic.SA1124.severity = none
+dotnet_diagnostic.SA1600.severity = none
+dotnet_diagnostic.SA1101.severity = none
+
+# Conventions de nommage — Error (sauf règles ci‑dessous en warning)
+dotnet_diagnostic.SA1300.severity = error
+dotnet_diagnostic.SA1301.severity = error
+dotnet_diagnostic.SA1302.severity = error
+dotnet_diagnostic.SA1303.severity = error
+dotnet_diagnostic.SA1304.severity = error
+dotnet_diagnostic.SA1305.severity = warning
+dotnet_diagnostic.SA1306.severity = warning
+dotnet_diagnostic.SA1307.severity = warning
+dotnet_diagnostic.SA1308.severity = error
+dotnet_diagnostic.SA1309.severity = warning
+dotnet_diagnostic.SA1310.severity = warning
+dotnet_diagnostic.SA1311.severity = warning
+dotnet_diagnostic.SA1312.severity = error
+dotnet_diagnostic.SA1313.severity = warning
+dotnet_diagnostic.SA1314.severity = error
+dotnet_diagnostic.SA1315.severity = error
+dotnet_diagnostic.SA1316.severity = error
+dotnet_diagnostic.SA1320.severity = error
+dotnet_diagnostic.SA1321.severity = error
+dotnet_diagnostic.SA1322.severity = error
+dotnet_diagnostic.SA1323.severity = error
+dotnet_diagnostic.SA1324.severity = error
+dotnet_diagnostic.SA1325.severity = error
+dotnet_diagnostic.SA1326.severity = error
+dotnet_diagnostic.SA1327.severity = error
+dotnet_diagnostic.SA1328.severity = error
