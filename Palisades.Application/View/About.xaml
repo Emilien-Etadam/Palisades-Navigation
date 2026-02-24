@@ -15,6 +15,13 @@
     <Window.DataContext>
         <viewModel:AboutViewModel />
     </Window.DataContext>
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/View/Styles/PalisadeStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
     <Grid>
         <StackPanel HorizontalAlignment="Center" Margin="50,0,50,20" TextElement.FontSize="18">
             <Label FontSize="48" HorizontalAlignment="Center" Content="Palisades"/>

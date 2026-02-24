@@ -16,6 +16,9 @@
     </Window.DataContext>
     <Window.Resources>
         <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/View/Styles/PalisadeStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
             <Style TargetType="TextBox">
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="HorizontalAlignment" Value="Left" />
@@ -25,7 +28,7 @@
     </Window.Resources>
     <Grid Margin="10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ColumnDefinitions="Auto,10,*" RowDefinitions="Auto,*">
         <Label Grid.Row="0" FontSize="24">Name</Label>
-        <TextBox FontSize="24" Grid.Row="0" Grid.Column="2" Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+        <TextBox FontSize="24" Grid.Row="0" Grid.Column="2" Style="{StaticResource PalisadeDialogTextBox}" Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 
     </Grid>
 </Window>

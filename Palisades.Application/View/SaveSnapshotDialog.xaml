@@ -7,8 +7,17 @@
         Title="Save current layout"
         Width="400"
         SizeToContent="Height"
+        Background="{DynamicResource PalisadeWindowBrush}"
+        TextElement.Foreground="{DynamicResource PalisadeTextBrush}"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/View/Styles/PalisadeStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -17,11 +26,11 @@
             <RowDefinition Height="25" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Label Grid.Row="0" Content="Layout name" />
-        <TextBox x:Name="NameTextBox" Grid.Row="2" Padding="6" FontSize="14" />
+        <TextBlock Text="Layout name" Grid.Row="0" Style="{StaticResource PalisadeDialogLabel}" />
+        <TextBox x:Name="NameTextBox" Grid.Row="2" FontSize="14" Style="{StaticResource PalisadeDialogTextBox}" />
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Cancel" Click="CancelButton_Click" Margin="0,0,10,0" Padding="12,6" />
-            <Button Content="Save" Click="SaveButton_Click" IsDefault="True" Padding="12,6" />
+            <Button Content="Cancel" Style="{StaticResource PalisadeDialogButton}" Click="CancelButton_Click" Margin="0,0,10,0" />
+            <Button Content="Save" Style="{StaticResource PalisadeDialogButton}" Click="SaveButton_Click" IsDefault="True" />
         </StackPanel>
     </Grid>
 </Window>

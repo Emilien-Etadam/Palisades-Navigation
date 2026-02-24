@@ -3,7 +3,16 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Rename layout"
         Width="350" SizeToContent="Height"
+        Background="{DynamicResource PalisadeWindowBrush}"
+        TextElement.Foreground="{DynamicResource PalisadeTextBrush}"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/View/Styles/PalisadeStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
     <Grid Margin="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -12,11 +21,11 @@
             <RowDefinition Height="16"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Label Grid.Row="0" Content="New name" />
-        <TextBox x:Name="NameTextBox" Grid.Row="2" Padding="6" FontSize="14" />
+        <TextBlock Text="New name" Grid.Row="0" Style="{StaticResource PalisadeDialogLabel}" />
+        <TextBox x:Name="NameTextBox" Grid.Row="2" FontSize="14" Style="{StaticResource PalisadeDialogTextBox}" />
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Cancel" Click="CancelButton_Click" Margin="0,0,8,0" Padding="10,6" />
-            <Button Content="OK" Click="OkButton_Click" IsDefault="True" Padding="10,6" />
+            <Button Content="Cancel" Style="{StaticResource PalisadeDialogButton}" Click="CancelButton_Click" Margin="0,0,8,0" />
+            <Button Content="OK" Style="{StaticResource PalisadeDialogButton}" Click="OkButton_Click" IsDefault="True" />
         </StackPanel>
     </Grid>
 </Window>

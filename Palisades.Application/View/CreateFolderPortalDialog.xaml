@@ -7,15 +7,20 @@
         Title="New Folder Portal"
         Width="450"
         SizeToContent="Height"
-        WindowStartupLocation="CenterScreen"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource PalisadeWindowBrush}"
+        TextElement.Foreground="{DynamicResource PalisadeTextBrush}"
         TextElement.FontWeight="Regular"
         TextOptions.TextFormattingMode="Ideal"
         TextOptions.TextRenderingMode="Auto"
-        Background="{DynamicResource MaterialDesignPaper}"
-        FontFamily="{DynamicResource MaterialDesignFont}"
-        Style="{StaticResource MaterialDesignWindow}"
+        WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/View/Styles/PalisadeStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -29,16 +34,16 @@
 
         <!-- Title input -->
         <StackPanel Grid.Row="0">
-            <Label Style="{StaticResource MaterialDesignLabel}" FontSize="18" Padding="0,0,0,5">Portal Title</Label>
+            <TextBlock Text="Portal Title" Style="{StaticResource PalisadeDialogLabel}" FontSize="18" Margin="0,0,0,5"/>
             <TextBox x:Name="TitleTextBox"
-                     Style="{StaticResource MaterialDesignTextBox}"
+                     Style="{StaticResource PalisadeDialogTextBox}"
                      FontSize="16"
                      Text="My Folder Portal" />
         </StackPanel>
 
         <!-- Folder path -->
         <StackPanel Grid.Row="2">
-            <Label Style="{StaticResource MaterialDesignLabel}" FontSize="18" Padding="0,0,0,5">Root Folder</Label>
+            <TextBlock Text="Root Folder" Style="{StaticResource PalisadeDialogLabel}" FontSize="18" Margin="0,0,0,5"/>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -47,13 +52,13 @@
                 </Grid.ColumnDefinitions>
                 <TextBox x:Name="PathTextBox"
                          Grid.Column="0"
-                         Style="{StaticResource MaterialDesignTextBox}"
+                         Style="{StaticResource PalisadeDialogTextBox}"
                          FontSize="14"
                          IsReadOnly="True" />
                 <Button Grid.Column="2"
                         Content="Browse..."
                         Click="BrowseButton_Click"
-                        Style="{StaticResource MaterialDesignFlatButton}"
+                        Style="{StaticResource PalisadeDialogButton}"
                         FontSize="14" />
             </Grid>
         </StackPanel>
@@ -69,12 +74,12 @@
         <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Content="Cancel"
                     Click="CancelButton_Click"
-                    Style="{StaticResource MaterialDesignFlatButton}"
+                    Style="{StaticResource PalisadeDialogButton}"
                     FontSize="14"
                     Margin="0,0,10,0" />
             <Button Content="Create"
                     Click="CreateButton_Click"
-                    Style="{StaticResource MaterialDesignFlatButton}"
+                    Style="{StaticResource PalisadeDialogButton}"
                     FontSize="14" />
         </StackPanel>
     </Grid>

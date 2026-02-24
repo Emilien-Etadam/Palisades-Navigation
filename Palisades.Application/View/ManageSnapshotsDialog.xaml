@@ -3,38 +3,47 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Manage layouts"
         Height="420" Width="640"
+        Background="{DynamicResource PalisadeWindowBrush}"
+        TextElement.Foreground="{DynamicResource PalisadeTextBrush}"
         WindowStartupLocation="CenterOwner" ResizeMode="CanResize">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/View/Styles/PalisadeStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
     <Grid Margin="12" RowDefinitions="Auto,*,Auto">
-        <TextBlock Grid.Row="0" Text="Saved layouts" FontWeight="SemiBold" Margin="0,0,0,8"/>
-        <ListBox x:Name="SnapshotsListBox" Grid.Row="1" Margin="0,0,0,10" SelectionChanged="SnapshotsListBox_SelectionChanged">
+        <TextBlock Grid.Row="0" Text="Saved layouts" FontWeight="SemiBold" Foreground="{DynamicResource PalisadeTextBrush}" Margin="0,0,0,8"/>
+        <ListBox x:Name="SnapshotsListBox" Grid.Row="1" Margin="0,0,0,10" Style="{StaticResource PalisadeDialogListBox}" SelectionChanged="SnapshotsListBox_SelectionChanged">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid Margin="4,2" ColumnDefinitions="*,Auto">
                         <StackPanel Grid.Column="0" Orientation="Horizontal">
                             <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Margin="0,0,12,0"/>
-                            <TextBlock Foreground="Gray" Margin="0,0,12,0">
+                            <TextBlock Foreground="{DynamicResource PalisadeSubtleBrush}" Margin="0,0,12,0">
                                 <Run Text="{Binding CreatedAt, StringFormat=\{0:g\}}"/>
                             </TextBlock>
-                            <TextBlock Foreground="Gray" Margin="0,0,12,0">
+                            <TextBlock Foreground="{DynamicResource PalisadeSubtleBrush}" Margin="0,0,12,0">
                                 <Run Text="{Binding ScreenWidth}"/>
                                 <Run Text="×"/>
                                 <Run Text="{Binding ScreenHeight}"/>
                             </TextBlock>
-                            <TextBlock Foreground="Gray" Text="{Binding Entries.Count, StringFormat={}{0} palisades}"/>
+                            <TextBlock Foreground="{DynamicResource PalisadeSubtleBrush}" Text="{Binding Entries.Count, StringFormat={}{0} palisades}"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Orientation="Horizontal">
-                            <Button Content="Restore" Tag="{Binding Id}" Click="RestoreButton_Click" Margin="0,0,4,0" Padding="8,4"/>
-                            <Button Content="Rename" Tag="{Binding Id}" Click="RenameButton_Click" Margin="0,0,4,0" Padding="8,4"/>
-                            <Button Content="Delete" Tag="{Binding Id}" Click="DeleteButton_Click" Padding="8,4"/>
+                            <Button Content="Restore" Tag="{Binding Id}" Style="{StaticResource PalisadeDialogButton}" Click="RestoreButton_Click" Margin="0,0,4,0"/>
+                            <Button Content="Rename" Tag="{Binding Id}" Style="{StaticResource PalisadeDialogButton}" Click="RenameButton_Click" Margin="0,0,4,0"/>
+                            <Button Content="Delete" Tag="{Binding Id}" Style="{StaticResource PalisadeDialogButton}" Click="DeleteButton_Click"/>
                         </StackPanel>
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Export..." Click="ExportButton_Click" Margin="0,0,8,0" Padding="12,6"/>
-            <Button Content="Import..." Click="ImportButton_Click" Margin="0,0,8,0" Padding="12,6"/>
-            <Button Content="Close" Click="CloseButton_Click" Padding="12,6"/>
+            <Button Content="Export..." Style="{StaticResource PalisadeDialogButton}" Click="ExportButton_Click" Margin="0,0,8,0"/>
+            <Button Content="Import..." Style="{StaticResource PalisadeDialogButton}" Click="ImportButton_Click" Margin="0,0,8,0"/>
+            <Button Content="Close" Style="{StaticResource PalisadeDialogButton}" Click="CloseButton_Click"/>
         </StackPanel>
     </Grid>
 </Window>

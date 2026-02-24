@@ -149,6 +149,83 @@
         </Setter>
     </Style>
 
+    <!-- Dialog styles -->
+    <Style x:Key="PalisadeDialogWindow" TargetType="Window">
+        <Setter Property="Background" Value="{DynamicResource PalisadeWindowBrush}"/>
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource PalisadeTextBrush}"/>
+        <Setter Property="TextElement.FontWeight" Value="Regular"/>
+        <Setter Property="TextOptions.TextFormattingMode" Value="Ideal"/>
+        <Setter Property="TextOptions.TextRenderingMode" Value="Auto"/>
+        <Setter Property="WindowStartupLocation" Value="CenterOwner"/>
+    </Style>
+
+    <Style x:Key="PalisadeDialogTextBox" TargetType="TextBox">
+        <Setter Property="Background" Value="{DynamicResource PalisadeControlBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource PalisadeTextBrush}"/>
+        <Setter Property="CaretBrush" Value="{DynamicResource PalisadeTextBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource PalisadeBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="6,4"/>
+    </Style>
+
+    <Style x:Key="PalisadeDialogPasswordBox" TargetType="PasswordBox">
+        <Setter Property="Background" Value="{DynamicResource PalisadeControlBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource PalisadeTextBrush}"/>
+        <Setter Property="CaretBrush" Value="{DynamicResource PalisadeTextBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource PalisadeBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="6,4"/>
+    </Style>
+
+    <Style x:Key="PalisadeDialogButton" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource PalisadeCardBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource PalisadeTextBrush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="12,6"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource PalisadeCardHoverBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsDefault" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{DynamicResource PalisadeHighlightBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="PalisadeDialogLabel" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource PalisadeSubtleBrush}"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Margin" Value="0,0,0,4"/>
+    </Style>
+
+    <Style x:Key="PalisadeDialogListBox" TargetType="ListBox">
+        <Setter Property="Background" Value="{DynamicResource PalisadeControlBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource PalisadeTextBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource PalisadeBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+
+    <Style x:Key="PalisadeDialogComboBox" TargetType="ComboBox">
+        <Setter Property="Background" Value="{DynamicResource PalisadeControlBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource PalisadeTextBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource PalisadeBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+
+    <Style x:Key="PalisadeDialogCheckBox" TargetType="CheckBox">
+        <Setter Property="Foreground" Value="{DynamicResource PalisadeTextBrush}"/>
+    </Style>
+
     <!-- Tab styles (Flat / Rounded) -->
     <Style x:Key="FlatTabStyle" TargetType="TabControl">
         <Setter Property="Template">
