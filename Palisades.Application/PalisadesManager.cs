@@ -283,8 +283,7 @@ namespace Palisades
 
         public static void DeletePalisade(string identifier)
         {
-            palisades.TryGetValue(identifier, out Window? window);
-            if (window == null) return;
+            if (!palisades.TryGetValue(identifier, out Window? window)) return;
 
             if (window is TabbedPalisade tabbed && tabbed.DataContext is PalisadeGroup group)
             {
@@ -293,7 +292,6 @@ namespace Palisades
                 (member as IDisposable)?.Dispose();
                 member.Delete();
                 group.RemoveMember(member);
-
                 palisades.Remove(identifier);
 
                 if (group.Members.Count == 0)
@@ -301,7 +299,6 @@ namespace Palisades
                     tabbed.Close();
                     return;
                 }
-
                 if (group.Members.Count == 1)
                 {
                     var single = group.Members[0];
@@ -310,10 +307,8 @@ namespace Palisades
                     palisades[single.Identifier] = standalone;
                     standalone.Show();
                     single.GroupId = null;
-                    single.Save();
                     return;
                 }
-
                 foreach (var m in group.Members)
                     palisades[m.Identifier] = tabbed;
                 return;
