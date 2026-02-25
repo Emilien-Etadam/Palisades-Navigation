@@ -16,16 +16,6 @@ namespace Palisades
     {
         public static readonly Dictionary<string, Window> palisades = new();
 
-        private static readonly XmlSerializer _baseSerializer = new(typeof(PalisadeModelBase), new[]
-        {
-            typeof(PalisadeModel),
-            typeof(StandardPalisadeModel),
-            typeof(FolderPortalModel),
-            typeof(TaskPalisadeModel),
-            typeof(CalendarPalisadeModel),
-            typeof(MailPalisadeModel)
-        });
-
         public static void LoadPalisades()
         {
             string saveDirectory = PDirectory.GetPalisadesDirectory();
@@ -42,7 +32,7 @@ namespace Palisades
                 try
                 {
                     using var reader = new StreamReader(stateFile);
-                    var obj = _baseSerializer.Deserialize(reader);
+                    var obj = ViewModelBase.SharedSerializer.Deserialize(reader);
                     if (obj is PalisadeModel legacy)
                     {
                         loadedConcrete.Add(PalisadeModelMigration.ToConcreteModel(legacy));
