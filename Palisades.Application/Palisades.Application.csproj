@@ -12,7 +12,7 @@
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <SignAssembly>False</SignAssembly>
     <PackageId>Palisades</PackageId>
-    <Version>0.4.0</Version>
+    <Version>0.5.12</Version>
     <Authors>Xavier Stouder</Authors>
     <Company>StouderIO</Company>
     <Product>Palisades</Product>
