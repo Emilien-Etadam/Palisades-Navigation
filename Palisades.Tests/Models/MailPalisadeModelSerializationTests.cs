@@ -35,9 +35,9 @@ namespace Palisades.Tests.Models
             Assert.Equal(model.ImapPort, d.ImapPort);
             Assert.Equal(model.ImapUsername, d.ImapUsername);
             Assert.Equal(model.ImapPassword, d.ImapPassword);
-            Assert.True(d.MonitoredFolders.Count >= 2);
-            Assert.Contains("INBOX", d.MonitoredFolders);
-            Assert.Contains("Sent", d.MonitoredFolders);
+            Assert.Equal(2, d.MonitoredFolders.Count);
+            Assert.Equal("INBOX", d.MonitoredFolders[0]);
+            Assert.Equal("Sent", d.MonitoredFolders[1]);
             Assert.Equal(MailDisplayMode.CountAndSubjects, d.DisplayMode);
             Assert.Equal(5, d.PollIntervalMinutes);
             Assert.Equal(model.WebmailUrl, d.WebmailUrl);

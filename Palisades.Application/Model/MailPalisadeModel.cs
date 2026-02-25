@@ -17,7 +17,7 @@ namespace Palisades.Model
         public int ImapPort { get; set; } = 993;
         public string ImapUsername { get; set; } = string.Empty;
         public string ImapPassword { get; set; } = string.Empty;
-        public List<string> MonitoredFolders { get; set; } = new List<string> { "INBOX" };
+        public List<string> MonitoredFolders { get; set; } = new List<string>();
         public MailDisplayMode DisplayMode { get; set; } = MailDisplayMode.CountOnly;
         public int MaxSubjectsShown { get; set; } = 5;
         public int PollIntervalMinutes { get; set; } = 3;
