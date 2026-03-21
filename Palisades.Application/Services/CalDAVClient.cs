@@ -14,7 +14,7 @@ namespace Palisades.Services
     /// Client CalDAV bas niveau. Gère l'authentification, les requêtes WebDAV,
     /// et le parsing des réponses multistatus.
     /// </summary>
-    public class CalDAVClient : IDisposable
+    public class CalDAVClient : ICalDAVClient
     {
         private readonly HttpClient _httpClient;
         private readonly Uri _baseUri;

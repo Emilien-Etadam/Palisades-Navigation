@@ -96,7 +96,25 @@ namespace Palisades
         private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             PalisadeDiagnostics.Log("DispatcherUnhandledException", e.Exception.Message, e.Exception);
+
+            if (IsFatalException(e.Exception))
+            {
+                e.Handled = false;
+                LayoutSnapshotService.SaveAutoSnapshotAndPrune(3);
+                return;
+            }
+
             e.Handled = true;
+        }
+
+        private static bool IsFatalException(Exception ex)
+        {
+            return ex is OutOfMemoryException
+                or StackOverflowException
+                or AccessViolationException
+                or BadImageFormatException
+                or TypeInitializationException
+                or InvalidProgramException;
         }
 
         private static async Task RunAutoUpdateAsync()

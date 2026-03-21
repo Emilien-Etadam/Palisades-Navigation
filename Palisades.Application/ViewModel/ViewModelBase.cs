@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Windows;
 using System.Windows.Input;
 using System.Xml.Serialization;
 using Palisades.Serialization;
@@ -99,22 +100,36 @@ namespace Palisades.ViewModel
         }
 
         /// <summary>Écrit sur disque si <see cref="ShouldSave"/> ; appelé une fois après période d’inactivité (pas de boucle périodique).</summary>
+        /// <remarks>
+        /// Le timer appelle depuis le pool de threads : la sérialisation lit le modèle sur le thread UI via
+        /// <see cref="Dispatcher.Invoke"/> pour éviter une course avec les mutations WPF (déplacement, redimensionnement).
+        /// </remarks>
         private void FlushSave()
         {
             if (!ShouldSave) return;
-            lock (_saveLock)
+            void WriteState()
             {
                 if (!ShouldSave) return;
-                try
+                lock (_saveLock)
                 {
-                    string saveDirectory = PDirectory.GetPalisadeDirectory(Identifier);
-                    PDirectory.EnsureExists(saveDirectory);
-                    using StreamWriter writer = new(Path.Combine(saveDirectory, "state.xml"));
-                    SharedSerializer.Serialize(writer, Model);
+                    if (!ShouldSave) return;
+                    try
+                    {
+                        string saveDirectory = PDirectory.GetPalisadeDirectory(Identifier);
+                        PDirectory.EnsureExists(saveDirectory);
+                        using StreamWriter writer = new(Path.Combine(saveDirectory, "state.xml"));
+                        SharedSerializer.Serialize(writer, Model);
+                    }
+                    catch { /* réessayer au prochain Save */ }
+                    finally { ShouldSave = false; }
                 }
-                catch { /* réessayer au prochain Save */ }
-                finally { ShouldSave = false; }
             }
+
+            var dispatcher = Application.Current?.Dispatcher;
+            if (dispatcher != null && !dispatcher.CheckAccess())
+                dispatcher.Invoke(WriteState);
+            else
+                WriteState();
         }
 
         #endregion

@@ -15,6 +15,11 @@ namespace Palisades.Model
     [XmlRoot(Namespace = "io.stouder", ElementName = "PalisadeModel")]
     public abstract class PalisadeModelBase
     {
+        // SchemaVersion history:
+        // 1 - Initial versioned format (v0.5.x). Corresponds to all models prior to explicit versioning.
+        // When adding version 2: add migration logic in PalisadeModelMigration.
+        private int _schemaVersion = 1;
+
         private string _identifier;
         private string _name;
         private int _fenceX;
@@ -43,5 +48,8 @@ namespace Palisades.Model
         public string? GroupId { get; set; }
         /// <summary>Position de l'onglet dans le groupe (défaut 0).</summary>
         public int TabOrder { get; set; }
+
+        /// <summary>Version du schéma XML pour state.xml (rétrocompatibilité : anciens fichiers sans attribut → 0, traité comme 1 au chargement).</summary>
+        public int SchemaVersion { get => _schemaVersion; set => _schemaVersion = value; }
     }
 }

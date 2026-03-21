@@ -29,8 +29,10 @@ namespace Palisades.ViewModel
         private string _errorMessage;
         private FileSystemWatcher? _watcher;
         private System.Threading.Timer? _fsDebounceTimer;
-        private readonly object _fsDebounceLock = new object();
+        private readonly object _fsTimerLock = new object();
         private bool _disposed;
+        /// <summary>Dispatcher UI capturé à la construction : le debounce timer s’exécute sur le pool de threads,
+        /// où <see cref="Dispatcher.CurrentDispatcher"/> n’est pas le dispatcher WPF de l’application.</summary>
         private readonly Dispatcher _uiDispatcher;
 
         public string RootPath
@@ -48,7 +50,7 @@ namespace Palisades.ViewModel
                 OnPropertyChanged();
                 UpdateBreadcrumb();
                 Save();
-                RefreshFileSystemWatcher();
+                SetupWatcher(CurrentPath);
             }
         }
 
@@ -387,7 +389,7 @@ namespace Palisades.ViewModel
                 LoadFolder(CurrentPath);
         }
 
-        private void RefreshFileSystemWatcher()
+        private void SetupWatcher(string? path)
         {
             try
             {
@@ -395,89 +397,82 @@ namespace Palisades.ViewModel
             }
             catch (Exception ex)
             {
-                PalisadeDiagnostics.Log("FolderPortal", "Dispose watcher", ex);
+                PalisadeDiagnostics.Log("FolderPortal.SetupWatcher", "Dispose watcher", ex);
             }
 
             _watcher = null;
-            string path = CurrentPath ?? string.Empty;
-            if (string.IsNullOrEmpty(path))
+
+            lock (_fsTimerLock)
+            {
+                try
+                {
+                    _fsDebounceTimer?.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    PalisadeDiagnostics.Log("FolderPortal.SetupWatcher", "Dispose debounce timer", ex);
+                }
+
+                _fsDebounceTimer = null;
+            }
+
+            if (string.IsNullOrEmpty(path) || !Directory.Exists(path))
+            {
+                PalisadeDiagnostics.Log(
+                    "FolderPortal.SetupWatcher",
+                    "path not found or inaccessible: " + (path ?? "(null)"));
                 return;
+            }
 
             try
             {
-                if (!Directory.Exists(path))
-                {
-                    PalisadeDiagnostics.Log("FolderPortal", "Watcher : dossier introuvable ou inaccessible : " + path, null);
-                    return;
-                }
-
                 var w = new FileSystemWatcher(path)
                 {
                     IncludeSubdirectories = false,
                     NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite,
                 };
-                w.Created += (_, _) => OnFileSystemChanged();
-                w.Deleted += (_, _) => OnFileSystemChanged();
-                w.Renamed += (_, _) => OnFileSystemChanged();
-                w.Changed += (_, _) => OnFileSystemChanged();
+                w.Created += (_, _) => OnFileSystemEvent();
+                w.Deleted += (_, _) => OnFileSystemEvent();
+                w.Renamed += (_, _) => OnFileSystemEvent();
+                w.Changed += (_, _) => OnFileSystemEvent();
                 w.EnableRaisingEvents = true;
                 _watcher = w;
             }
             catch (Exception ex)
             {
-                PalisadeDiagnostics.Log("FolderPortal", "Création FileSystemWatcher impossible.", ex);
+                PalisadeDiagnostics.Log("FolderPortal.SetupWatcher", "FileSystemWatcher init failed.", ex);
+                _watcher = null;
             }
         }
 
-        private void OnFileSystemChanged()
+        private void OnFileSystemEvent()
         {
-            ScheduleDebouncedRefresh();
-        }
-
-        private void ScheduleDebouncedRefresh()
-        {
-            lock (_fsDebounceLock)
+            lock (_fsTimerLock)
             {
                 if (_disposed)
                     return;
                 if (_fsDebounceTimer == null)
-                    _fsDebounceTimer = new System.Threading.Timer(_ => OnDebounceTick(), null, 500, Timeout.Infinite);
+                    _fsDebounceTimer = new System.Threading.Timer(_ => OnFsDebounceFire(), null, 500, Timeout.Infinite);
                 else
                     _fsDebounceTimer.Change(500, Timeout.Infinite);
             }
         }
 
-        private void OnDebounceTick()
+        private void OnFsDebounceFire()
         {
             try
             {
-                InvokeOnUiThread(() =>
+                _uiDispatcher.Invoke(() =>
                 {
                     if (_disposed)
                         return;
-                    if (!string.IsNullOrEmpty(CurrentPath) && Directory.Exists(CurrentPath))
-                        LoadFolder(CurrentPath);
+                    RefreshItems();
                 });
             }
             catch (Exception ex)
             {
-                PalisadeDiagnostics.Log("FolderPortal", "Rafraîchissement après événement fichier.", ex);
+                PalisadeDiagnostics.Log("FolderPortal.SetupWatcher", "Refresh after filesystem event.", ex);
             }
-        }
-
-        private void InvokeOnUiThread(Action action)
-        {
-            var dispatcher = _uiDispatcher;
-            if (dispatcher == null)
-            {
-                action();
-                return;
-            }
-
-            if (dispatcher.CheckAccess())
-                action();
-            else
-                dispatcher.BeginInvoke(action);
         }
 
         public override void Dispose()
@@ -495,7 +490,7 @@ namespace Palisades.ViewModel
             }
 
             _watcher = null;
-            lock (_fsDebounceLock)
+            lock (_fsTimerLock)
             {
                 _fsDebounceTimer?.Dispose();
                 _fsDebounceTimer = null;

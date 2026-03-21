@@ -1,7 +1,6 @@
 using Palisades.Helpers;
 using Palisades.Properties;
 using Palisades.Model;
-using Palisades.Services;
 using Palisades.View;
 using Palisades.ViewModel;
 using System;
@@ -37,10 +36,13 @@ namespace Palisades
                     var obj = ViewModelBase.SharedSerializer.Deserialize(reader);
                     if (obj is PalisadeModel legacy)
                     {
-                        loadedConcrete.Add(PalisadeModelMigration.ToConcreteModel(legacy));
+                        var concrete = PalisadeModelMigration.ToConcreteModel(legacy);
+                        NormalizeSchemaVersion(concrete);
+                        loadedConcrete.Add(concrete);
                     }
                     else if (obj is PalisadeModelBase concrete)
                     {
+                        NormalizeSchemaVersion(concrete);
                         loadedConcrete.Add(concrete);
                     }
                 }
@@ -60,7 +62,7 @@ namespace Palisades
                 var viewModels = new List<IPalisadeViewModel>();
                 foreach (var concrete in ordered)
                 {
-                    var vm = CreateViewModel(concrete);
+                    var vm = PalisadeFactory.CreateViewModel(concrete);
                     if (vm != null)
                         viewModels.Add(vm);
                 }
@@ -75,62 +77,11 @@ namespace Palisades
 
             foreach (PalisadeModelBase concrete in standalone)
             {
-                var vm = CreateViewModel(concrete);
+                var vm = PalisadeFactory.CreateViewModel(concrete);
                 if (vm == null) continue;
-                var window = PalisadeWindowFactory.Create(vm);
+                var window = PalisadeFactory.CreateWindow(vm);
                 palisades.Add(concrete.Identifier, window);
             }
-        }
-
-        private static IPalisadeViewModel? CreateViewModel(PalisadeModelBase concrete)
-        {
-            if (concrete is FolderPortalModel folderModel)
-                return new FolderPortalViewModel(folderModel);
-            if (concrete is TaskPalisadeModel taskModel)
-            {
-                string caldavUrl;
-                string username;
-                string password;
-                if (taskModel.ZimbraAccountId is Guid accountId && ZimbraAccountStore.GetById(accountId) is ZimbraAccount account)
-                {
-                    caldavUrl = account.CalDAVBaseUrl ?? string.Empty;
-                    username = account.Email ?? string.Empty;
-                    password = CredentialEncryptor.Decrypt(account.EncryptedPassword ?? "");
-                }
-                else
-                {
-                    caldavUrl = taskModel.CalDAVUrl ?? string.Empty;
-                    username = taskModel.CalDAVUsername ?? string.Empty;
-                    password = CredentialEncryptor.Decrypt(taskModel.CalDAVPassword ?? "");
-                }
-                var client = new CalDAVClient(caldavUrl, username, password);
-                var caldavService = new Services.CalDAVService(client);
-                return new TaskPalisadeViewModel(taskModel, caldavService);
-            }
-            if (concrete is CalendarPalisadeModel calModel)
-            {
-                string calUrl = calModel.CalDAVBaseUrl ?? "";
-                string calUser = calModel.CalDAVUsername ?? "";
-                string calPass = "";
-                if (calModel.ZimbraAccountId is Guid zimbraId && ZimbraAccountStore.GetById(zimbraId) is ZimbraAccount zimbraAcc)
-                {
-                    calUrl = !string.IsNullOrEmpty(zimbraAcc.CalDAVBaseUrl) ? zimbraAcc.CalDAVBaseUrl : calUrl;
-                    calUser = !string.IsNullOrEmpty(zimbraAcc.Email) ? zimbraAcc.Email : calUser;
-                    calPass = CredentialEncryptor.Decrypt(zimbraAcc.EncryptedPassword ?? "");
-                }
-                else
-                {
-                    calPass = CredentialEncryptor.Decrypt(calModel.CalDAVPassword ?? "");
-                }
-                var calClient = new CalDAVClient(calUrl, calUser, calPass);
-                var calService = new CalendarCalDAVService(calClient);
-                return new CalendarPalisadeViewModel(calModel, calService);
-            }
-            if (concrete is MailPalisadeModel mailModel)
-                return new MailPalisadeViewModel(mailModel);
-            if (concrete is StandardPalisadeModel standardModel)
-                return new PalisadeViewModel(standardModel);
-            return null;
         }
 
         public static void CreatePalisade(int? x = null, int? y = null, int? width = null, int? height = null, string? groupId = null, TabbedPalisade? tabbedWindow = null)
@@ -287,7 +238,7 @@ namespace Palisades
             if (hostWindow.DataContext is not IPalisadeViewModel existing) return;
 
             var listIds = dialog.SelectedTaskListIds ?? new List<string>();
-            var vm = BuildTaskPalisadeViewModel(dialog.CalDAVUrl, dialog.Username, dialog.Password, listIds, dialog.PalisadeTitle, existing.FenceX, existing.FenceY, existing.Width, existing.Height);
+            var vm = PalisadeFactory.CreateTaskViewModel(dialog.CalDAVUrl, dialog.Username, dialog.Password, listIds, dialog.PalisadeTitle, existing.FenceX, existing.FenceY, existing.Width, existing.Height);
             MergeStandaloneIntoTabbedWithNewMember(hostWindow, existing, vm);
         }
 
@@ -304,7 +255,7 @@ namespace Palisades
             if (dialog.ShowDialog() != true) return;
             if (hostWindow.DataContext is not IPalisadeViewModel existing) return;
 
-            var vm = BuildCalendarPalisadeViewModel(dialog.CalDAVUrl, dialog.Username, dialog.Password, dialog.SelectedCalendarIds, dialog.PalisadeTitle, dialog.ViewMode, dialog.DaysToShow, existing.FenceX, existing.FenceY, existing.Width, existing.Height);
+            var vm = PalisadeFactory.CreateCalendarViewModel(dialog.CalDAVUrl, dialog.Username, dialog.Password, dialog.SelectedCalendarIds, dialog.PalisadeTitle, dialog.ViewMode, dialog.DaysToShow, existing.FenceX, existing.FenceY, existing.Width, existing.Height);
             MergeStandaloneIntoTabbedWithNewMember(hostWindow, existing, vm);
         }
 
@@ -321,7 +272,7 @@ namespace Palisades
             if (dialog.ShowDialog() != true) return;
             if (hostWindow.DataContext is not IPalisadeViewModel existing) return;
 
-            var vm = BuildMailPalisadeViewModel(dialog.ImapHost, dialog.ImapPort, dialog.Username, dialog.Password, dialog.SelectedFolders, dialog.PalisadeTitle, dialog.DisplayMode, dialog.PollIntervalMinutes, dialog.WebmailUrl, existing.FenceX, existing.FenceY, existing.Width, existing.Height);
+            var vm = PalisadeFactory.CreateMailViewModel(dialog.ImapHost, dialog.ImapPort, dialog.Username, dialog.Password, dialog.SelectedFolders, dialog.PalisadeTitle, dialog.DisplayMode, dialog.PollIntervalMinutes, dialog.WebmailUrl, existing.FenceX, existing.FenceY, existing.Width, existing.Height);
             MergeStandaloneIntoTabbedWithNewMember(hostWindow, existing, vm);
         }
 
@@ -367,32 +318,9 @@ namespace Palisades
             }
         }
 
-        private static TaskPalisadeViewModel BuildTaskPalisadeViewModel(string caldavUrl, string username, string password, List<string> taskListIds, string title, int? x, int? y, int? width, int? height)
-        {
-            taskListIds = taskListIds ?? new List<string>();
-            var model = new TaskPalisadeModel
-            {
-                Name = title,
-                CalDAVUrl = caldavUrl,
-                CalDAVUsername = username,
-                CalDAVPassword = CredentialEncryptor.Encrypt(password),
-                TaskListIds = taskListIds,
-                TaskListId = taskListIds.Count > 0 ? taskListIds[0] : string.Empty,
-                Width = width ?? 600,
-                Height = height ?? 400,
-            };
-            if (x.HasValue) model.FenceX = x.Value;
-            if (y.HasValue) model.FenceY = y.Value;
-            if (width.HasValue) model.Width = width.Value;
-            if (height.HasValue) model.Height = height.Value;
-            var client = new CalDAVClient(caldavUrl, username, password);
-            var caldavService = new Services.CalDAVService(client);
-            return new TaskPalisadeViewModel(model, caldavService);
-        }
-
         public static void CreateTaskPalisade(string caldavUrl, string username, string password, List<string> taskListIds, string title, int? x = null, int? y = null, int? width = null, int? height = null, string? groupId = null, TabbedPalisade? tabbedWindow = null)
         {
-            var viewModel = BuildTaskPalisadeViewModel(caldavUrl, username, password, taskListIds, title, x, y, width, height);
+            var viewModel = PalisadeFactory.CreateTaskViewModel(caldavUrl, username, password, taskListIds, title, x, y, width, height);
 
             if (!string.IsNullOrEmpty(groupId) && tabbedWindow != null && tabbedWindow.DataContext is PalisadeGroup g)
             {
@@ -429,32 +357,9 @@ namespace Palisades
                 CreateTaskPalisade(dialog.CalDAVUrl, dialog.Username, dialog.Password, listIds, dialog.PalisadeTitle);
         }
 
-        private static CalendarPalisadeViewModel BuildCalendarPalisadeViewModel(string caldavUrl, string username, string password, List<string> calendarIds, string title, CalendarViewMode viewMode, int daysToShow, int? x, int? y, int? width, int? height)
-        {
-            var model = new CalendarPalisadeModel
-            {
-                Name = title,
-                CalDAVBaseUrl = caldavUrl,
-                CalDAVUsername = username,
-                CalDAVPassword = CredentialEncryptor.Encrypt(password),
-                CalendarIds = calendarIds ?? new List<string>(),
-                ViewMode = viewMode,
-                DaysToShow = daysToShow,
-                Width = width ?? 500,
-                Height = height ?? 400,
-            };
-            if (x.HasValue) model.FenceX = x.Value;
-            if (y.HasValue) model.FenceY = y.Value;
-            if (width.HasValue) model.Width = width.Value;
-            if (height.HasValue) model.Height = height.Value;
-            var client = new CalDAVClient(caldavUrl, username, password);
-            var calendarService = new CalendarCalDAVService(client);
-            return new CalendarPalisadeViewModel(model, calendarService);
-        }
-
         public static void CreateCalendarPalisade(string caldavUrl, string username, string password, List<string> calendarIds, string title, CalendarViewMode viewMode, int daysToShow, int? x = null, int? y = null, int? width = null, int? height = null, string? groupId = null, TabbedPalisade? tabbedWindow = null)
         {
-            var viewModel = BuildCalendarPalisadeViewModel(caldavUrl, username, password, calendarIds, title, viewMode, daysToShow, x, y, width, height);
+            var viewModel = PalisadeFactory.CreateCalendarViewModel(caldavUrl, username, password, calendarIds, title, viewMode, daysToShow, x, y, width, height);
 
             if (!string.IsNullOrEmpty(groupId) && tabbedWindow != null && tabbedWindow.DataContext is PalisadeGroup g)
             {
@@ -481,32 +386,9 @@ namespace Palisades
                 CreateCalendarPalisade(dialog.CalDAVUrl, dialog.Username, dialog.Password, dialog.SelectedCalendarIds, dialog.PalisadeTitle, dialog.ViewMode, dialog.DaysToShow);
         }
 
-        private static MailPalisadeViewModel BuildMailPalisadeViewModel(string imapHost, int imapPort, string username, string password, List<string> monitoredFolders, string title, MailDisplayMode displayMode, int pollIntervalMinutes, string? webmailUrl, int? x, int? y, int? width, int? height)
-        {
-            var model = new MailPalisadeModel
-            {
-                Name = title,
-                ImapHost = imapHost,
-                ImapPort = imapPort,
-                ImapUsername = username,
-                ImapPassword = CredentialEncryptor.Encrypt(password),
-                MonitoredFolders = monitoredFolders ?? new List<string> { "INBOX" },
-                DisplayMode = displayMode,
-                PollIntervalMinutes = pollIntervalMinutes,
-                WebmailUrl = webmailUrl,
-                Width = width ?? 320,
-                Height = height ?? 240,
-            };
-            if (x.HasValue) model.FenceX = x.Value;
-            if (y.HasValue) model.FenceY = y.Value;
-            if (width.HasValue) model.Width = width.Value;
-            if (height.HasValue) model.Height = height.Value;
-            return new MailPalisadeViewModel(model);
-        }
-
         public static void CreateMailPalisade(string imapHost, int imapPort, string username, string password, List<string> monitoredFolders, string title, MailDisplayMode displayMode, int pollIntervalMinutes, string? webmailUrl = null, int? x = null, int? y = null, int? width = null, int? height = null, string? groupId = null, TabbedPalisade? tabbedWindow = null)
         {
-            var viewModel = BuildMailPalisadeViewModel(imapHost, imapPort, username, password, monitoredFolders, title, displayMode, pollIntervalMinutes, webmailUrl, x, y, width, height);
+            var viewModel = PalisadeFactory.CreateMailViewModel(imapHost, imapPort, username, password, monitoredFolders, title, displayMode, pollIntervalMinutes, webmailUrl, x, y, width, height);
 
             if (!string.IsNullOrEmpty(groupId) && tabbedWindow != null && tabbedWindow.DataContext is PalisadeGroup g)
             {
@@ -555,7 +437,7 @@ namespace Palisades
                 {
                     var single = group.Members[0];
                     tabbed.Close();
-                    var standalone = PalisadeWindowFactory.Create(single);
+                    var standalone = PalisadeFactory.CreateWindow(single);
                     palisades[single.Identifier] = standalone;
                     standalone.Show();
                     single.GroupId = null;
@@ -625,6 +507,12 @@ namespace Palisades
                     RescaleVm(vm, oldWidth, oldHeight, newWidth, newHeight, minW, minH);
                 }
             }
+        }
+
+        private static void NormalizeSchemaVersion(PalisadeModelBase model)
+        {
+            if (model.SchemaVersion == 0)
+                model.SchemaVersion = 1;
         }
 
         private static void RescaleVm(IPalisadeViewModel vm, int oldW, int oldH, int newW, int newH, int minW, int minH)

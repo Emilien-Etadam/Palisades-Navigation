@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
@@ -10,6 +9,11 @@ using Xunit;
 
 namespace Palisades.Tests.ViewModel
 {
+    /// <summary>
+    /// Nécessite un thread STA et une <see cref="Dispatcher"/> WPF : le watcher déclenche un timer
+    /// qui rappelle l’UI via <c>Dispatcher.Invoke</c> ; sans Application, le test est exécuté sur un
+    /// thread STA dédié avec pompage du dispatcher.
+    /// </summary>
     public class FolderPortalViewModelFileWatcherTests
     {
         [Fact]
@@ -34,18 +38,19 @@ namespace Palisades.Tests.ViewModel
                         };
                         var vm = new FolderPortalViewModel(model);
 
-                        var testFile = Path.Combine(tempDir, "watcher_new_file.txt");
-                        File.WriteAllText(testFile, "x");
+                        Assert.Empty(vm.Items);
 
-                        var deadline = DateTime.UtcNow.AddSeconds(5);
-                        while (DateTime.UtcNow < deadline &&
-                               !vm.Items.Any(i => i.Name == "watcher_new_file.txt"))
+                        var testFile = Path.Combine(tempDir, "test.txt");
+                        File.WriteAllText(testFile, "content");
+
+                        var deadline = DateTime.UtcNow.AddMilliseconds(1500);
+                        while (DateTime.UtcNow < deadline)
                         {
                             Application.Current!.Dispatcher.Invoke(() => { }, DispatcherPriority.Background);
-                            Thread.Sleep(50);
+                            Thread.Sleep(10);
                         }
 
-                        Assert.Contains(vm.Items, i => i.Name == "watcher_new_file.txt");
+                        Assert.Contains(vm.Items, i => i.Name == "test.txt");
                     }
                     finally
                     {

@@ -12,12 +12,12 @@ using Ical.Net.Serialization;
 
 namespace Palisades.Services
 {
-    public class CalDAVService
+    public class CalDAVService : ICalDAVService
     {
-        private readonly CalDAVClient _client;
+        private readonly ICalDAVClient _client;
         private readonly CalendarSerializer _serializer = new CalendarSerializer();
 
-        public CalDAVService(CalDAVClient client)
+        public CalDAVService(ICalDAVClient client)
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
         }

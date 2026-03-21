@@ -19,7 +19,7 @@ namespace Palisades.ViewModel
     public class TaskPalisadeViewModel : ViewModelBase
     {
         private readonly TaskPalisadeModel _model;
-        private readonly CalDAVService _caldavService;
+        private readonly ICalDAVService _caldavService;
         private CalDAVTask? _selectedTask;
         private string _errorMessage = string.Empty;
         private bool _isSyncing;
@@ -129,7 +129,7 @@ namespace Palisades.ViewModel
         public TaskPalisadeViewModel() : this(new TaskPalisadeModel { Name = Strings.TaskDefaultName, Width = 600, Height = 400 }, new CalDAVService(new CalDAVClient("https://localhost/", "", "")))
         { }
 
-        public TaskPalisadeViewModel(TaskPalisadeModel model, CalDAVService caldavService) : base(model)
+        public TaskPalisadeViewModel(TaskPalisadeModel model, ICalDAVService caldavService) : base(model)
         {
             _model = model;
             _caldavService = caldavService;

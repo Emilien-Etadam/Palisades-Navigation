@@ -15,7 +15,7 @@ namespace Palisades.Services
     /// <summary>
     /// Service IMAP pour compter les mails non lus et récupérer les sujets (Zimbra, etc.).
     /// </summary>
-    public class ImapMailService
+    public class ImapMailService : IImapMailService
     {
         private readonly string _host;
         private readonly int _port;

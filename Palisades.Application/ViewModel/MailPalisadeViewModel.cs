@@ -1,5 +1,6 @@
 using Palisades.Helpers;
 using Palisades.Properties;
+using Palisades;
 using Palisades.Model;
 using Palisades.Services;
 using Palisades.View;
@@ -19,7 +20,7 @@ namespace Palisades.ViewModel
     public class MailPalisadeViewModel : ViewModelBase
     {
         private readonly MailPalisadeModel _model;
-        private ImapMailService? _mailService;
+        private IImapMailService? _mailService;
         private string _errorMessage = string.Empty;
         private bool _isConnected;
         private bool _isLoading;
@@ -98,24 +99,7 @@ namespace Palisades.ViewModel
         private async Task EnsureConnectedAndRefreshAsync()
         {
             if (_mailService == null)
-            {
-                string host; int port; string username; string password;
-                if (_model.ZimbraAccountId is Guid id && ZimbraAccountStore.GetById(id) is ZimbraAccount acc)
-                {
-                    host = !string.IsNullOrEmpty(acc.ImapHost) ? acc.ImapHost : acc.Server;
-                    port = 993;
-                    username = acc.Email ?? "";
-                    password = CredentialEncryptor.Decrypt(acc.EncryptedPassword ?? "");
-                }
-                else
-                {
-                    host = _model.ImapHost;
-                    port = _model.ImapPort > 0 ? _model.ImapPort : 993;
-                    username = _model.ImapUsername;
-                    password = CredentialEncryptor.Decrypt(_model.ImapPassword ?? "");
-                }
-                _mailService = new ImapMailService(host, port, username, password);
-            }
+                _mailService = PalisadeFactory.CreateImapMailService(_model);
             try
             {
                 await _mailService.ConnectAsync();

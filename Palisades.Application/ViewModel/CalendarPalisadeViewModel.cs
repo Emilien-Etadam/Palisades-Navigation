@@ -25,7 +25,7 @@ namespace Palisades.ViewModel
     public class CalendarPalisadeViewModel : ViewModelBase
     {
         private readonly CalendarPalisadeModel _model;
-        private readonly CalendarCalDAVService _calendarService;
+        private readonly ICalendarCalDAVService _calendarService;
         private DateTime _selectedDate = DateTime.Today;
         private string _errorMessage = string.Empty;
         private bool _isLoading;
@@ -37,7 +37,7 @@ namespace Palisades.ViewModel
             new CalendarCalDAVService(new CalDAVClient("https://localhost/", "", "")))
         { }
 
-        public CalendarPalisadeViewModel(CalendarPalisadeModel model, CalendarCalDAVService calendarService)
+        public CalendarPalisadeViewModel(CalendarPalisadeModel model, ICalendarCalDAVService calendarService)
             : base(model)
         {
             _model = model;

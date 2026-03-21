@@ -11,6 +11,7 @@ namespace Palisades.Model
         public int ScreenWidth { get; set; }
         public int ScreenHeight { get; set; }
         public int ScreenCount { get; set; }
+        public int SchemaVersion { get; set; } = 1;
         public List<SnapshotEntry> Entries { get; set; } = new List<SnapshotEntry>();
     }
 

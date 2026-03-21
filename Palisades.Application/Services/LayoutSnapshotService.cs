@@ -110,6 +110,9 @@ namespace Palisades.Services
             }
             if (snapshot?.Entries == null) return;
 
+            if (snapshot.SchemaVersion == 0)
+                snapshot.SchemaVersion = 1;
+
             PalisadesManager.CloseAllPalisades();
             var savedDir = PDirectory.GetPalisadesDirectory();
             if (Directory.Exists(savedDir))
