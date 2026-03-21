@@ -271,9 +271,7 @@
                              Background="Transparent" BorderThickness="0"
                              Visibility="{Binding IsLoading, Converter={StaticResource InverseBoolToVis}}">
                         <ListBox.Resources>
-                            <Style TargetType="ScrollBar">
-                                <Setter Property="Width" Value="4"/>
-                            </Style>
+                            <Style TargetType="ScrollBar" BasedOn="{StaticResource PalisadeScrollBarStyle}"/>
                         </ListBox.Resources>
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem" BasedOn="{StaticResource PalisadeListBoxItemStyle}"/>
@@ -352,9 +350,7 @@
                              BorderThickness="0"
                              Visibility="{Binding IsLoading, Converter={StaticResource InverseBoolToVis}}">
                         <ListBox.Resources>
-                            <Style TargetType="ScrollBar">
-                                <Setter Property="Width" Value="4"/>
-                            </Style>
+                            <Style TargetType="ScrollBar" BasedOn="{StaticResource PalisadeScrollBarStyle}"/>
                         </ListBox.Resources>
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem" BasedOn="{StaticResource PalisadeListBoxItemStyle}"/>
@@ -462,9 +458,7 @@
                             </Style>
                         </ListBox.Style>
                         <ListBox.Resources>
-                            <Style TargetType="ScrollBar">
-                                <Setter Property="Width" Value="4"/>
-                            </Style>
+                            <Style TargetType="ScrollBar" BasedOn="{StaticResource PalisadeScrollBarStyle}"/>
                         </ListBox.Resources>
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem" BasedOn="{StaticResource PalisadeListBoxItemStyle}"/>

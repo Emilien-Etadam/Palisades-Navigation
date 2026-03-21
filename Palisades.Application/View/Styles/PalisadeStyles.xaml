@@ -88,12 +88,15 @@
     </Style>
 
     <Style x:Key="PalisadeScrollBarStyle" TargetType="ScrollBar">
-        <Setter Property="Width" Value="4"/>
+        <Setter Property="Width" Value="8"/>
+        <Setter Property="MinWidth" Value="8"/>
         <Setter Property="Background" Value="Transparent"/>
+        <!-- Espace dans la zone de contenu : la barre reste dans le fond PalisadeControlBrush -->
+        <Setter Property="Margin" Value="0,4,4,4"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ScrollBar">
-                    <Grid>
+                    <Grid SnapsToDevicePixels="True">
                         <Track x:Name="PART_Track" IsDirectionReversed="True">
                             <Track.Thumb>
                                 <Thumb>
@@ -102,7 +105,17 @@
                                             <Setter Property="Template">
                                                 <Setter.Value>
                                                     <ControlTemplate TargetType="Thumb">
-                                                        <Border Background="{DynamicResource PalisadeBorderBrush}" CornerRadius="2" MinHeight="20"/>
+                                                        <Border x:Name="ThumbBorder" Background="{DynamicResource PalisadeBorderBrush}" CornerRadius="3" Width="4" HorizontalAlignment="Center" MinHeight="24"/>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter TargetName="ThumbBorder" Property="Background" Value="{DynamicResource PalisadeAccentBrush}"/>
+                                                                <Setter TargetName="ThumbBorder" Property="Opacity" Value="0.9"/>
+                                                            </Trigger>
+                                                            <Trigger Property="IsDragging" Value="True">
+                                                                <Setter TargetName="ThumbBorder" Property="Background" Value="{DynamicResource PalisadeAccentBrush}"/>
+                                                                <Setter TargetName="ThumbBorder" Property="Opacity" Value="1"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
                                                     </ControlTemplate>
                                                 </Setter.Value>
                                             </Setter>
