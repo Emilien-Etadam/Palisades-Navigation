@@ -16,8 +16,10 @@ namespace Palisades.Helpers
         private const uint SWP_NOMOVE = 0x0002;
         private const uint SWP_NOZORDER = 0x0004;
         private const uint SWP_NOACTIVATE = 0x0010;
+        private const uint SWP_SHOWWINDOW = 0x0040;
 
         private static readonly IntPtr HWND_BOTTOM = new(1);
+        private static readonly IntPtr HWND_TOP = IntPtr.Zero;
         #endregion
 
         #region Attributs
@@ -58,6 +60,7 @@ namespace Palisades.Helpers
 
             window.Loaded -= OnWindowLoaded;
             window.Closing -= OnWindowClosing;
+            window.PreviewMouseDown -= OnPreviewMouseDown;
 
             disposed = true;
         }
@@ -82,12 +85,45 @@ namespace Palisades.Helpers
 
             var source = HwndSource.FromHwnd(new WindowInteropHelper(window).Handle);
             source?.AddHook(WndProc);
+
+            window.PreviewMouseDown += OnPreviewMouseDown;
         }
 
         private void OnWindowClosing(object? sender, CancelEventArgs e)
         {
+            window.PreviewMouseDown -= OnPreviewMouseDown;
+
             var source = HwndSource.FromHwnd(new WindowInteropHelper(window).Handle);
             source?.RemoveHook(WndProc);
+        }
+
+        /// <summary>
+        /// Au clic, passage au premier plan : le hook WM_WINDOWPOSCHANGING impose SWP_NOZORDER et bloque sinon tout remontage.
+        /// </summary>
+        private void OnPreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            BringWindowToFront();
+        }
+
+        private void BringWindowToFront()
+        {
+            if (!window.IsLoaded)
+                return;
+            var hwnd = new WindowInteropHelper(window).Handle;
+            if (hwnd == IntPtr.Zero)
+                return;
+
+            var source = HwndSource.FromHwnd(hwnd);
+            source?.RemoveHook(WndProc);
+            try
+            {
+                SetWindowPos(hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_SHOWWINDOW);
+                window.Activate();
+            }
+            finally
+            {
+                source?.AddHook(WndProc);
+            }
         }
 
         private IntPtr WndProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)

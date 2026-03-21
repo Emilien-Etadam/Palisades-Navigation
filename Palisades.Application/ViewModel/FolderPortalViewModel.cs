@@ -419,10 +419,6 @@ namespace Palisades.ViewModel
 
         public void Drop(IDropInfo dropInfo)
         {
-            string targetDir = CurrentPath;
-            if (string.IsNullOrEmpty(targetDir) || !Directory.Exists(targetDir))
-                return;
-
             string[]? files = null;
             if (dropInfo.Data is DataObject dataObject && dataObject.GetDataPresent(DataFormats.FileDrop))
                 files = (string[])dataObject.GetData(DataFormats.FileDrop);
@@ -435,6 +431,21 @@ namespace Palisades.ViewModel
                 return;
 
             bool isCopy = (dropInfo.KeyStates & DragDropKeyStates.ControlKey) != 0;
+            ImportFileSystemPaths(files, isCopy);
+        }
+
+        public void ImportExplorerFileDrop(string[] files, bool isCopy)
+        {
+            if (files == null || files.Length == 0)
+                return;
+            ImportFileSystemPaths(files, isCopy);
+        }
+
+        private void ImportFileSystemPaths(string[] files, bool isCopy)
+        {
+            string targetDir = CurrentPath;
+            if (string.IsNullOrEmpty(targetDir) || !Directory.Exists(targetDir))
+                return;
 
             foreach (string sourcePath in files)
             {

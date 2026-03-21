@@ -6,6 +6,7 @@ namespace Palisades.View
     {
         public string? NewName { get; private set; }
         public string CurrentName { get; set; } = "";
+        public string PromptLabel { get; set; } = "New name";
 
         public RenameSnapshotInputDialog()
         {

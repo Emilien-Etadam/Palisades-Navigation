@@ -75,22 +75,28 @@
                         <MenuItem Header="About" Command="{Binding Path=Data.OpenAboutCommand, Source={StaticResource proxy}}" />
                     </ContextMenu>
                 </Grid.ContextMenu>
-                <Grid Grid.Row="0" Height="32" Background="{DynamicResource PalisadeWindowBrush}" ColumnDefinitions="Auto,*,Auto">
-                    <Button Grid.Column="0"
+                <Grid Grid.Row="0" Height="32" Background="{DynamicResource PalisadeWindowBrush}" ColumnDefinitions="Auto,Auto,*,Auto,Auto">
+                    <Button Grid.Column="0" Style="{StaticResource PalisadeNavButton}" Click="TitleBarMenuButton_Click" ToolTip="Menu">
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE700;" FontSize="14" VerticalAlignment="Center"/>
+                    </Button>
+                    <Button Grid.Column="1"
                             Content="&#x2190;"
                             Command="{Binding NavigateBackCommand}"
                             ToolTip="Navigate back"
                             Style="{StaticResource PalisadeNavButton}"
                             Visibility="{Binding CanNavigateBack, Converter={StaticResource BoolToVis}}"/>
-                    <TextBlock Grid.Column="1" Text="{Binding Name, Mode=OneWay}" Margin="5,0" Style="{StaticResource PalisadeHeaderText}" HorizontalAlignment="Center"/>
+                    <TextBlock Grid.Column="2" Text="{Binding Name, Mode=OneWay}" Margin="5,0" Style="{StaticResource PalisadeHeaderText}" HorizontalAlignment="Center"/>
 
                     <!-- Home button -->
-                    <Button Grid.Column="2"
+                    <Button Grid.Column="3"
                             Content="&#x2302;"
                             Command="{Binding NavigateToRootCommand}"
                             ToolTip="Go to root folder"
                             Style="{StaticResource PalisadeNavButton}"
                             Visibility="{Binding CanNavigateBack, Converter={StaticResource BoolToVis}}"/>
+                    <Button Grid.Column="4" Style="{StaticResource PalisadeNavButton}" Click="AddFolderPortalTab_Click" ToolTip="Ajouter un onglet Folder Portal (groupe avec ce portail)">
+                        <TextBlock Text="+" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource PalisadeTextBrush}" VerticalAlignment="Center"/>
+                    </Button>
                 </Grid>
                 <Grid Grid.Row="1" Background="{DynamicResource PalisadeWindowBrush}">
                     <TextBlock Text="{Binding Breadcrumb, Mode=OneWay}"
@@ -102,7 +108,8 @@
                                VerticalAlignment="Center" />
                 </Grid>
             </Grid>
-            <Border CornerRadius="0" ClipToBounds="True" Background="{DynamicResource PalisadeControlBrush}">
+            <Border CornerRadius="0" ClipToBounds="True" Background="{DynamicResource PalisadeControlBrush}"
+                    AllowDrop="True" Drop="OnExternalFileDrop" DragOver="OnExternalFileDragOver">
                 <Grid x:Name="content">
                     <Grid.ContextMenu>
                         <ContextMenu>

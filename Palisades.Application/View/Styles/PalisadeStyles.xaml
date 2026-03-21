@@ -226,44 +226,61 @@
         <Setter Property="Foreground" Value="{DynamicResource PalisadeTextBrush}"/>
     </Style>
 
-    <!-- Tab styles (Flat / Rounded) -->
+    <!-- Tab styles (Flat / Rounded) — bandeau horizontal comme un navigateur (TabPanel) -->
     <Style x:Key="FlatTabStyle" TargetType="TabControl">
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TabControl">
-                    <DockPanel>
-                        <Border DockPanel.Dock="Top" Background="{DynamicResource PalisadeWindowBrush}" Padding="0,4,0,0">
-                            <ItemsPresenter />
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Border Grid.Row="0"
+                                Background="{DynamicResource PalisadeWindowBrush}"
+                                BorderBrush="{DynamicResource PalisadeBorderBrush}"
+                                BorderThickness="0,0,0,1"
+                                Padding="6,4,6,0">
+                            <TabPanel IsItemsHost="True"/>
                         </Border>
-                        <ContentPresenter Content="{TemplateBinding SelectedContent}" ContentTemplate="{TemplateBinding SelectedContentTemplate}"
-                                          ContentTemplateSelector="{TemplateBinding SelectedContentTemplateSelector}" Margin="0" />
-                    </DockPanel>
+                        <Border Grid.Row="1" Background="{DynamicResource PalisadeControlBrush}" ClipToBounds="True">
+                            <ContentPresenter x:Name="PART_SelectedContentHost"
+                                              Margin="0"
+                                              ContentSource="SelectedContent"
+                                              ContentTemplate="{TemplateBinding SelectedContentTemplate}"
+                                              ContentTemplateSelector="{TemplateBinding SelectedContentTemplateSelector}"/>
+                        </Border>
+                    </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
     <Style x:Key="FlatTabItemStyle" TargetType="TabItem">
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="MinHeight" Value="32"/>
+        <Setter Property="VerticalAlignment" Value="Bottom"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TabItem">
-                    <Border x:Name="Border" Background="Transparent" Padding="12,6" Margin="2,0,0,0" Cursor="Hand">
-                        <ContentPresenter ContentSource="Header" />
-                        <Border.Style>
-                            <Style TargetType="Border">
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="{StaticResource PalisadeCardPressedBrush}" />
-                                    </Trigger>
-                                    <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=TabItem}}" Value="True">
-                                        <Setter Property="Background" Value="{StaticResource PalisadeHoverSubtleBrush}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
+                    <Border x:Name="Border"
+                            Background="Transparent"
+                            Padding="14,8,14,8"
+                            Margin="0,0,1,0"
+                            BorderBrush="{DynamicResource PalisadeBorderBrush}"
+                            BorderThickness="0,0,1,0"
+                            Cursor="Hand">
+                        <ContentPresenter ContentSource="Header" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     </Border>
                     <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource PalisadeCardHoverBrush}"/>
+                        </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="Border" Property="Background" Value="{StaticResource PalisadeCardPressedBrush}" />
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource PalisadeCardPressedBrush}"/>
+                            <Setter TargetName="Border" Property="BorderThickness" Value="0,0,0,2"/>
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource PalisadeAccentBrush}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -272,18 +289,30 @@
     </Style>
     <Style x:Key="RoundedTabStyle" TargetType="TabControl" BasedOn="{StaticResource FlatTabStyle}" />
     <Style x:Key="RoundedTabItemStyle" TargetType="TabItem">
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="MinHeight" Value="32"/>
+        <Setter Property="VerticalAlignment" Value="Bottom"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TabItem">
-                    <Border x:Name="Border" Background="{StaticResource PalisadeCardHoverBrush}" CornerRadius="6,6,0,0" Padding="12,6" Margin="2,0,0,0" Cursor="Hand">
-                        <ContentPresenter ContentSource="Header" />
+                    <Border x:Name="Border"
+                            Background="{StaticResource PalisadeCardHoverBrush}"
+                            CornerRadius="6,6,0,0"
+                            Padding="14,8,14,8"
+                            Margin="0,0,4,0"
+                            BorderBrush="{DynamicResource PalisadeBorderBrush}"
+                            BorderThickness="1,1,1,0"
+                            Cursor="Hand">
+                        <ContentPresenter ContentSource="Header" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Border" Property="Background" Value="{StaticResource PalisadeCardPressedBrush}" />
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource PalisadeCardPressedBrush}"/>
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="Border" Property="Background" Value="{StaticResource PalisadeHoverActiveBrush}" />
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource PalisadeHoverActiveBrush}"/>
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource PalisadeAccentBrush}"/>
+                            <Setter TargetName="Border" Property="BorderThickness" Value="1,1,1,2"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

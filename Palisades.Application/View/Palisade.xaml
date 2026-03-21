@@ -37,13 +37,13 @@
         </ResourceDictionary>
     </Window.Resources>
     <i:Interaction.Triggers>
-        <i:EventTrigger EventName="KeyDown" >
-            <i:InvokeCommandAction Command="{Binding DelKeyPressedCommand}" CommandParameter="{Binding}" />
+        <i:EventTrigger EventName="PreviewKeyDown">
+            <i:InvokeCommandAction Command="{Binding DelKeyPressedCommand}" PassEventArgsToCommand="True" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Border x:Name="LayoutRoot" CornerRadius="0" ClipToBounds="True">
         <DockPanel>
-            <Grid DockPanel.Dock="Top" x:Name="Header" Height="32" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource PalisadeWindowBrush}" Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" ColumnDefinitions="80,*,80">
+            <Grid DockPanel.Dock="Top" x:Name="Header" Height="32" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource PalisadeWindowBrush}" Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" ColumnDefinitions="Auto,*,Auto">
                 <Grid.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Edit" Command="{Binding Path=Data.EditPalisadeCommand, Source={StaticResource proxy}}" CommandParameter="{Binding}" />
@@ -76,7 +76,13 @@
                         <MenuItem Header="About" Command="{Binding Path=Data.OpenAboutCommand, Source={StaticResource proxy}}" />
                     </ContextMenu>
                 </Grid.ContextMenu>
+                <Button Grid.Column="0" Style="{StaticResource PalisadeNavButton}" Click="TitleBarMenuButton_Click" ToolTip="Menu">
+                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE700;" FontSize="14" VerticalAlignment="Center"/>
+                </Button>
                 <TextBlock Grid.Column="1" Text="{Binding Name, Mode=OneWay}" Margin="8,0" Style="{StaticResource PalisadeHeaderText}" HorizontalAlignment="Center"/>
+                <Button Grid.Column="2" Style="{StaticResource PalisadeNavButton}" Click="AddFolderPortalTab_Click" ToolTip="Ajouter un onglet Folder Portal (groupe avec cette fence)">
+                    <TextBlock Text="+" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource PalisadeTextBrush}" VerticalAlignment="Center"/>
+                </Button>
             </Grid>
             <Border x:Name="drag" CornerRadius="0" Background="{DynamicResource PalisadeControlBrush}" AllowDrop="True" Drop="OnExternalFileDrop" DragOver="OnExternalFileDragOver">
                 <Border.ContextMenu>
@@ -97,7 +103,8 @@
               VirtualizingPanel.VirtualizationMode="Recycling"
               dd:DragDrop.IsDragSource="True"
               dd:DragDrop.IsDropTarget="True"
-              dd:DragDrop.DropHandler="{Binding}">
+              dd:DragDrop.DropHandler="{Binding}"
+              dd:DragDrop.DragHandler="{Binding}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <WrapPanel />
@@ -115,6 +122,13 @@
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                     <Border Margin="0,10" CornerRadius="4" Width="100">
+                                        <Border.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Supprimer"
+                                                          Command="{Binding Path=Data.RemoveSelectedShortcutCommand, Source={StaticResource proxy}}"
+                                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                            </ContextMenu>
+                                        </Border.ContextMenu>
                                         <Border.Style>
                                             <Style>
                                                 <Style.Triggers>

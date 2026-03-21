@@ -21,7 +21,8 @@
             <RowDefinition Height="16"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <TextBlock Text="New name" Grid.Row="0" Style="{StaticResource PalisadeDialogLabel}" />
+        <TextBlock Grid.Row="0" Style="{StaticResource PalisadeDialogLabel}"
+                   Text="{Binding PromptLabel, RelativeSource={RelativeSource AncestorType=Window}}" />
         <TextBox x:Name="NameTextBox" Grid.Row="2" FontSize="14" Style="{StaticResource PalisadeDialogTextBox}" />
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Content="Cancel" Style="{StaticResource PalisadeDialogButton}" Click="CancelButton_Click" Margin="0,0,8,0" />

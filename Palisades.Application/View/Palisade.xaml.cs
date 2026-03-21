@@ -1,5 +1,7 @@
 using Palisades.ViewModel;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 
 namespace Palisades.View
@@ -21,6 +23,24 @@ namespace Palisades.View
             DragMove();
         }
 
+        private void TitleBarMenuButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (Header.ContextMenu is ContextMenu cm)
+            {
+                cm.PlacementTarget = sender as UIElement;
+                cm.Placement = PlacementMode.Bottom;
+                cm.IsOpen = true;
+            }
+            e.Handled = true;
+        }
+
+        private void AddFolderPortalTab_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is System.Windows.FrameworkElement anchor)
+                PalisadesManager.RequestAddTab(this, anchor);
+            e.Handled = true;
+        }
+
         private void LayoutsSubmenu_SubmenuOpened(object sender, RoutedEventArgs e)
         {
             if (viewModel != null)
@@ -38,23 +58,18 @@ namespace Palisades.View
 
         private void OnExternalFileDrop(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            if (!e.Data.GetDataPresent(DataFormats.FileDrop))
+                return;
+            var files = e.Data.GetData(DataFormats.FileDrop) as string[];
+            if (files == null || DataContext is not ViewModel.PalisadeViewModel vm)
+                return;
+            foreach (var filePath in files)
             {
-                var files = e.Data.GetData(DataFormats.FileDrop) as string[];
-                if (files == null || DataContext is not ViewModel.PalisadeViewModel vm) return;
-                foreach (var filePath in files)
-                {
-                    if (string.IsNullOrEmpty(filePath)) continue;
-                    var name = System.IO.Path.GetFileNameWithoutExtension(filePath);
-                    var ext = System.IO.Path.GetExtension(filePath)?.ToLowerInvariant();
-                    Model.Shortcut sc = ext == ".url"
-                        ? new Model.UrlShortcut { Name = name, UriOrFileAction = filePath, IconPath = filePath }
-                        : new Model.LnkShortcut { Name = name, UriOrFileAction = filePath, IconPath = filePath };
-                    vm.Shortcuts.Add(sc);
-                }
-                vm.Save();
-                e.Handled = true;
+                if (string.IsNullOrEmpty(filePath)) continue;
+                vm.TryAddShortcutFromExternalPath(filePath);
             }
+
+            e.Handled = true;
         }
     }
 }

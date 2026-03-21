@@ -25,6 +25,11 @@ namespace Palisades.Helpers
             return Path.Combine(GetPalisadeDirectory(identifier), "icons");
         }
 
+        internal static string GetPalisadeImportedDirectory(string identifier)
+        {
+            return Path.Combine(GetPalisadeDirectory(identifier), "imported");
+        }
+
         internal static string GetAccountsFilePath()
         {
             return Path.Combine(GetAppDirectory(), "accounts.xml");

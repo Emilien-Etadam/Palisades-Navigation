@@ -1,14 +1,13 @@
 using Palisades.ViewModel;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Collections.ObjectModel;
 
 namespace Palisades
 {
     public class PalisadeGroup
     {
         public string GroupId { get; }
-        public List<IPalisadeViewModel> Members { get; } = new List<IPalisadeViewModel>();
+        public ObservableCollection<IPalisadeViewModel> Members { get; } = new ObservableCollection<IPalisadeViewModel>();
 
         public IPalisadeViewModel? FirstMember => Members.Count > 0 ? Members[0] : null;
 
@@ -39,6 +38,23 @@ namespace Palisades
         public void RemoveMember(IPalisadeViewModel vm)
         {
             Members.Remove(vm);
+            RecalculateTabOrder();
+        }
+
+        /// <summary>Déplace un membre d’un cran à gauche (-1) ou à droite (+1) dans la bande d’onglets.</summary>
+        public bool TryMoveMember(IPalisadeViewModel vm, int delta)
+        {
+            int i = Members.IndexOf(vm);
+            if (i < 0) return false;
+            int newIdx = i + delta;
+            if (newIdx < 0 || newIdx >= Members.Count) return false;
+            Members.Move(i, newIdx);
+            RecalculateTabOrder();
+            return true;
+        }
+
+        private void RecalculateTabOrder()
+        {
             for (int i = 0; i < Members.Count; i++)
                 Members[i].TabOrder = i;
         }
