@@ -16,7 +16,7 @@ namespace Palisades.View
         {
             using var dialog = new System.Windows.Forms.FolderBrowserDialog
             {
-                Description = "Select the root folder for the Folder Portal",
+                Description = "Select the folder to show in this browse palisade",
                 ShowNewFolderButton = true
             };
 

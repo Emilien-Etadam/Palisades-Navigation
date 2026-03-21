@@ -1,7 +1,7 @@
 <Window x:Class="Palisades.View.EditCalendarPalisade"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Edit Calendar Palisade" Height="320" Width="400" MinHeight="280" MinWidth="380"
+        Title="Edit calendar palisade" Height="320" Width="400" MinHeight="280" MinWidth="380"
         Background="{DynamicResource PalisadeWindowBrush}"
         TextElement.Foreground="{DynamicResource PalisadeTextBrush}"
         WindowStartupLocation="CenterOwner" ResizeMode="CanResize">

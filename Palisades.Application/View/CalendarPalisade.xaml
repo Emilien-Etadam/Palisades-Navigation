@@ -6,7 +6,7 @@
         helpers:WindowBackdrop.IsEnabled="True"
         helpers:WindowSinker.AlwaysOnBottom="True"
         ShowInTaskbar="False"
-        Title="Calendar"
+        Title="Calendar palisade"
         Width="{Binding Width, Mode=TwoWay}"
         Height="{Binding Height, Mode=TwoWay}"
         AllowsTransparency="True"
@@ -40,11 +40,11 @@
                         <Separator />
                         <MenuItem Header="Delete" Command="{Binding Path=Data.DeletePalisadeCommand, Source={StaticResource proxy}}" CommandParameter="{Binding Identifier}" />
                         <Separator />
-                        <MenuItem Header="New fence" Command="{Binding Path=Data.NewPalisadeCommand, Source={StaticResource proxy}}" />
-                        <MenuItem Header="New Folder Portal" Command="{Binding Path=Data.NewFolderPortalCommand, Source={StaticResource proxy}}" />
-                        <MenuItem Header="New Task Palisade" Command="{Binding Path=Data.NewTaskPalisadeCommand, Source={StaticResource proxy}}" />
-                        <MenuItem Header="New Calendar Palisade" Command="{Binding Path=Data.NewCalendarPalisadeCommand, Source={StaticResource proxy}}" />
-                        <MenuItem Header="New Mail Palisade" Command="{Binding Path=Data.NewMailPalisadeCommand, Source={StaticResource proxy}}" />
+                        <MenuItem Header="New shortcut palisade" Command="{Binding Path=Data.NewPalisadeCommand, Source={StaticResource proxy}}" />
+                        <MenuItem Header="New browse palisade" Command="{Binding Path=Data.NewFolderPortalCommand, Source={StaticResource proxy}}" />
+                        <MenuItem Header="New task palisade" Command="{Binding Path=Data.NewTaskPalisadeCommand, Source={StaticResource proxy}}" />
+                        <MenuItem Header="New calendar palisade" Command="{Binding Path=Data.NewCalendarPalisadeCommand, Source={StaticResource proxy}}" />
+                        <MenuItem Header="New mail palisade" Command="{Binding Path=Data.NewMailPalisadeCommand, Source={StaticResource proxy}}" />
                         <Separator />
                         <MenuItem Header="Manage Zimbra Accounts" Command="{Binding Path=Data.ManageZimbraAccountsCommand, Source={StaticResource proxy}}" />
                         <Separator />

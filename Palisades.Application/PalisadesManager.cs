@@ -213,11 +213,11 @@ namespace Palisades
                 menu.Items.Add(item);
             }
 
-            Add("Fence", () => AddTabFence(hostWindow));
-            Add("Folder Portal", () => AddTabFolderPortal(hostWindow));
-            Add("Task Palisade", () => AddTabTaskPalisade(hostWindow));
-            Add("Calendar Palisade", () => AddTabCalendarPalisade(hostWindow));
-            Add("Mail Palisade", () => AddTabMailPalisade(hostWindow));
+            Add("Shortcut palisade", () => AddTabFence(hostWindow));
+            Add("Browse palisade", () => AddTabFolderPortal(hostWindow));
+            Add("Task palisade", () => AddTabTaskPalisade(hostWindow));
+            Add("Calendar palisade", () => AddTabCalendarPalisade(hostWindow));
+            Add("Mail palisade", () => AddTabMailPalisade(hostWindow));
 
             menu.PlacementTarget = anchor;
             menu.Placement = PlacementMode.Bottom;

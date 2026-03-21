@@ -33,11 +33,11 @@ namespace Palisades.Helpers
             _notifyIcon.Visible = true;
 
             var menu = new ContextMenuStrip();
-            menu.Items.Add(CreateItem("New fence", () => PalisadesManager.CreatePalisade()));
-            menu.Items.Add(CreateItem("New Folder Portal", () => PalisadesManager.ShowCreateFolderPortalDialog()));
-            menu.Items.Add(CreateItem("New Task Palisade", () => PalisadesManager.ShowCreateTaskPalisadeDialog()));
-            menu.Items.Add(CreateItem("New Calendar Palisade", () => PalisadesManager.ShowCreateCalendarPalisadeDialog()));
-            menu.Items.Add(CreateItem("New Mail Palisade", () => PalisadesManager.ShowCreateMailPalisadeDialog()));
+            menu.Items.Add(CreateItem("New shortcut palisade", () => PalisadesManager.CreatePalisade()));
+            menu.Items.Add(CreateItem("New browse palisade", () => PalisadesManager.ShowCreateFolderPortalDialog()));
+            menu.Items.Add(CreateItem("New task palisade", () => PalisadesManager.ShowCreateTaskPalisadeDialog()));
+            menu.Items.Add(CreateItem("New calendar palisade", () => PalisadesManager.ShowCreateCalendarPalisadeDialog()));
+            menu.Items.Add(CreateItem("New mail palisade", () => PalisadesManager.ShowCreateMailPalisadeDialog()));
             menu.Items.Add(new ToolStripSeparator());
             menu.Items.Add(CreateItem("Manage Zimbra Accounts", () => new ManageAccountsDialog().ShowDialog()));
             menu.Items.Add(new ToolStripSeparator());

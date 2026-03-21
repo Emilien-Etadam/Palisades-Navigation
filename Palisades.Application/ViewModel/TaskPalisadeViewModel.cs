@@ -124,7 +124,7 @@ namespace Palisades.ViewModel
             set { _syncStatus = value; OnPropertyChanged(); }
         }
 
-        public TaskPalisadeViewModel() : this(new TaskPalisadeModel { Name = "Task Palisade", Width = 600, Height = 400 }, new CalDAVService(new CalDAVClient("https://localhost/", "", "")))
+        public TaskPalisadeViewModel() : this(new TaskPalisadeModel { Name = "Task palisade", Width = 600, Height = 400 }, new CalDAVService(new CalDAVClient("https://localhost/", "", "")))
         { }
 
         public TaskPalisadeViewModel(TaskPalisadeModel model, CalDAVService caldavService) : base(model)

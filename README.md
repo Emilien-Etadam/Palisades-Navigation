@@ -2,42 +2,57 @@
 
 <p align="center">
   <a href="https://github.com/Emilien-Etadam/Palisades-Navigation/blob/main/LICENSE">
-    <img alt="mit" src="https://img.shields.io/github/license/Emilien-Etadam/Palisades-Navigation?style=for-the-badge"/>
+    <img alt="Licence" src="https://img.shields.io/github/license/Emilien-Etadam/Palisades-Navigation?style=for-the-badge"/>
   </a>
   <a href="https://github.com/Emilien-Etadam/Palisades-Navigation/releases">
-    <img alt="mit" src="https://img.shields.io/github/v/release/Emilien-Etadam/Palisades-Navigation?label=Version&style=for-the-badge"/>
+    <img alt="Version" src="https://img.shields.io/github/v/release/Emilien-Etadam/Palisades-Navigation?label=Version&style=for-the-badge"/>
   </a>
   <a href="https://github.com/Emilien-Etadam/Palisades-Navigation/releases">
-    <img alt="mit" src="https://img.shields.io/github/downloads/Emilien-Etadam/Palisades-Navigation/total?style=for-the-badge"/>
+    <img alt="Téléchargements" src="https://img.shields.io/github/downloads/Emilien-Etadam/Palisades-Navigation/total?style=for-the-badge"/>
   </a>
 </p>
 
 ## Introduction
 
-Palisades lets you organize your desktop with small, always-on-bottom windows (palisades) that can hold shortcuts, act as mini file explorers, show CalDAV tasks or calendars, and display unread mail counts. Palisades stay behind your windows and can be grouped in tabs or saved/restored as layouts.
+Palisades organise le bureau avec de petites fenêtres toujours en arrière-plan (« palisades ») : raccourcis, mini-explorateur de fichiers, tâches ou calendriers CalDAV, compteur de courriels non lus. Les palisades restent derrière les autres fenêtres ; on peut les regrouper par onglets et enregistrer ou restaurer des dispositions.
 
-## Getting Started
+## Installation
 
-Just download the latest installer on the [Releases](https://github.com/Emilien-Etadam/Palisades-Navigation/releases) page, use it to install Palisades and run the software.
+Téléchargez le dernier installateur sur la page [Releases](https://github.com/Emilien-Etadam/Palisades-Navigation/releases), installez Palisades puis lancez l’application.
 
-## Features
+## Compiler depuis les sources
 
-- **Standard Palisades**: Drag and drop shortcuts; reorder by drag and drop; customize name, header/body colors, and text colors.
-- **Folder Portals**: Mini file explorer for a chosen folder on the desktop (breadcrumbs, open with default app).
-- **Task Palisade**: CalDAV task list (e.g. Zimbra), sync, add/edit/complete/delete tasks.
-- **Calendar Palisade**: CalDAV calendars, agenda view, multiple calendars.
-- **Mail Palisade**: IMAP unread count and optional subject list (e.g. Zimbra), configurable polling.
-- **Create by drawing**: Right-click + drag on the desktop to draw a rectangle, then choose the palisade type to create at that size and position.
-- **Tabs**: Palisades can be grouped into a single tabbed window; load/save preserves groups.
-- **Layouts**: Save the current set of palisades as a named layout, restore later (with position rescaling if resolution changed). Up to 5 recent layouts in the context menu; full manage dialog (rename, delete, export, import). Auto-save on exit keeps the last 3 auto-saved layouts.
-- **Zimbra / OVH**: Central account management (CalDAV + IMAP), encrypted credentials (DPAPI), optional auto-detect from email.
+Prérequis : [SDK .NET 10](https://dotnet.microsoft.com/download) (voir `global.json` pour la version exacte du SDK). Cible : `net10.0-windows10.0.17763.0` (Windows 10 version 1809 ou ultérieure).
 
-## Usage
+```bash
+git clone https://github.com/Emilien-Etadam/Palisades-Navigation.git
+cd Palisades-Navigation
+dotnet restore Palisades.sln
+dotnet build Palisades.sln -c Release
+```
 
-- **Shortcuts**: Drag and drop into a Standard Palisade.
-- **New palisade**: Right-click a palisade header for the full menu, or right-click + drag on the desktop to draw a new one.
-- **Layouts**: Right-click a palisade header → Layouts → Save current layout… or Manage layouts….
+L’exécutable se trouve sous `Palisades.Application\bin\Release\net10.0-windows10.0.17763.0\Palisades.exe`.
 
-## Tech
+Pour le rapport d’erreurs Sentry en local, copiez `Palisades.Application\appsettings.example.json` vers `appsettings.json` et renseignez votre DSN.
 
-.NET 8, WPF. Material Design In XAML for parts of the UI; Sentry for error reporting. Inspired by [Twometer's NoFences](https://github.com/Twometer/NoFences) and [Stardock's Fences](https://www.stardock.com/products/fences/).
+## Fonctionnalités
+
+- **Palisade raccourcis** : glisser-déposer de raccourcis ; réordonnancement ; nom, couleurs d’en-tête / corps et du texte.
+- **Palisade navigation** : mini-explorateur pour un dossier (fil d’Ariane, ouverture avec l’application par défaut).
+- **Palisade tâches** : liste CalDAV (ex. Zimbra), synchronisation, ajout / édition / complétion / suppression.
+- **Palisade calendrier** : calendriers CalDAV, vue agenda, plusieurs calendriers.
+- **Palisade courriel** : nombre de non lus IMAP et liste optionnelle des sujets (ex. Zimbra), interrogation configurable.
+- **Création au tracé** : clic droit + glisser sur le bureau pour dessiner un rectangle, puis choix du type de palisade.
+- **Onglets** : regroupement dans une fenêtre à onglets ; chargement / enregistrement des groupes.
+- **Dispositions** : enregistrer l’ensemble des palisades sous un nom, restaurer plus tard (avec remise à l’échelle si la résolution change). Jusqu’à 5 dispositions récentes dans le menu contextuel ; dialogue de gestion (renommer, supprimer, exporter, importer). Sauvegarde automatique à la sortie (3 dernières dispositions).
+- **Zimbra / OVH** : gestion centralisée des comptes (CalDAV + IMAP), identifiants chiffrés (DPAPI), détection automatique optionnelle à partir du courriel.
+
+## Utilisation
+
+- **Raccourcis** : glisser-déposer dans une palisade raccourcis.
+- **Nouvelle palisade** : menu complet via clic droit sur l’en-tête, ou clic droit + glisser sur le bureau pour en dessiner une nouvelle.
+- **Dispositions** : clic droit sur l’en-tête → Dispositions → Enregistrer la disposition actuelle… ou Gérer les dispositions….
+
+## Technique
+
+.NET 10, WPF et Windows Forms. [Sentry](https://sentry.io) pour le suivi des erreurs ; GongSolutions.WPF.DragDrop pour le glisser-déposer ; MailKit et Ical.Net pour IMAP / iCalendar. Inspiré par [NoFences de Twometer](https://github.com/Twometer/NoFences) et [Fences de Stardock](https://www.stardock.com/products/fences/).

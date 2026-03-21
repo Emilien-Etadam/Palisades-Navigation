@@ -1,7 +1,7 @@
 <Window x:Class="Palisades.View.CreateTaskPalisadeDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Create Task Palisade" Height="520" Width="500"
+        Title="New task palisade" Height="520" Width="500"
         Background="{DynamicResource PalisadeWindowBrush}"
         TextElement.Foreground="{DynamicResource PalisadeTextBrush}"
         WindowStartupLocation="CenterOwner" ResizeMode="CanResize"
@@ -14,8 +14,8 @@
         </ResourceDictionary>
     </Window.Resources>
     <Grid Margin="12" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*,Auto">
-        <TextBlock Text="Palisade Title" Grid.Row="0" Style="{StaticResource PalisadeDialogLabel}"/>
-        <TextBox x:Name="PalisadeTitleTextBox" Grid.Row="1" Margin="0,0,0,10" Style="{StaticResource PalisadeDialogTextBox}" Text="Task Palisade"/>
+        <TextBlock Text="Title" Grid.Row="0" Style="{StaticResource PalisadeDialogLabel}"/>
+        <TextBox x:Name="PalisadeTitleTextBox" Grid.Row="1" Margin="0,0,0,10" Style="{StaticResource PalisadeDialogTextBox}" Text="Task palisade"/>
 
         <TextBlock Text="CalDAV Server URL" Grid.Row="2" Style="{StaticResource PalisadeDialogLabel}"/>
         <TextBox x:Name="CalDAVUrlTextBox" Grid.Row="3" Margin="0,0,0,10" Style="{StaticResource PalisadeDialogTextBox}"

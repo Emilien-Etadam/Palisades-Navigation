@@ -17,7 +17,7 @@
         <TextBox x:Name="EmailTextBox" Grid.Row="1" Margin="0,0,0,6" Style="{StaticResource PalisadeDialogTextBox}"/>
         <TextBlock Text="CalDAV Base URL" Grid.Row="2" Style="{StaticResource PalisadeDialogLabel}"/>
         <TextBox x:Name="CalDAVUrlTextBox" Grid.Row="3" Margin="0,0,0,6" Style="{StaticResource PalisadeDialogTextBox}" ToolTip="Ex: https://zimbra1.mail.ovh.net/dav/user@domain/"/>
-        <TextBlock Text="IMAP Host (for Mail Palisade)" Grid.Row="4" Style="{StaticResource PalisadeDialogLabel}"/>
+        <TextBlock Text="IMAP host (for mail palisade)" Grid.Row="4" Style="{StaticResource PalisadeDialogLabel}"/>
         <TextBox x:Name="ImapHostTextBox" Grid.Row="5" Margin="0,0,0,6" Style="{StaticResource PalisadeDialogTextBox}"/>
         <TextBlock Text="Password" Grid.Row="6" Style="{StaticResource PalisadeDialogLabel}"/>
         <PasswordBox x:Name="PasswordBox" Grid.Row="7" Margin="0,0,0,10" Style="{StaticResource PalisadeDialogPasswordBox}"/>

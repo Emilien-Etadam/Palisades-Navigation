@@ -80,7 +80,7 @@ namespace Palisades.ViewModel
             }
         }
 
-        public FolderPortalViewModel() : this(new FolderPortalModel { Name = "Folder Portal" })
+        public FolderPortalViewModel() : this(new FolderPortalModel { Name = "Browse palisade" })
         { }
 
         public FolderPortalViewModel(FolderPortalModel model) : base(model)

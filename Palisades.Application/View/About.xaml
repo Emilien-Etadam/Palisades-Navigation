@@ -5,13 +5,14 @@
         xmlns:helpers="clr-namespace:Palisades.Helpers"
         TextElement.Foreground="{DynamicResource PalisadeTextBrush}"
         TextElement.FontWeight="Regular"
-        TextOptions.TextFormattingMode="Ideal" 
-        TextOptions.TextRenderingMode="Auto"        
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
         Background="{DynamicResource PalisadeWindowBrush}"
         Title="About Palisades"
-        Width="408"
+        Width="480"
         SizeToContent="Height"
-        ResizeMode="NoResize">
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner">
     <Window.DataContext>
         <viewModel:AboutViewModel />
     </Window.DataContext>
@@ -23,41 +24,65 @@
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
-        <StackPanel HorizontalAlignment="Center" Margin="50,0,50,20" TextElement.FontSize="18">
+        <StackPanel HorizontalAlignment="Center" Margin="36,0,36,20" TextElement.FontSize="18">
             <Label FontSize="48" HorizontalAlignment="Center" Content="Palisades"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <Label FontWeight="Bold" Content="{Binding Version}" />
                 <Label Content="{Binding ReleaseDate}" />
             </StackPanel>
-            <TextBlock TextAlignment="Justify" TextWrapping="Wrap" Foreground="{DynamicResource PalisadeTextBrush}" Margin="0,20,0,0" Padding="20,0,20,0">
-                <Run Text="This software is maintained by " />
+            <TextBlock TextAlignment="Center" Foreground="{DynamicResource PalisadeSubtleBrush}" FontSize="14" Margin="0,4,0,0"
+                       Text="{Binding FrameworkRuntime}" />
+            <TextBlock TextAlignment="Justify" TextWrapping="Wrap" Foreground="{DynamicResource PalisadeTextBrush}" Margin="0,16,0,0" Padding="8,0,8,0" FontSize="15">
+                <Run Text="Maintained by " />
                 <helpers:HyperlinkCommander Foreground="{DynamicResource PalisadeAccentBrush}" Command="{Binding NavigateCommand}" CommandParameter="https://stouder.io/">
                     <Run Text="Xavier Stouder" />
                 </helpers:HyperlinkCommander>
-                <Run Text=" and released under MIT licence. You can report issues, check for updates and even contribute on the " />
+                <Run Text=". Released under the MIT licence. Report issues, check for updates, or contribute on the " />
                 <helpers:HyperlinkCommander Foreground="{DynamicResource PalisadeAccentBrush}" Command="{Binding NavigateCommand}" CommandParameter="https://github.com/Emilien-Etadam/Palisades-Navigation">
-                    <Run Text="Github repository." />
+                    <Run Text="GitHub repository" />
                 </helpers:HyperlinkCommander>
+                <Run Text="." />
             </TextBlock>
-            <StackPanel HorizontalAlignment="Center">
-                <Label FontSize="22" HorizontalAlignment="Center" Content="Credits" Margin="0,20,0,0" />
-                <TextBlock TextAlignment="Justify" TextWrapping="Wrap" Foreground="{DynamicResource PalisadeTextBrush}" Margin="0,5,0,5" Padding="20,0,20,0">
-                    Palisades uses the following open source libraries to work.
+            <StackPanel HorizontalAlignment="Stretch">
+                <Label FontSize="22" HorizontalAlignment="Center" Content="Credits" Margin="0,18,0,0" />
+                <TextBlock TextAlignment="Justify" TextWrapping="Wrap" Foreground="{DynamicResource PalisadeTextBrush}" Margin="0,4,0,8" Padding="8,0,8,0" FontSize="14">
+                    Open-source libraries used by this application:
                 </TextBlock>
-                <Label Padding="20,0,20,0">
-                    <helpers:HyperlinkCommander Foreground="{DynamicResource PalisadeAccentBrush}" Command="{Binding NavigateCommand}" CommandParameter="https://github.com/punker76/gong-wpf-dragdrop">GongSolutions.WPF.DragDrop</helpers:HyperlinkCommander>
-                </Label>
-                <Label Padding="20,0,20,0">
-                    <helpers:HyperlinkCommander Foreground="{DynamicResource PalisadeAccentBrush}" Command="{Binding NavigateCommand}" CommandParameter="https://github.com/Microsoft/XamlBehaviorsWpf">
-                        XamlBehaviors for WPF
+                <ItemsControl>
+                    <ItemsControl.Items>
+                        <Label Padding="8,2,8,2" FontSize="14" HorizontalContentAlignment="Left">
+                            <helpers:HyperlinkCommander Foreground="{DynamicResource PalisadeAccentBrush}" Command="{Binding NavigateCommand}" CommandParameter="https://github.com/punker76/gong-wpf-dragdrop">GongSolutions.WPF.DragDrop</helpers:HyperlinkCommander>
+                        </Label>
+                        <Label Padding="8,2,8,2" FontSize="14" HorizontalContentAlignment="Left">
+                            <helpers:HyperlinkCommander Foreground="{DynamicResource PalisadeAccentBrush}" Command="{Binding NavigateCommand}" CommandParameter="https://github.com/Microsoft/XamlBehaviorsWpf">Microsoft.Xaml.Behaviors.Wpf</helpers:HyperlinkCommander>
+                        </Label>
+                        <Label Padding="8,2,8,2" FontSize="14" HorizontalContentAlignment="Left">
+                            <helpers:HyperlinkCommander Foreground="{DynamicResource PalisadeAccentBrush}" Command="{Binding NavigateCommand}" CommandParameter="https://github.com/lstratman/Ical.Net">Ical.Net</helpers:HyperlinkCommander>
+                        </Label>
+                        <Label Padding="8,2,8,2" FontSize="14" HorizontalContentAlignment="Left">
+                            <helpers:HyperlinkCommander Foreground="{DynamicResource PalisadeAccentBrush}" Command="{Binding NavigateCommand}" CommandParameter="https://github.com/jstedfast/MailKit">MailKit</helpers:HyperlinkCommander>
+                        </Label>
+                        <Label Padding="8,2,8,2" FontSize="14" HorizontalContentAlignment="Left">
+                            <helpers:HyperlinkCommander Foreground="{DynamicResource PalisadeAccentBrush}" Command="{Binding NavigateCommand}" CommandParameter="https://github.com/CommunityToolkit/WindowsCommunityToolkit">Microsoft.Toolkit.Uwp.Notifications</helpers:HyperlinkCommander>
+                        </Label>
+                        <Label Padding="8,2,8,2" FontSize="14" HorizontalContentAlignment="Left">
+                            <helpers:HyperlinkCommander Foreground="{DynamicResource PalisadeAccentBrush}" Command="{Binding NavigateCommand}" CommandParameter="https://sentry.io/">Sentry</helpers:HyperlinkCommander>
+                        </Label>
+                    </ItemsControl.Items>
+                </ItemsControl>
+                <Label FontSize="18" HorizontalAlignment="Center" Content="Inspired by" Margin="0,16,0,0" />
+                <TextBlock TextAlignment="Center" TextWrapping="Wrap" Foreground="{DynamicResource PalisadeTextBrush}" Margin="0,6,0,0" Padding="8,0,8,0" FontSize="14">
+                    <helpers:HyperlinkCommander Foreground="{DynamicResource PalisadeAccentBrush}" Command="{Binding NavigateCommand}" CommandParameter="https://github.com/Twometer/NoFences">
+                        <Run Text="NoFences" />
                     </helpers:HyperlinkCommander>
-                </Label>
-                <Label Padding="20,0,20,0">
-                    <helpers:HyperlinkCommander Foreground="{DynamicResource PalisadeAccentBrush}" Command="{Binding NavigateCommand}" CommandParameter="https://sentry.io/">
-                        Sentry
+                    <Run Text=" (Twometer) and " />
+                    <helpers:HyperlinkCommander Foreground="{DynamicResource PalisadeAccentBrush}" Command="{Binding NavigateCommand}" CommandParameter="https://www.stardock.com/products/fences/">
+                        <Run Text="Fences" />
                     </helpers:HyperlinkCommander>
-                </Label>
+                    <Run Text=" (Stardock)." />
+                </TextBlock>
             </StackPanel>
+            <Button Content="Close" HorizontalAlignment="Center" Margin="0,22,0,0" Padding="32,8" IsDefault="True" Click="CloseButton_Click" />
         </StackPanel>
     </Grid>
 </Window>

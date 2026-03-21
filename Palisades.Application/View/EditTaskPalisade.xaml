@@ -1,7 +1,7 @@
 <Window x:Class="Palisades.View.EditTaskPalisade"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Edit Task Palisade" Height="450" Width="500" MinHeight="450" MinWidth="500"
+        Title="Edit task palisade" Height="450" Width="500" MinHeight="450" MinWidth="500"
         Background="{DynamicResource PalisadeWindowBrush}"
         TextElement.Foreground="{DynamicResource PalisadeTextBrush}"
         WindowStartupLocation="CenterOwner" ResizeMode="CanResize" Loaded="Window_Loaded">

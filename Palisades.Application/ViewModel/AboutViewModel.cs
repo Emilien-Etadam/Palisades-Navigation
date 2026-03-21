@@ -1,9 +1,10 @@
-﻿using Palisades.Helpers;
+using Palisades.Helpers;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Windows.Input;
 
 namespace Palisades.ViewModel
@@ -34,6 +35,8 @@ namespace Palisades.ViewModel
                 return releaseDate;
             }
         }
+
+        public string FrameworkRuntime => RuntimeInformation.FrameworkDescription;
         #endregion
 
         public AboutViewModel()

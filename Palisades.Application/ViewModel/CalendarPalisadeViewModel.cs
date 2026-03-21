@@ -32,7 +32,7 @@ namespace Palisades.ViewModel
         private readonly HashSet<string> _notifiedEventUids = new HashSet<string>();
 
         public CalendarPalisadeViewModel() : this(
-            new CalendarPalisadeModel { Name = "Calendar", Width = 500, Height = 400 },
+            new CalendarPalisadeModel { Name = "Calendar palisade", Width = 500, Height = 400 },
             new CalendarCalDAVService(new CalDAVClient("https://localhost/", "", "")))
         { }
 

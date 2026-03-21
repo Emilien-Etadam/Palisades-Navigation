@@ -9,7 +9,7 @@ namespace Palisades.View
 {
     public partial class CreateTaskPalisadeDialog : Window
     {
-        public string PalisadeTitle { get; set; } = "Task Palisade";
+        public string PalisadeTitle { get; set; } = "Task palisade";
         public string CalDAVUrl { get; set; } = string.Empty;
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;

@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="New Folder Portal"
+        Title="New browse palisade"
         Width="450"
         SizeToContent="Height"
         Background="{DynamicResource PalisadeWindowBrush}"
@@ -34,11 +34,11 @@
 
         <!-- Title input -->
         <StackPanel Grid.Row="0">
-            <TextBlock Text="Portal Title" Style="{StaticResource PalisadeDialogLabel}" FontSize="18" Margin="0,0,0,5"/>
+            <TextBlock Text="Title" Style="{StaticResource PalisadeDialogLabel}" FontSize="18" Margin="0,0,0,5"/>
             <TextBox x:Name="TitleTextBox"
                      Style="{StaticResource PalisadeDialogTextBox}"
                      FontSize="16"
-                     Text="My Folder Portal" />
+                     Text="My browse palisade" />
         </StackPanel>
 
         <!-- Folder path -->

@@ -10,7 +10,7 @@ namespace Palisades.View
 {
     public partial class CreateCalendarPalisadeDialog : Window
     {
-        public string PalisadeTitle { get; set; } = "Calendar";
+        public string PalisadeTitle { get; set; } = "Calendar palisade";
         public string CalDAVUrl { get; set; } = string.Empty;
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;

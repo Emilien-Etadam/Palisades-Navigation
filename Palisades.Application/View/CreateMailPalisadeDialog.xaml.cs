@@ -10,7 +10,7 @@ namespace Palisades.View
 {
     public partial class CreateMailPalisadeDialog : Window
     {
-        public string PalisadeTitle { get; set; } = "Mail";
+        public string PalisadeTitle { get; set; } = "Mail palisade";
         public string ImapHost { get; set; } = string.Empty;
         public int ImapPort { get; set; } = 993;
         public string Username { get; set; } = string.Empty;

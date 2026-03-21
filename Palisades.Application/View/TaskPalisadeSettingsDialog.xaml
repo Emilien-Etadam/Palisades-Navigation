@@ -1,7 +1,7 @@
 <Window x:Class="Palisades.View.TaskPalisadeSettingsDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Task Palisade Settings" Height="350" Width="400" MinHeight="350" MinWidth="400"
+        Title="Task palisade settings" Height="350" Width="400" MinHeight="350" MinWidth="400"
         Background="{DynamicResource PalisadeWindowBrush}"
         TextElement.Foreground="{DynamicResource PalisadeTextBrush}"
         WindowStartupLocation="CenterOwner" ResizeMode="CanResize">
