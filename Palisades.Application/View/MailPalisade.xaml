@@ -131,6 +131,11 @@
                                 </Style.Triggers>
                             </Style>
                         </ListBox.Style>
+                        <ListBox.Resources>
+                            <Style TargetType="ScrollBar">
+                                <Setter Property="Width" Value="4"/>
+                            </Style>
+                        </ListBox.Resources>
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem" BasedOn="{StaticResource PalisadeListBoxItemStyle}"/>
                         </ListBox.ItemContainerStyle>
