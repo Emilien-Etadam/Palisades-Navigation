@@ -1,4 +1,5 @@
 using Palisades.Model;
+using Palisades.Properties;
 using Palisades.Services;
 using System;
 using System.Collections.Generic;
@@ -37,7 +38,7 @@ namespace Palisades.View
             Password = PasswordBox.Password;
             if (string.IsNullOrWhiteSpace(ImapHost) || string.IsNullOrWhiteSpace(Username))
             {
-                MessageBox.Show("Please enter IMAP host and username.", "Mail", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(Strings.MailEnterHostUser, Strings.MailTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
             try
@@ -51,11 +52,11 @@ namespace Palisades.View
                 if (folders.Contains("INBOX"))
                     FoldersListBox.SelectedItems.Add("INBOX");
                 service.Disconnect();
-                MessageBox.Show("Connection successful. Select folders to monitor.", "Mail", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(Strings.MailConnectionOk, Strings.MailTitle, MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (System.Exception ex)
             {
-                MessageBox.Show($"Connection failed: {ex.Message}", "Mail", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.MailConnectionFailedFormat, ex.Message), Strings.MailTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -72,12 +73,12 @@ namespace Palisades.View
             var user = UsernameTextBox.Text?.Trim() ?? "";
             if (string.IsNullOrWhiteSpace(host))
             {
-                MessageBox.Show("Please enter an IMAP Host.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(Strings.MailEnterImapHost, Strings.ValidationTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
             if (string.IsNullOrWhiteSpace(user))
             {
-                MessageBox.Show("Please enter a username.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(Strings.MailEnterUsername, Strings.ValidationTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 

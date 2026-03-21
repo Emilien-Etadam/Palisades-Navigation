@@ -1,7 +1,9 @@
+using Palisades.Properties;
 using Palisades.Helpers;
 using Palisades.Model;
 using Palisades.Services;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -64,7 +66,7 @@ namespace Palisades.View
         {
             if (AccountsListBox.SelectedItem is not ZimbraAccount acc) return;
             var password = CredentialEncryptor.Decrypt(acc.EncryptedPassword ?? "");
-            acc.LastTestStatus = "Testing...";
+            acc.LastTestStatus = Strings.AccountTestingStatus;
             AccountsListBox.ItemsSource = null;
             AccountsListBox.ItemsSource = _accounts;
 
@@ -85,11 +87,11 @@ namespace Palisades.View
                     await imap.ConnectAsync();
                     imap.Disconnect();
                 }
-                acc.LastTestStatus = "OK";
+                acc.LastTestStatus = Strings.AccountTestOk;
             }
             catch (System.Exception ex)
             {
-                acc.LastTestStatus = "Failed: " + ex.Message;
+                acc.LastTestStatus = string.Format(CultureInfo.CurrentCulture, Strings.AccountTestFailedFormat, ex.Message);
             }
 
             SaveAccounts();
@@ -100,7 +102,7 @@ namespace Palisades.View
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
             if (AccountsListBox.SelectedItem is not ZimbraAccount acc) return;
-            if (MessageBox.Show($"Delete account {acc.Email}?", "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+            if (MessageBox.Show(string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.DeleteAccountFormat, acc.Email), Strings.ConfirmTitle, MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
                 return;
             _accounts.Remove(acc);
             SaveAccounts();

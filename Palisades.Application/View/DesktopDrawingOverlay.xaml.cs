@@ -1,6 +1,7 @@
 using System;
 using System.Windows;
 using Palisades;
+using Palisades.Properties;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -57,26 +58,26 @@ namespace Palisades.View
                 _creationMenu.Items.Add(item);
             }
 
-            AddItem("Shortcut palisade", (x, y, w, h) => PalisadesManager.CreatePalisade(x, y, w, h));
-            AddItem("Browse palisade", (x, y, w, h) =>
+            AddItem(Strings.DesktopShortcutPalisade, (x, y, w, h) => PalisadesManager.CreatePalisade(x, y, w, h));
+            AddItem(Strings.DesktopBrowsePalisade, (x, y, w, h) =>
             {
                 var d = new CreateFolderPortalDialog();
                 if (d.ShowDialog() == true)
                     PalisadesManager.CreateFolderPortal(d.SelectedPath, d.PortalTitle, x, y, w, h);
             });
-            AddItem("Task palisade", (x, y, w, h) =>
+            AddItem(Strings.DesktopTaskPalisade, (x, y, w, h) =>
             {
                 var d = new CreateTaskPalisadeDialog();
                 if (d.ShowDialog() == true)
                     PalisadesManager.CreateTaskPalisade(d.CalDAVUrl, d.Username, d.Password, d.SelectedTaskListIds, d.PalisadeTitle, x, y, w, h);
             });
-            AddItem("Calendar palisade", (x, y, w, h) =>
+            AddItem(Strings.DesktopCalendarPalisade, (x, y, w, h) =>
             {
                 var d = new CreateCalendarPalisadeDialog();
                 if (d.ShowDialog() == true)
                     PalisadesManager.CreateCalendarPalisade(d.CalDAVUrl, d.Username, d.Password, d.SelectedCalendarIds, d.PalisadeTitle, d.ViewMode, d.DaysToShow, x, y, w, h);
             });
-            AddItem("Mail palisade", (x, y, w, h) =>
+            AddItem(Strings.DesktopMailPalisade, (x, y, w, h) =>
             {
                 var d = new CreateMailPalisadeDialog();
                 if (d.ShowDialog() == true)

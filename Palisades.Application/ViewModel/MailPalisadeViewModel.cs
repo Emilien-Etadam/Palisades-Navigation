@@ -1,4 +1,5 @@
 using Palisades.Helpers;
+using Palisades.Properties;
 using Palisades.Model;
 using Palisades.Services;
 using Palisades.View;
@@ -28,7 +29,7 @@ namespace Palisades.ViewModel
         private readonly Dictionary<string, int> _previousUnreadCounts = new Dictionary<string, int>();
         private bool _firstLoad = true;
 
-        public MailPalisadeViewModel() : this(new MailPalisadeModel { Name = "Mail palisade", Width = 320, Height = 240 })
+        public MailPalisadeViewModel() : this(new MailPalisadeModel { Name = Strings.MailDefaultName, Width = 320, Height = 240 })
         { }
 
         public MailPalisadeViewModel(MailPalisadeModel model) : base(model)

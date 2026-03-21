@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Palisades.Model;
+using Palisades.Properties;
 using Palisades.Services;
 using System.Linq;
 using System.Windows;
@@ -10,7 +11,7 @@ namespace Palisades.View
 {
     public partial class CreateCalendarPalisadeDialog : Window
     {
-        public string PalisadeTitle { get; set; } = "Calendar palisade";
+        public string PalisadeTitle { get; set; } = Strings.CalendarDefaultName;
         public string CalDAVUrl { get; set; } = string.Empty;
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
@@ -37,7 +38,7 @@ namespace Palisades.View
             Password = PasswordBox.Password;
             if (string.IsNullOrWhiteSpace(CalDAVUrl) || string.IsNullOrWhiteSpace(Username))
             {
-                MessageBox.Show("Please enter CalDAV URL and username.", "Calendar", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(Strings.CaldavEnterUrlUser, Strings.CalendarTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
             try
@@ -48,11 +49,11 @@ namespace Palisades.View
                 CalendarsListBox.ItemsSource = _calendarList;
                 CalendarsListBox.SelectedItems.Clear();
                 if (_calendarList.Count == 0)
-                    MessageBox.Show("No calendar collection found at this URL.", "Calendar", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show(Strings.CaldavNoCalendar, Strings.CalendarTitle, MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (System.Exception ex)
             {
-                MessageBox.Show($"Could not load calendars: {ex.Message}", "Calendar", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.CaldavLoadCalendarFailedFormat, ex.Message), Strings.CalendarTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -70,17 +71,17 @@ namespace Palisades.View
             var user = UsernameTextBox.Text?.Trim() ?? "";
             if (string.IsNullOrWhiteSpace(url))
             {
-                MessageBox.Show("Please enter a CalDAV Base URL.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(Strings.CaldavEnterBaseUrl, Strings.ValidationTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
             if (!url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
             {
-                MessageBox.Show("The CalDAV URL must start with https://.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(Strings.CaldavHttpsRequired, Strings.ValidationTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
             if (string.IsNullOrWhiteSpace(user))
             {
-                MessageBox.Show("Please enter a username.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(Strings.MailEnterUsername, Strings.ValidationTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
             DialogResult = true;

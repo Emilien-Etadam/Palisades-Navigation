@@ -6,10 +6,11 @@
         xmlns:viewModel="clr-namespace:Palisades.ViewModel"
         xmlns:converters="clr-namespace:Palisades.Converters"
         xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
+        xmlns:properties="clr-namespace:Palisades.Properties"
         helpers:WindowBackdrop.IsEnabled="True"
         helpers:WindowSinker.AlwaysOnBottom="True"
         ShowInTaskbar="False"
-        Title="Shortcut palisade"
+        Title="{x:Static properties:Strings.AddTabShortcutPalisade}"
         Width="{Binding Width, Mode=TwoWay}"
         Height="{Binding Height, Mode=TwoWay}"
         AllowsTransparency="True"
@@ -46,19 +47,19 @@
             <Grid DockPanel.Dock="Top" x:Name="Header" Height="32" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource PalisadeWindowBrush}" Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" ColumnDefinitions="Auto,*,Auto">
                 <Grid.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="Edit" Command="{Binding Path=Data.EditPalisadeCommand, Source={StaticResource proxy}}" CommandParameter="{Binding}" />
-                        <MenuItem Header="Delete" Command="{Binding Path=Data.DeletePalisadeCommand, Source={StaticResource proxy}}" CommandParameter="{Binding Identifier}" />
+                        <MenuItem Header="{x:Static properties:Strings.MenuEdit}" Command="{Binding Path=Data.EditPalisadeCommand, Source={StaticResource proxy}}" CommandParameter="{Binding}" />
+                        <MenuItem Header="{x:Static properties:Strings.MenuDelete}" Command="{Binding Path=Data.DeletePalisadeCommand, Source={StaticResource proxy}}" CommandParameter="{Binding Identifier}" />
                         <Separator />
-                        <MenuItem Header="New shortcut palisade" Command="{Binding Path=Data.NewPalisadeCommand, Source={StaticResource proxy}}" />
-                        <MenuItem Header="New browse palisade" Command="{Binding Path=Data.NewFolderPortalCommand, Source={StaticResource proxy}}" />
-                        <MenuItem Header="New task palisade" Command="{Binding Path=Data.NewTaskPalisadeCommand, Source={StaticResource proxy}}" />
-                        <MenuItem Header="New calendar palisade" Command="{Binding Path=Data.NewCalendarPalisadeCommand, Source={StaticResource proxy}}" />
-                        <MenuItem Header="New mail palisade" Command="{Binding Path=Data.NewMailPalisadeCommand, Source={StaticResource proxy}}" />
+                        <MenuItem Header="{x:Static properties:Strings.MenuNewShortcutPalisade}" Command="{Binding Path=Data.NewPalisadeCommand, Source={StaticResource proxy}}" />
+                        <MenuItem Header="{x:Static properties:Strings.MenuNewBrowsePalisade}" Command="{Binding Path=Data.NewFolderPortalCommand, Source={StaticResource proxy}}" />
+                        <MenuItem Header="{x:Static properties:Strings.MenuNewTaskPalisade}" Command="{Binding Path=Data.NewTaskPalisadeCommand, Source={StaticResource proxy}}" />
+                        <MenuItem Header="{x:Static properties:Strings.MenuNewCalendarPalisade}" Command="{Binding Path=Data.NewCalendarPalisadeCommand, Source={StaticResource proxy}}" />
+                        <MenuItem Header="{x:Static properties:Strings.MenuNewMailPalisade}" Command="{Binding Path=Data.NewMailPalisadeCommand, Source={StaticResource proxy}}" />
                         <Separator />
-                        <MenuItem Header="Manage Zimbra Accounts" Command="{Binding Path=Data.ManageZimbraAccountsCommand, Source={StaticResource proxy}}" />
+                        <MenuItem Header="{x:Static properties:Strings.MenuManageZimbraAccounts}" Command="{Binding Path=Data.ManageZimbraAccountsCommand, Source={StaticResource proxy}}" />
                         <Separator />
-                        <MenuItem Header="Layouts" SubmenuOpened="LayoutsSubmenu_SubmenuOpened">
-                            <MenuItem Header="Save current layout..." Command="{Binding Path=Data.SaveSnapshotCommand, Source={StaticResource proxy}}" />
+                        <MenuItem Header="{x:Static properties:Strings.MenuLayouts}" SubmenuOpened="LayoutsSubmenu_SubmenuOpened">
+                            <MenuItem Header="{x:Static properties:Strings.MenuSaveCurrentLayout}" Command="{Binding Path=Data.SaveSnapshotCommand, Source={StaticResource proxy}}" />
                             <Separator />
                             <MenuItem ItemsSource="{Binding Path=Data.RecentSnapshots, Source={StaticResource proxy}}">
                                 <MenuItem.ItemContainerStyle>
@@ -70,31 +71,31 @@
                                 </MenuItem.ItemContainerStyle>
                             </MenuItem>
                             <Separator />
-                            <MenuItem Header="Manage layouts..." Command="{Binding Path=Data.ManageSnapshotsCommand, Source={StaticResource proxy}}" />
+                            <MenuItem Header="{x:Static properties:Strings.MenuManageLayouts}" Command="{Binding Path=Data.ManageSnapshotsCommand, Source={StaticResource proxy}}" />
                         </MenuItem>
                         <Separator />
-                        <MenuItem Header="About" Command="{Binding Path=Data.OpenAboutCommand, Source={StaticResource proxy}}" />
+                        <MenuItem Header="{x:Static properties:Strings.MenuAbout}" Command="{Binding Path=Data.OpenAboutCommand, Source={StaticResource proxy}}" />
                     </ContextMenu>
                 </Grid.ContextMenu>
-                <Button Grid.Column="0" Style="{StaticResource PalisadeNavButton}" Click="TitleBarMenuButton_Click" ToolTip="Menu">
+                <Button Grid.Column="0" Style="{StaticResource PalisadeNavButton}" Click="TitleBarMenuButton_Click" ToolTip="{x:Static properties:Strings.TooltipMenu}">
                     <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE700;" FontSize="14" VerticalAlignment="Center"/>
                 </Button>
                 <TextBlock Grid.Column="1" Text="{Binding Name, Mode=OneWay}" Margin="8,0" Style="{StaticResource PalisadeHeaderText}" HorizontalAlignment="Center"/>
-                <Button Grid.Column="2" Style="{StaticResource PalisadeNavButton}" Click="AddFolderPortalTab_Click" ToolTip="Add tab: browse palisade (same group)">
+                <Button Grid.Column="2" Style="{StaticResource PalisadeNavButton}" Click="AddFolderPortalTab_Click" ToolTip="{x:Static properties:Strings.TooltipAddTabBrowseSameGroup}">
                     <TextBlock Text="+" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource PalisadeTextBrush}" VerticalAlignment="Center"/>
                 </Button>
             </Grid>
             <Border x:Name="drag" CornerRadius="0" Background="{DynamicResource PalisadeControlBrush}" AllowDrop="True" Drop="OnExternalFileDrop" DragOver="OnExternalFileDragOver">
                 <Border.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="Paste" Command="{Binding PasteShortcutCommand}"/>
-                        <MenuItem Header="Sort by name" Command="{Binding SortByNameCommand}"/>
+                        <MenuItem Header="{x:Static properties:Strings.MenuPaste}" Command="{Binding PasteShortcutCommand}"/>
+                        <MenuItem Header="{x:Static properties:Strings.MenuSortByName}" Command="{Binding SortByNameCommand}"/>
                         <Separator/>
-                        <MenuItem Header="New shortcut palisade" Command="{Binding NewPalisadeCommand}"/>
-                        <MenuItem Header="New browse palisade" Command="{Binding NewFolderPortalCommand}"/>
-                        <MenuItem Header="New task palisade" Command="{Binding NewTaskPalisadeCommand}"/>
-                        <MenuItem Header="New calendar palisade" Command="{Binding NewCalendarPalisadeCommand}"/>
-                        <MenuItem Header="New mail palisade" Command="{Binding NewMailPalisadeCommand}"/>
+                        <MenuItem Header="{x:Static properties:Strings.MenuNewShortcutPalisade}" Command="{Binding NewPalisadeCommand}"/>
+                        <MenuItem Header="{x:Static properties:Strings.MenuNewBrowsePalisade}" Command="{Binding NewFolderPortalCommand}"/>
+                        <MenuItem Header="{x:Static properties:Strings.MenuNewTaskPalisade}" Command="{Binding NewTaskPalisadeCommand}"/>
+                        <MenuItem Header="{x:Static properties:Strings.MenuNewCalendarPalisade}" Command="{Binding NewCalendarPalisadeCommand}"/>
+                        <MenuItem Header="{x:Static properties:Strings.MenuNewMailPalisade}" Command="{Binding NewMailPalisadeCommand}"/>
                     </ContextMenu>
                 </Border.ContextMenu>
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
@@ -124,7 +125,7 @@
                                     <Border Margin="0,10" CornerRadius="4" Width="100">
                                         <Border.ContextMenu>
                                             <ContextMenu>
-                                                <MenuItem Header="Supprimer"
+                                                <MenuItem Header="{x:Static properties:Strings.MenuDelete}"
                                                           Command="{Binding Path=Data.RemoveSelectedShortcutCommand, Source={StaticResource proxy}}"
                                                           CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
                                             </ContextMenu>

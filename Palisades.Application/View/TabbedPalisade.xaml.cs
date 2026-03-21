@@ -6,6 +6,7 @@ using System.Windows.Media;
 using Palisades.Model;
 using Palisades.ViewModel;
 using Palisades;
+using Palisades.Properties;
 using Palisades.Services;
 
 namespace Palisades.View
@@ -92,16 +93,16 @@ namespace Palisades.View
                 return;
 
             var menu = new ContextMenu();
-            var rename = new MenuItem { Header = "Renommer…" };
+            var rename = new MenuItem { Header = Strings.TabRenameMenu };
             rename.Click += (_, _) => RenameTab(vm);
             menu.Items.Add(rename);
 
-            var left = new MenuItem { Header = "Déplacer à gauche" };
+            var left = new MenuItem { Header = Strings.TabMoveLeft };
             left.Click += (_, _) => MoveTab(vm, -1);
             left.IsEnabled = _group.Members.IndexOf(vm) > 0;
             menu.Items.Add(left);
 
-            var right = new MenuItem { Header = "Déplacer à droite" };
+            var right = new MenuItem { Header = Strings.TabMoveRight };
             right.Click += (_, _) => MoveTab(vm, 1);
             right.IsEnabled = _group.Members.IndexOf(vm) < _group.Members.Count - 1;
             menu.Items.Add(right);
@@ -128,8 +129,8 @@ namespace Palisades.View
             var dlg = new RenameSnapshotInputDialog
             {
                 Owner = this,
-                Title = "Renommer l'onglet",
-                PromptLabel = "Nouveau nom",
+                Title = Strings.RenameTabTitle,
+                PromptLabel = Strings.NewTabNamePrompt,
                 CurrentName = vm.Name,
             };
             if (dlg.ShowDialog() != true || string.IsNullOrWhiteSpace(dlg.NewName))

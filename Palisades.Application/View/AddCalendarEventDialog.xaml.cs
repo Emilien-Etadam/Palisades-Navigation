@@ -1,4 +1,5 @@
 using Palisades.Model;
+using Palisades.Properties;
 using System;
 using System.Globalization;
 using System.Windows;
@@ -35,7 +36,7 @@ namespace Palisades.View
             var summary = SummaryTextBox?.Text?.Trim() ?? string.Empty;
             if (string.IsNullOrEmpty(summary))
             {
-                MessageBox.Show("Summary is required.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(Strings.SummaryRequired, Strings.ValidationTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 

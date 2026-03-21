@@ -1,0 +1,1117 @@
+[
+  {
+    "key": "RestoreLayoutConfirm",
+    "fr": "Cette disposition remplacera la disposition actuelle. Continuer ?",
+    "en": "This will replace the current layout. Continue?"
+  },
+  {
+    "key": "RestoreLayoutTitle",
+    "fr": "Restaurer la disposition",
+    "en": "Restore layout"
+  },
+  {
+    "key": "DeleteLayoutConfirm",
+    "fr": "Supprimer cette disposition ?",
+    "en": "Delete this layout?"
+  },
+  {
+    "key": "DeleteLayoutTitle",
+    "fr": "Supprimer la disposition",
+    "en": "Delete layout"
+  },
+  {
+    "key": "ExportSelectLayout",
+    "fr": "Sélectionnez une disposition à exporter.",
+    "en": "Select a layout to export."
+  },
+  {
+    "key": "ExportTitle",
+    "fr": "Exporter",
+    "en": "Export"
+  },
+  {
+    "key": "ExportSuccess",
+    "fr": "Disposition exportée avec succès.",
+    "en": "Layout exported successfully."
+  },
+  {
+    "key": "ExportFailed",
+    "fr": "Échec de l'export (le dossier existe peut-être déjà).",
+    "en": "Export failed (folder may already exist)."
+  },
+  {
+    "key": "ImportSuccess",
+    "fr": "Disposition importée avec succès.",
+    "en": "Layout imported successfully."
+  },
+  {
+    "key": "ImportNoSnapshot",
+    "fr": "Aucune disposition valide dans le dossier sélectionné.",
+    "en": "No valid layout in the selected folder."
+  },
+  {
+    "key": "ImportTitle",
+    "fr": "Importer",
+    "en": "Import"
+  },
+  {
+    "key": "SaveLayoutDefaultNameFormat",
+    "fr": "Disposition - {0}",
+    "en": "Layout - {0}"
+  },
+  {
+    "key": "SaveLayoutNameRequired",
+    "fr": "Veuillez saisir un nom.",
+    "en": "Enter a name."
+  },
+  {
+    "key": "SaveLayoutTitle",
+    "fr": "Enregistrer la disposition",
+    "en": "Save layout"
+  },
+  {
+    "key": "ValidationTitle",
+    "fr": "Validation",
+    "en": "Validation"
+  },
+  {
+    "key": "CalendarTitle",
+    "fr": "Calendrier",
+    "en": "Calendar"
+  },
+  {
+    "key": "MailTitle",
+    "fr": "Courriel",
+    "en": "Mail"
+  },
+  {
+    "key": "MailEnterHostUser",
+    "fr": "Saisissez l'hôte IMAP et le nom d'utilisateur.",
+    "en": "Enter IMAP host and username."
+  },
+  {
+    "key": "MailConnectionOk",
+    "fr": "Connexion réussie. Sélectionnez les dossiers à surveiller.",
+    "en": "Connected. Select folders to watch."
+  },
+  {
+    "key": "MailConnectionFailedFormat",
+    "fr": "Échec de la connexion : {0}",
+    "en": "Connection failed: {0}"
+  },
+  {
+    "key": "MailEnterImapHost",
+    "fr": "Saisissez un hôte IMAP.",
+    "en": "Enter an IMAP host."
+  },
+  {
+    "key": "MailEnterUsername",
+    "fr": "Saisissez un nom d'utilisateur.",
+    "en": "Enter a username."
+  },
+  {
+    "key": "CaldavEnterUrlUser",
+    "fr": "Saisissez l'URL CalDAV et le nom d'utilisateur.",
+    "en": "Enter CalDAV URL and username."
+  },
+  {
+    "key": "CaldavEnterBaseUrl",
+    "fr": "Saisissez une URL de base CalDAV.",
+    "en": "Enter a CalDAV base URL."
+  },
+  {
+    "key": "CaldavHttpsRequired",
+    "fr": "L'URL CalDAV doit commencer par https://.",
+    "en": "CalDAV URL must start with https://."
+  },
+  {
+    "key": "CaldavNoCalendar",
+    "fr": "Aucune collection de calendriers à cette URL.",
+    "en": "No calendar collection at this URL."
+  },
+  {
+    "key": "CaldavLoadCalendarFailedFormat",
+    "fr": "Impossible de charger les calendriers : {0}",
+    "en": "Could not load calendars: {0}"
+  },
+  {
+    "key": "CaldavEnterServerUrl",
+    "fr": "Saisissez une URL de serveur CalDAV.",
+    "en": "Enter a CalDAV server URL."
+  },
+  {
+    "key": "TaskListsTitle",
+    "fr": "Listes de tâches",
+    "en": "Task lists"
+  },
+  {
+    "key": "TaskNoVtodo",
+    "fr": "Aucune liste de tâches (VTODO) à cette URL.",
+    "en": "No task list (VTODO) at this URL."
+  },
+  {
+    "key": "TaskLoadFailedFormat",
+    "fr": "Impossible de charger les listes de tâches : {0}",
+    "en": "Could not load task lists: {0}"
+  },
+  {
+    "key": "ErrorTitle",
+    "fr": "Erreur",
+    "en": "Error"
+  },
+  {
+    "key": "TaskSelectList",
+    "fr": "Sélectionnez au moins une liste de tâches.",
+    "en": "Select at least one task list."
+  },
+  {
+    "key": "SummaryRequired",
+    "fr": "Le titre est obligatoire.",
+    "en": "Title is required."
+  },
+  {
+    "key": "AccountEmailRequired",
+    "fr": "L'e-mail est obligatoire.",
+    "en": "Email is required."
+  },
+  {
+    "key": "AccountTitle",
+    "fr": "Compte",
+    "en": "Account"
+  },
+  {
+    "key": "AccountTestingStatus",
+    "fr": "Test en cours…",
+    "en": "Testing…"
+  },
+  {
+    "key": "AccountTestOk",
+    "fr": "OK",
+    "en": "OK"
+  },
+  {
+    "key": "AccountTestFailedFormat",
+    "fr": "Échec : {0}",
+    "en": "Failed: {0}"
+  },
+  {
+    "key": "ConfirmTitle",
+    "fr": "Confirmer",
+    "en": "Confirm"
+  },
+  {
+    "key": "DeleteAccountFormat",
+    "fr": "Supprimer le compte {0} ?",
+    "en": "Delete account {0}?"
+  },
+  {
+    "key": "StartupErrorFormat",
+    "fr": "Erreur au démarrage : {0}{1}{1}{2}",
+    "en": "Startup error: {0}{1}{1}{2}"
+  },
+  {
+    "key": "PalisadesErrorTitle",
+    "fr": "Palisades - Erreur",
+    "en": "Palisades - Error"
+  },
+  {
+    "key": "UpdateAvailableFormat",
+    "fr": "Version {0} disponible.{1}{1}{2}{1}{1}Installer et relancer ?",
+    "en": "Version {0} is available.{1}{1}{2}{1}{1}Install and restart?"
+  },
+  {
+    "key": "UpdateTitle",
+    "fr": "Mise à jour Palisades",
+    "en": "Palisades update"
+  },
+  {
+    "key": "UpdateFailedFormat",
+    "fr": "Échec de la mise à jour : {0}",
+    "en": "Update failed: {0}"
+  },
+  {
+    "key": "ErrorGenericTitle",
+    "fr": "Erreur",
+    "en": "Error"
+  },
+  {
+    "key": "TabRenameMenu",
+    "fr": "Renommer…",
+    "en": "Rename…"
+  },
+  {
+    "key": "TabMoveLeft",
+    "fr": "Déplacer à gauche",
+    "en": "Move left"
+  },
+  {
+    "key": "TabMoveRight",
+    "fr": "Déplacer à droite",
+    "en": "Move right"
+  },
+  {
+    "key": "RenameTabTitle",
+    "fr": "Renommer l'onglet",
+    "en": "Rename tab"
+  },
+  {
+    "key": "NewTabNamePrompt",
+    "fr": "Nouveau nom",
+    "en": "New name"
+  },
+  {
+    "key": "AddTabShortcutPalisade",
+    "fr": "Palissade raccourcis",
+    "en": "Shortcut Palisade"
+  },
+  {
+    "key": "AddTabBrowsePalisade",
+    "fr": "Palissade navigation",
+    "en": "Browse Palisade"
+  },
+  {
+    "key": "AddTabTaskPalisade",
+    "fr": "Palissade tâches",
+    "en": "Task Palisade"
+  },
+  {
+    "key": "AddTabCalendarPalisade",
+    "fr": "Palissade calendrier",
+    "en": "Calendar Palisade"
+  },
+  {
+    "key": "AddTabMailPalisade",
+    "fr": "Palissade courriel",
+    "en": "Mail Palisade"
+  },
+  {
+    "key": "DesktopShortcutPalisade",
+    "fr": "Palissade raccourcis",
+    "en": "Shortcut Palisade"
+  },
+  {
+    "key": "DesktopBrowsePalisade",
+    "fr": "Palissade navigation",
+    "en": "Browse Palisade"
+  },
+  {
+    "key": "DesktopTaskPalisade",
+    "fr": "Palissade tâches",
+    "en": "Task Palisade"
+  },
+  {
+    "key": "DesktopCalendarPalisade",
+    "fr": "Palissade calendrier",
+    "en": "Calendar Palisade"
+  },
+  {
+    "key": "DesktopMailPalisade",
+    "fr": "Palissade courriel",
+    "en": "Mail Palisade"
+  },
+  {
+    "key": "FolderDefaultName",
+    "fr": "Palissade navigation",
+    "en": "Browse Palisade"
+  },
+  {
+    "key": "NewFolderName",
+    "fr": "Nouveau dossier",
+    "en": "New folder"
+  },
+  {
+    "key": "NewFolderNameFormat",
+    "fr": "Nouveau dossier ({0})",
+    "en": "New folder ({0})"
+  },
+  {
+    "key": "NewFileName",
+    "fr": "Nouveau fichier.txt",
+    "en": "New file.txt"
+  },
+  {
+    "key": "NewFileNameFormat",
+    "fr": "Nouveau fichier ({0}).txt",
+    "en": "New file ({0}).txt"
+  },
+  {
+    "key": "CannotOpenFileFormat",
+    "fr": "Impossible d'ouvrir le fichier : {0}",
+    "en": "Cannot open file: {0}"
+  },
+  {
+    "key": "FolderNotFoundFormat",
+    "fr": "Dossier introuvable : {0}",
+    "en": "Folder not found: {0}"
+  },
+  {
+    "key": "AccessDeniedFormat",
+    "fr": "Accès refusé : {0}",
+    "en": "Access denied: {0}"
+  },
+  {
+    "key": "ErrorGenericFormat",
+    "fr": "Erreur : {0}",
+    "en": "Error: {0}"
+  },
+  {
+    "key": "FileOperationFailedFormat",
+    "fr": "Échec du {0} de {1} : {2}",
+    "en": "Could not {0} {1}: {2}"
+  },
+  {
+    "key": "CopyVerb",
+    "fr": "copie",
+    "en": "copy"
+  },
+  {
+    "key": "MoveVerb",
+    "fr": "déplacement",
+    "en": "move"
+  },
+  {
+    "key": "MailDefaultName",
+    "fr": "Palissade courriel",
+    "en": "Mail Palisade"
+  },
+  {
+    "key": "CalendarDefaultName",
+    "fr": "Palissade calendrier",
+    "en": "Calendar Palisade"
+  },
+  {
+    "key": "TaskDefaultName",
+    "fr": "Palissade tâches",
+    "en": "Task Palisade"
+  },
+  {
+    "key": "CalendarNoCalendarsConfigured",
+    "fr": "Aucun calendrier configuré. Clic droit > Modifier pour configurer.",
+    "en": "No calendars configured. Right-click > Edit to set up."
+  },
+  {
+    "key": "TaskNewTaskName",
+    "fr": "Nouvelle tâche",
+    "en": "New task"
+  },
+  {
+    "key": "TaskNewTaskDescription",
+    "fr": "Description de la tâche",
+    "en": "Task description"
+  },
+  {
+    "key": "TaskDeleteFailedFormat",
+    "fr": "Échec de la suppression de la tâche : {0}",
+    "en": "Could not delete task: {0}"
+  },
+  {
+    "key": "TaskUpdateFailedFormat",
+    "fr": "Échec de la mise à jour de la tâche : {0}",
+    "en": "Could not update task: {0}"
+  },
+  {
+    "key": "TaskSavedSuccess",
+    "fr": "Tâche enregistrée",
+    "en": "Task saved"
+  },
+  {
+    "key": "TaskSaveFailedFormat",
+    "fr": "Échec de l'enregistrement de la tâche : {0}",
+    "en": "Could not save task: {0}"
+  },
+  {
+    "key": "TaskListDefaultName",
+    "fr": "Tâches",
+    "en": "Tasks"
+  },
+  {
+    "key": "CaldavIncomplete",
+    "fr": "Configuration CalDAV incomplète",
+    "en": "CalDAV setup incomplete"
+  },
+  {
+    "key": "SyncReady",
+    "fr": "Prêt",
+    "en": "Ready"
+  },
+  {
+    "key": "SyncLoadingTasks",
+    "fr": "Chargement des tâches…",
+    "en": "Loading tasks…"
+  },
+  {
+    "key": "SyncTasksLoaded",
+    "fr": "Tâches chargées avec succès",
+    "en": "Tasks loaded"
+  },
+  {
+    "key": "SyncLoadFailedFormat",
+    "fr": "Échec du chargement des tâches : {0}",
+    "en": "Could not load tasks: {0}"
+  },
+  {
+    "key": "SyncLoadError",
+    "fr": "Erreur de chargement des tâches",
+    "en": "Task load error"
+  },
+  {
+    "key": "SyncLocalChanges",
+    "fr": "Modifications locales détectées, synchronisation dans un instant…",
+    "en": "Local changes detected, syncing shortly…"
+  },
+  {
+    "key": "SyncWithCalDav",
+    "fr": "Synchronisation CalDAV…",
+    "en": "Syncing CalDAV…"
+  },
+  {
+    "key": "SyncCompletedFormat",
+    "fr": "Synchronisation terminée : {0}",
+    "en": "Sync finished: {0}"
+  },
+  {
+    "key": "SyncFailedFormat",
+    "fr": "Échec de la synchronisation : {0}",
+    "en": "Sync failed: {0}"
+  },
+  {
+    "key": "SyncError",
+    "fr": "Erreur de synchronisation",
+    "en": "Sync error"
+  },
+  {
+    "key": "ToastNewMessagesFormat",
+    "fr": "{0} nouveau(x) message(s) dans {1}",
+    "en": "{0} new message(s) in {1}"
+  },
+  {
+    "key": "ToastMailAttribution",
+    "fr": "Palisades - Courriel",
+    "en": "Palisades - Mail"
+  },
+  {
+    "key": "ToastStartsAtFormat",
+    "fr": "Début à {0}",
+    "en": "Starts at {0}"
+  },
+  {
+    "key": "ToastCalendarAttribution",
+    "fr": "Palisades - Calendrier",
+    "en": "Palisades - Calendar"
+  },
+  {
+    "key": "MainWindowTitleUpdatingFormat",
+    "fr": "Palisades — Téléchargement de la mise à jour : {0}%",
+    "en": "Palisades — Downloading update: {0}%"
+  },
+  {
+    "key": "ExportFolderDescription",
+    "fr": "Choisissez le dossier de destination pour la disposition exportée.",
+    "en": "Choose the folder for the exported layout."
+  },
+  {
+    "key": "ImportFolderDescription",
+    "fr": "Sélectionnez le dossier contenant une disposition (snapshot.xml).",
+    "en": "Select the folder containing a layout (snapshot.xml)."
+  },
+  {
+    "key": "WindowTitleEditShortcutPalisade",
+    "fr": "Modifier la palissade raccourcis",
+    "en": "Edit Shortcut Palisade"
+  },
+  {
+    "key": "WindowTitleSaveCurrentLayout",
+    "fr": "Enregistrer la disposition actuelle",
+    "en": "Save current layout"
+  },
+  {
+    "key": "WindowTitleZimbraAccount",
+    "fr": "Compte Zimbra",
+    "en": "Zimbra account"
+  },
+  {
+    "key": "WindowTitleEditCalendarPalisade",
+    "fr": "Modifier la palissade calendrier",
+    "en": "Edit Calendar Palisade"
+  },
+  {
+    "key": "WindowTitleTaskPalisadeSettings",
+    "fr": "Paramètres de la palissade tâches",
+    "en": "Task Palisade settings"
+  },
+  {
+    "key": "WindowTitleAboutPalisades",
+    "fr": "À propos de Palisades",
+    "en": "About Palisades"
+  },
+  {
+    "key": "WindowTitleEditBrowsePalisade",
+    "fr": "Modifier la palissade navigation",
+    "en": "Edit Browse Palisade"
+  },
+  {
+    "key": "WindowTitleAddEvent",
+    "fr": "Ajouter un événement",
+    "en": "Add event"
+  },
+  {
+    "key": "WindowTitleManageLayouts",
+    "fr": "Gérer les dispositions",
+    "en": "Manage layouts"
+  },
+  {
+    "key": "WindowTitleNewBrowsePalisade",
+    "fr": "Nouvelle palissade navigation",
+    "en": "New Browse Palisade"
+  },
+  {
+    "key": "WindowTitleNewCalendarPalisade",
+    "fr": "Nouvelle palissade calendrier",
+    "en": "New Calendar Palisade"
+  },
+  {
+    "key": "WindowTitleNewTaskPalisade",
+    "fr": "Nouvelle palissade tâches",
+    "en": "New Task Palisade"
+  },
+  {
+    "key": "WindowTitleNewMailPalisade",
+    "fr": "Nouvelle palissade courriel",
+    "en": "New Mail Palisade"
+  },
+  {
+    "key": "WindowTitleRenameLayout",
+    "fr": "Renommer la disposition",
+    "en": "Rename layout"
+  },
+  {
+    "key": "WindowTitleEditTaskPalisade",
+    "fr": "Modifier la palissade tâches",
+    "en": "Edit Task Palisade"
+  },
+  {
+    "key": "AppNamePalisades",
+    "fr": "Palisades",
+    "en": "Palisades"
+  },
+  {
+    "key": "WindowTitleManageZimbraAccounts",
+    "fr": "Gérer les comptes Zimbra",
+    "en": "Manage Zimbra accounts"
+  },
+  {
+    "key": "AboutCreditsHeading",
+    "fr": "Crédits",
+    "en": "Credits"
+  },
+  {
+    "key": "AboutGitHubRepository",
+    "fr": "dépôt GitHub",
+    "en": "GitHub repository"
+  },
+  {
+    "key": "AboutInspiredBy",
+    "fr": "Inspiré par",
+    "en": "Inspired by"
+  },
+  {
+    "key": "AboutLibrariesIntro",
+    "fr": "Bibliothèques open source utilisées par cette application :",
+    "en": "Open-source libraries used by this app:"
+  },
+  {
+    "key": "AboutMaintainedByPrefix",
+    "fr": "Maintenu par ",
+    "en": "Maintained by "
+  },
+  {
+    "key": "AboutNoFencesAndFencesConnector",
+    "fr": " (Twometer) et ",
+    "en": " (Twometer) and "
+  },
+  {
+    "key": "AboutReleasedUnderMitSuffix",
+    "fr": ". Publié sous licence MIT. Signalez les problèmes, vérifiez les mises à jour ou contribuez sur le ",
+    "en": ". Released under the MIT license. Report issues, check for updates, or contribute on the "
+  },
+  {
+    "key": "AboutStardockSuffix",
+    "fr": " (Stardock).",
+    "en": " (Stardock)."
+  },
+  {
+    "key": "ButtonAdd",
+    "fr": "Ajouter",
+    "en": "Add"
+  },
+  {
+    "key": "ButtonBrowse",
+    "fr": "Parcourir…",
+    "en": "Browse…"
+  },
+  {
+    "key": "ButtonCancel",
+    "fr": "Annuler",
+    "en": "Cancel"
+  },
+  {
+    "key": "ButtonClose",
+    "fr": "Fermer",
+    "en": "Close"
+  },
+  {
+    "key": "ButtonCreate",
+    "fr": "Créer",
+    "en": "Create"
+  },
+  {
+    "key": "ButtonDelete",
+    "fr": "Supprimer",
+    "en": "Delete"
+  },
+  {
+    "key": "ButtonEdit",
+    "fr": "Modifier",
+    "en": "Edit"
+  },
+  {
+    "key": "ButtonExport",
+    "fr": "Exporter…",
+    "en": "Export…"
+  },
+  {
+    "key": "ButtonImport",
+    "fr": "Importer…",
+    "en": "Import…"
+  },
+  {
+    "key": "ButtonLoadCalendars",
+    "fr": "Charger les calendriers",
+    "en": "Load calendars"
+  },
+  {
+    "key": "ButtonLoadTaskLists",
+    "fr": "Charger les listes de tâches",
+    "en": "Load task lists"
+  },
+  {
+    "key": "ButtonOk",
+    "fr": "OK",
+    "en": "OK"
+  },
+  {
+    "key": "ButtonRename",
+    "fr": "Renommer",
+    "en": "Rename"
+  },
+  {
+    "key": "ButtonRestore",
+    "fr": "Restaurer",
+    "en": "Restore"
+  },
+  {
+    "key": "ButtonSave",
+    "fr": "Enregistrer",
+    "en": "Save"
+  },
+  {
+    "key": "ButtonTest",
+    "fr": "Tester",
+    "en": "Test"
+  },
+  {
+    "key": "ButtonTestConnectionLoadFolders",
+    "fr": "Tester la connexion et charger les dossiers",
+    "en": "Test connection & load folders"
+  },
+  {
+    "key": "CheckBoxAllDay",
+    "fr": "Toute la journée",
+    "en": "All day"
+  },
+  {
+    "key": "CheckBoxEnableDetailedLogging",
+    "fr": "Journal détaillé",
+    "en": "Verbose logging"
+  },
+  {
+    "key": "CheckBoxShowCompletedTasks",
+    "fr": "Afficher les tâches terminées",
+    "en": "Show completed tasks"
+  },
+  {
+    "key": "DefaultBrowsePalisadeTitle",
+    "fr": "Ma palissade navigation",
+    "en": "My Browse Palisade"
+  },
+  {
+    "key": "DefaultTaskPalisadeTitle",
+    "fr": "Palissade tâches",
+    "en": "Task Palisade"
+  },
+  {
+    "key": "DialogLayoutNameLabel",
+    "fr": "Nom de la disposition",
+    "en": "Layout name"
+  },
+  {
+    "key": "EmptyNoEvents",
+    "fr": "Aucun événement",
+    "en": "No events"
+  },
+  {
+    "key": "EmptyNoTasks",
+    "fr": "Aucune tâche",
+    "en": "No tasks"
+  },
+  {
+    "key": "EventButtonAdd",
+    "fr": "+ Événement",
+    "en": "+ Event"
+  },
+  {
+    "key": "EventButtonAddTask",
+    "fr": "+ Tâche",
+    "en": "+ Task"
+  },
+  {
+    "key": "LabelCaldavBaseUrl",
+    "fr": "URL de base CalDAV",
+    "en": "CalDAV base URL"
+  },
+  {
+    "key": "LabelCaldavServerUrl",
+    "fr": "URL du serveur CalDAV",
+    "en": "CalDAV server URL"
+  },
+  {
+    "key": "LabelCalendarsToShow",
+    "fr": "Calendriers à afficher",
+    "en": "Calendars to show"
+  },
+  {
+    "key": "LabelDaysToShow",
+    "fr": "Jours à afficher",
+    "en": "Days to show"
+  },
+  {
+    "key": "LabelDisplayColon",
+    "fr": "Affichage :",
+    "en": "Display:"
+  },
+  {
+    "key": "LabelEmail",
+    "fr": "Courriel",
+    "en": "Email"
+  },
+  {
+    "key": "LabelEndDate",
+    "fr": "Date de fin",
+    "en": "End date"
+  },
+  {
+    "key": "LabelEndTime",
+    "fr": "Heure de fin (HH:mm)",
+    "en": "End time (HH:mm)"
+  },
+  {
+    "key": "LabelEventSummaryRequired",
+    "fr": "Titre *",
+    "en": "Title *"
+  },
+  {
+    "key": "LabelFoldersToMonitor",
+    "fr": "Dossiers à surveiller (sélectionner après le test)",
+    "en": "Folders to watch (select after test)"
+  },
+  {
+    "key": "LabelImapHost",
+    "fr": "Hôte IMAP",
+    "en": "IMAP host"
+  },
+  {
+    "key": "LabelLocation",
+    "fr": "Lieu",
+    "en": "Location"
+  },
+  {
+    "key": "LabelName",
+    "fr": "Nom",
+    "en": "Name"
+  },
+  {
+    "key": "LabelPalisadeTitle",
+    "fr": "Titre de la palissade",
+    "en": "Palisade title"
+  },
+  {
+    "key": "LabelPassword",
+    "fr": "Mot de passe",
+    "en": "Password"
+  },
+  {
+    "key": "LabelRootFolder",
+    "fr": "Dossier racine",
+    "en": "Root folder"
+  },
+  {
+    "key": "LabelRootPath",
+    "fr": "Chemin racine",
+    "en": "Root path"
+  },
+  {
+    "key": "LabelStartDate",
+    "fr": "Date de début",
+    "en": "Start date"
+  },
+  {
+    "key": "LabelStartTime",
+    "fr": "Heure de début (HH:mm)",
+    "en": "Start time (HH:mm)"
+  },
+  {
+    "key": "LabelSyncIntervalMinutes",
+    "fr": "Intervalle de synchro (minutes)",
+    "en": "Sync interval (minutes)"
+  },
+  {
+    "key": "LabelTaskListId",
+    "fr": "ID de la liste de tâches",
+    "en": "Task list ID"
+  },
+  {
+    "key": "LabelTitle",
+    "fr": "Titre",
+    "en": "Title"
+  },
+  {
+    "key": "LabelUsername",
+    "fr": "Nom d'utilisateur",
+    "en": "Username"
+  },
+  {
+    "key": "LabelUsernameEmail",
+    "fr": "Nom d'utilisateur (courriel)",
+    "en": "Username (email)"
+  },
+  {
+    "key": "LabelViewMode",
+    "fr": "Mode d'affichage",
+    "en": "View mode"
+  },
+  {
+    "key": "LabelZimbraImapHostForMail",
+    "fr": "Hôte IMAP (palissade courriel)",
+    "en": "IMAP host (Mail Palisade)"
+  },
+  {
+    "key": "LayoutNameSavedList",
+    "fr": "Dispositions enregistrées",
+    "en": "Saved layouts"
+  },
+  {
+    "key": "LoadingEllipsis",
+    "fr": "Chargement…",
+    "en": "Loading…"
+  },
+  {
+    "key": "MailComboCountAndSubjects",
+    "fr": "Nombre et sujets",
+    "en": "Count and subjects"
+  },
+  {
+    "key": "MailComboCountOnly",
+    "fr": "Nombre seulement",
+    "en": "Count only"
+  },
+  {
+    "key": "ManageSnapshotsPalisadeCountFormat",
+    "fr": "{0} palissades",
+    "en": "{0} palisades"
+  },
+  {
+    "key": "MenuAbout",
+    "fr": "À propos",
+    "en": "About"
+  },
+  {
+    "key": "MenuDelete",
+    "fr": "Supprimer",
+    "en": "Delete"
+  },
+  {
+    "key": "MenuDeleteSelection",
+    "fr": "Supprimer la sélection",
+    "en": "Delete selection"
+  },
+  {
+    "key": "MenuEdit",
+    "fr": "Modifier",
+    "en": "Edit"
+  },
+  {
+    "key": "MenuLayouts",
+    "fr": "Dispositions",
+    "en": "Layouts"
+  },
+  {
+    "key": "MenuManageLayouts",
+    "fr": "Gérer les dispositions…",
+    "en": "Manage layouts…"
+  },
+  {
+    "key": "MenuManageZimbraAccounts",
+    "fr": "Gérer les comptes Zimbra",
+    "en": "Manage Zimbra accounts"
+  },
+  {
+    "key": "MenuNewBrowsePalisade",
+    "fr": "Nouvelle palissade navigation",
+    "en": "New Browse Palisade"
+  },
+  {
+    "key": "MenuNewCalendarPalisade",
+    "fr": "Nouvelle palissade calendrier",
+    "en": "New Calendar Palisade"
+  },
+  {
+    "key": "MenuNewFolder",
+    "fr": "Nouveau dossier",
+    "en": "New folder"
+  },
+  {
+    "key": "MenuNewMailPalisade",
+    "fr": "Nouvelle palissade courriel",
+    "en": "New Mail Palisade"
+  },
+  {
+    "key": "MenuNewShortcutPalisade",
+    "fr": "Nouvelle palissade raccourcis",
+    "en": "New Shortcut Palisade"
+  },
+  {
+    "key": "MenuNewTaskPalisade",
+    "fr": "Nouvelle palissade tâches",
+    "en": "New Task Palisade"
+  },
+  {
+    "key": "MenuNewTextFile",
+    "fr": "Nouveau fichier texte",
+    "en": "New text file"
+  },
+  {
+    "key": "MenuOpenInExplorer",
+    "fr": "Ouvrir dans l'Explorateur",
+    "en": "Open in Explorer"
+  },
+  {
+    "key": "MenuOpenWebmail",
+    "fr": "Ouvrir le webmail",
+    "en": "Open webmail"
+  },
+  {
+    "key": "MenuPaste",
+    "fr": "Coller",
+    "en": "Paste"
+  },
+  {
+    "key": "MenuRefresh",
+    "fr": "Actualiser",
+    "en": "Refresh"
+  },
+  {
+    "key": "MenuSaveCurrentLayout",
+    "fr": "Enregistrer la disposition actuelle…",
+    "en": "Save current layout…"
+  },
+  {
+    "key": "MenuSortByName",
+    "fr": "Trier par nom",
+    "en": "Sort by name"
+  },
+  {
+    "key": "ScreenDimensionsSeparator",
+    "fr": "×",
+    "en": "×"
+  },
+  {
+    "key": "TaskLoadingEllipsis",
+    "fr": "Chargement des tâches…",
+    "en": "Loading tasks…"
+  },
+  {
+    "key": "TooltipAddTabBrowseSameGroup",
+    "fr": "Ajouter un onglet : palissade navigation (même groupe)",
+    "en": "Add tab: Browse Palisade (same group)"
+  },
+  {
+    "key": "TooltipCalDAVBaseUrlExample",
+    "fr": "Ex. : https://mail.example.com/dav/user@domain/",
+    "en": "e.g. https://mail.example.com/dav/user@domain/"
+  },
+  {
+    "key": "TooltipCalDAVUrlExampleZimbra",
+    "fr": "Ex. : https://zimbra1.mail.ovh.net/dav/user@domain.com/",
+    "en": "e.g. https://zimbra1.mail.ovh.net/dav/user@domain.com/"
+  },
+  {
+    "key": "TooltipForceSync",
+    "fr": "Forcer la synchronisation",
+    "en": "Force sync"
+  },
+  {
+    "key": "TooltipGoToRoot",
+    "fr": "Aller au dossier racine",
+    "en": "Go to root folder"
+  },
+  {
+    "key": "TooltipImapHostExample",
+    "fr": "Ex. : imap.example.com",
+    "en": "e.g. imap.example.com"
+  },
+  {
+    "key": "TooltipMenu",
+    "fr": "Menu",
+    "en": "Menu"
+  },
+  {
+    "key": "TooltipNavigateBack",
+    "fr": "Retour",
+    "en": "Back"
+  },
+  {
+    "key": "TooltipRefresh",
+    "fr": "Actualiser",
+    "en": "Refresh"
+  },
+  {
+    "key": "TooltipSave",
+    "fr": "Enregistrer",
+    "en": "Save"
+  },
+  {
+    "key": "TooltipDelete",
+    "fr": "Supprimer",
+    "en": "Delete"
+  },
+  {
+    "key": "TooltipSettings",
+    "fr": "Paramètres",
+    "en": "Settings"
+  },
+  {
+    "key": "TooltipEdit",
+    "fr": "Modifier",
+    "en": "Edit"
+  },
+  {
+    "key": "TooltipToday",
+    "fr": "Aujourd'hui",
+    "en": "Today"
+  },
+  {
+    "key": "ZimbraAccountsSectionTitle",
+    "fr": "Comptes Zimbra (CalDAV / Courriel)",
+    "en": "Zimbra accounts (CalDAV / Mail)"
+  }
+]

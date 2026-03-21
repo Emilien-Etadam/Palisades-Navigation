@@ -1,5 +1,6 @@
 using System;
 using System.Windows;
+using Palisades.Properties;
 
 namespace Palisades.View
 {
@@ -10,7 +11,7 @@ namespace Palisades.View
         public SaveSnapshotDialog()
         {
             InitializeComponent();
-            NameTextBox.Text = "Layout - " + DateTime.Now.ToString("yyyy-MM-dd HH:mm");
+            NameTextBox.Text = string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.SaveLayoutDefaultNameFormat, DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
             NameTextBox.SelectAll();
         }
 
@@ -19,7 +20,7 @@ namespace Palisades.View
             var name = NameTextBox.Text?.Trim() ?? "";
             if (string.IsNullOrEmpty(name))
             {
-                MessageBox.Show("Please enter a name.", "Save layout", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(Strings.SaveLayoutNameRequired, Strings.SaveLayoutTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
             SnapshotName = name;

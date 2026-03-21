@@ -33,7 +33,7 @@ dotnet build Palisades.sln -c Release
 
 L’exécutable se trouve sous `Palisades.Application\bin\Release\net10.0-windows10.0.17763.0\Palisades.exe`.
 
-En cas d’erreur fatale, un détail peut être écrit dans `%TEMP%\Palisades_startup.log` (les traces verbeuses de démarrage ne sont produites qu’en build Debug).
+Les erreurs non gérées, les échecs de chiffrement DPAPI et certains problèmes de snapshots sont consignés dans `%TEMP%\Palisades_startup.log`. Les traces verbeuses de démarrage ne sont ajoutées qu’en build Debug.
 
 ## Fonctionnalités
 
@@ -55,4 +55,4 @@ En cas d’erreur fatale, un détail peut être écrit dans `%TEMP%\Palisades_st
 
 ## Technique
 
-.NET 10, WPF et Windows Forms. [Sentry](https://sentry.io) pour le suivi des erreurs ; GongSolutions.WPF.DragDrop pour le glisser-déposer ; MailKit et Ical.Net pour IMAP / iCalendar. Inspiré par [NoFences de Twometer](https://github.com/Twometer/NoFences) et [Fences de Stardock](https://www.stardock.com/products/fences/).
+.NET 10, WPF et Windows Forms. Les erreurs non gérées et plusieurs échecs (ex. chiffrement DPAPI, lecture de snapshot) sont consignés dans `%TEMP%\Palisades_startup.log`. GongSolutions.WPF.DragDrop pour le glisser-déposer ; MailKit et Ical.Net pour IMAP / iCalendar. Inspiré par [NoFences de Twometer](https://github.com/Twometer/NoFences) et [Fences de Stardock](https://www.stardock.com/products/fences/).

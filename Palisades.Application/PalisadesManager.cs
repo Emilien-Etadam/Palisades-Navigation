@@ -1,4 +1,5 @@
 using Palisades.Helpers;
+using Palisades.Properties;
 using Palisades.Model;
 using Palisades.Services;
 using Palisades.View;
@@ -10,7 +11,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Xml.Serialization;
 
 namespace Palisades
 {
@@ -77,7 +77,7 @@ namespace Palisades
             {
                 var vm = CreateViewModel(concrete);
                 if (vm == null) continue;
-                var window = CreateWindowFor(vm);
+                var window = PalisadeWindowFactory.Create(vm);
                 palisades.Add(concrete.Identifier, window);
             }
         }
@@ -213,11 +213,11 @@ namespace Palisades
                 menu.Items.Add(item);
             }
 
-            Add("Shortcut palisade", () => AddTabFence(hostWindow));
-            Add("Browse palisade", () => AddTabFolderPortal(hostWindow));
-            Add("Task palisade", () => AddTabTaskPalisade(hostWindow));
-            Add("Calendar palisade", () => AddTabCalendarPalisade(hostWindow));
-            Add("Mail palisade", () => AddTabMailPalisade(hostWindow));
+            Add(Strings.AddTabShortcutPalisade, () => AddTabFence(hostWindow));
+            Add(Strings.AddTabBrowsePalisade, () => AddTabFolderPortal(hostWindow));
+            Add(Strings.AddTabTaskPalisade, () => AddTabTaskPalisade(hostWindow));
+            Add(Strings.AddTabCalendarPalisade, () => AddTabCalendarPalisade(hostWindow));
+            Add(Strings.AddTabMailPalisade, () => AddTabMailPalisade(hostWindow));
 
             menu.PlacementTarget = anchor;
             menu.Placement = PlacementMode.Bottom;
@@ -555,7 +555,7 @@ namespace Palisades
                 {
                     var single = group.Members[0];
                     tabbed.Close();
-                    var standalone = CreateWindowFor(single);
+                    var standalone = PalisadeWindowFactory.Create(single);
                     palisades[single.Identifier] = standalone;
                     standalone.Show();
                     single.GroupId = null;
@@ -572,16 +572,6 @@ namespace Palisades
             window.Close();
             palisades.Remove(identifier);
         }
-
-        private static Window CreateWindowFor(IPalisadeViewModel vm) => vm switch
-        {
-            PalisadeViewModel p => new Palisade(p),
-            FolderPortalViewModel f => new FolderPortal(f),
-            TaskPalisadeViewModel t => new TaskPalisade(t),
-            CalendarPalisadeViewModel c => new CalendarPalisade(c),
-            MailPalisadeViewModel m => new MailPalisade(m),
-            _ => throw new NotSupportedException($"No window for {vm.GetType().Name}")
-        };
 
         public static Window GetWindow(string identifier)
         {

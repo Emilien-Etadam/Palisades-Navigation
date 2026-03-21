@@ -1,10 +1,12 @@
 using Palisades.Helpers;
+using Palisades.Properties;
 using Palisades.Model;
 using Palisades.Services;
 using Palisades.View;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Collections.Specialized;
 using System.Threading;
@@ -22,7 +24,7 @@ namespace Palisades.ViewModel
         private string _errorMessage = string.Empty;
         private bool _isSyncing;
         private bool _isLoading;
-        private string _syncStatus = "Ready";
+        private string _syncStatus = Strings.SyncReady;
         private Timer? _syncTimer;
 
         public string CalDAVUrl
@@ -124,7 +126,7 @@ namespace Palisades.ViewModel
             set { _syncStatus = value; OnPropertyChanged(); }
         }
 
-        public TaskPalisadeViewModel() : this(new TaskPalisadeModel { Name = "Task palisade", Width = 600, Height = 400 }, new CalDAVService(new CalDAVClient("https://localhost/", "", "")))
+        public TaskPalisadeViewModel() : this(new TaskPalisadeModel { Name = Strings.TaskDefaultName, Width = 600, Height = 400 }, new CalDAVService(new CalDAVClient("https://localhost/", "", "")))
         { }
 
         public TaskPalisadeViewModel(TaskPalisadeModel model, CalDAVService caldavService) : base(model)
@@ -138,9 +140,9 @@ namespace Palisades.ViewModel
             ForceSyncCommand = new RelayCommand(async () => await ForceSyncAsync());
             AddTaskCommand = new RelayCommand(() =>
             {
-                var newTask = new CalDAVTask("New Task")
+                var newTask = new CalDAVTask(Strings.TaskNewTaskName)
                 {
-                    Description = "Task description",
+                    Description = Strings.TaskNewTaskDescription,
                     DueDate = DateTime.Today.AddDays(1)
                 };
                 if (HasMultipleLists && SelectedTaskTab != null)
@@ -170,7 +172,7 @@ namespace Palisades.ViewModel
                 }
                 catch (Exception ex)
                 {
-                    ErrorMessage = $"Failed to delete task: {ex.Message}";
+                    ErrorMessage = string.Format(CultureInfo.CurrentCulture, Strings.TaskDeleteFailedFormat, ex.Message);
                 }
             });
             ToggleTaskCompletedCommand = new RelayCommand<CalDAVTask>(async task =>
@@ -188,7 +190,7 @@ namespace Palisades.ViewModel
                 }
                 catch (Exception ex)
                 {
-                    ErrorMessage = $"Failed to update task: {ex.Message}";
+                    ErrorMessage = string.Format(CultureInfo.CurrentCulture, Strings.TaskUpdateFailedFormat, ex.Message);
                     t.Completed = !t.Completed;
                     t.CompletedDate = t.Completed ? DateTime.Now : null;
                 }
@@ -211,11 +213,11 @@ namespace Palisades.ViewModel
                     {
                         await _caldavService.UpdateTaskAsync(listId, t);
                     }
-                    SyncStatus = "Task saved successfully";
+                    SyncStatus = Strings.TaskSavedSuccess;
                 }
                 catch (Exception ex)
                 {
-                    ErrorMessage = $"Failed to save task: {ex.Message}";
+                    ErrorMessage = string.Format(CultureInfo.CurrentCulture, Strings.TaskSaveFailedFormat, ex.Message);
                 }
             });
 
@@ -257,7 +259,7 @@ namespace Palisades.ViewModel
 
         private string GetDisplayNameForListId(string href)
         {
-            if (string.IsNullOrEmpty(href)) return "Tasks";
+            if (string.IsNullOrEmpty(href)) return Strings.TaskListDefaultName;
             var idx = href.TrimEnd('/').LastIndexOf('/');
             return idx >= 0 ? href.Substring(idx + 1).TrimEnd('/') : href;
         }
@@ -267,13 +269,13 @@ namespace Palisades.ViewModel
             var listIds = GetListIds().ToList();
             if (listIds.Count == 0 || string.IsNullOrEmpty(CalDAVUrl))
             {
-                Dispatch(() => { ErrorMessage = "CalDAV configuration incomplete"; });
+                Dispatch(() => { ErrorMessage = Strings.CaldavIncomplete; });
                 return;
             }
 
             try
             {
-                Dispatch(() => { IsLoading = true; ErrorMessage = string.Empty; SyncStatus = "Loading tasks..."; });
+                Dispatch(() => { IsLoading = true; ErrorMessage = string.Empty; SyncStatus = Strings.SyncLoadingTasks; });
 
                 if (listIds.Count > 1)
                 {
@@ -296,7 +298,7 @@ namespace Palisades.ViewModel
                                 SelectedTaskTab = TaskTabs[0];
                         });
                     }
-                    Dispatch(() => { SyncStatus = "Tasks loaded successfully"; OnPropertyChanged(nameof(ActiveTasks)); OnPropertyChanged(nameof(HasNoTasks)); });
+                    Dispatch(() => { SyncStatus = Strings.SyncTasksLoaded; OnPropertyChanged(nameof(ActiveTasks)); OnPropertyChanged(nameof(HasNoTasks)); });
                 }
                 else
                 {
@@ -307,7 +309,7 @@ namespace Palisades.ViewModel
                         Tasks.Clear();
                         foreach (var task in tasks)
                             Tasks.Add(task);
-                        SyncStatus = "Tasks loaded successfully";
+                        SyncStatus = Strings.SyncTasksLoaded;
                         OnPropertyChanged(nameof(ActiveTasks));
                         OnPropertyChanged(nameof(HasNoTasks));
                     });
@@ -315,8 +317,8 @@ namespace Palisades.ViewModel
             }
             catch (Exception ex)
             {
-                var msg = $"Failed to load tasks: {ex.Message}";
-                Dispatch(() => { ErrorMessage = msg; SyncStatus = "Error loading tasks"; OnPropertyChanged(nameof(ActiveTasks)); OnPropertyChanged(nameof(HasNoTasks)); });
+                var msg = string.Format(CultureInfo.CurrentCulture, Strings.SyncLoadFailedFormat, ex.Message);
+                Dispatch(() => { ErrorMessage = msg; SyncStatus = Strings.SyncLoadError; OnPropertyChanged(nameof(ActiveTasks)); OnPropertyChanged(nameof(HasNoTasks)); });
             }
             finally
             {
@@ -337,7 +339,7 @@ namespace Palisades.ViewModel
             Save();
             if (!_isSyncing)
             {
-                SyncStatus = "Local changes detected, will sync soon...";
+                SyncStatus = Strings.SyncLocalChanges;
             }
         }
 
@@ -358,7 +360,7 @@ namespace Palisades.ViewModel
 
             try
             {
-                Dispatch(() => { IsSyncing = true; SyncStatus = "Syncing with CalDAV..."; ErrorMessage = string.Empty; });
+                Dispatch(() => { IsSyncing = true; SyncStatus = Strings.SyncWithCalDav; ErrorMessage = string.Empty; });
 
                 if (TaskTabs.Count > 1)
                 {
@@ -373,7 +375,7 @@ namespace Palisades.ViewModel
                                 tab.Tasks.Add(t);
                         });
                     }
-                    Dispatch(() => SyncStatus = "Sync completed: " + DateTime.Now.ToShortTimeString());
+                    Dispatch(() => SyncStatus = string.Format(CultureInfo.CurrentCulture, Strings.SyncCompletedFormat, DateTime.Now.ToShortTimeString()));
                 }
                 else
                 {
@@ -384,14 +386,14 @@ namespace Palisades.ViewModel
                         Tasks.Clear();
                         foreach (var t in merged)
                             Tasks.Add(t);
-                        SyncStatus = "Sync completed: " + DateTime.Now.ToShortTimeString();
+                        SyncStatus = string.Format(CultureInfo.CurrentCulture, Strings.SyncCompletedFormat, DateTime.Now.ToShortTimeString());
                     });
                 }
             }
             catch (Exception ex)
             {
-                var msg = $"Sync failed: {ex.Message}";
-                Dispatch(() => { ErrorMessage = msg; SyncStatus = "Sync error"; });
+                var msg = string.Format(CultureInfo.CurrentCulture, Strings.SyncFailedFormat, ex.Message);
+                Dispatch(() => { ErrorMessage = msg; SyncStatus = Strings.SyncError; });
             }
             finally
             {

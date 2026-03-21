@@ -1,4 +1,5 @@
 using System;
+using Palisades.Properties;
 using Palisades.Helpers;
 using Palisades.Model;
 using System.Windows;
@@ -27,7 +28,7 @@ namespace Palisades.View
             var email = EmailTextBox.Text?.Trim() ?? "";
             if (string.IsNullOrEmpty(email))
             {
-                MessageBox.Show("Email is required.", "Account", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(Strings.AccountEmailRequired, Strings.AccountTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
             if (Account == null)

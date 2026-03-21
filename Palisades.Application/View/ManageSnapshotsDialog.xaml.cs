@@ -1,4 +1,5 @@
 using Palisades.Model;
+using Palisades.Properties;
 using Palisades.Services;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +33,7 @@ namespace Palisades.View
         {
             var id = (string)((Button)sender).Tag;
             if (string.IsNullOrEmpty(id)) return;
-            if (MessageBox.Show("This will replace your current layout. Continue?", "Restore layout", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+            if (MessageBox.Show(Strings.RestoreLayoutConfirm, Strings.RestoreLayoutTitle, MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
                 return;
             LayoutSnapshotService.RestoreSnapshot(id);
             DialogResult = true;
@@ -57,7 +58,7 @@ namespace Palisades.View
         {
             var id = (string)((Button)sender).Tag;
             if (string.IsNullOrEmpty(id)) return;
-            if (MessageBox.Show("Delete this layout?", "Delete layout", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
+            if (MessageBox.Show(Strings.DeleteLayoutConfirm, Strings.DeleteLayoutTitle, MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
                 return;
             LayoutSnapshotService.DeleteSnapshot(id);
             RefreshList();
@@ -68,26 +69,26 @@ namespace Palisades.View
             var selected = SnapshotsListBox.SelectedItem as LayoutSnapshot;
             if (selected == null)
             {
-                MessageBox.Show("Select a layout to export.", "Export", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(Strings.ExportSelectLayout, Strings.ExportTitle, MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
             using var dlg = new System.Windows.Forms.FolderBrowserDialog
             {
-                Description = "Choose destination folder for the exported layout",
+                Description = Strings.ExportFolderDescription,
                 ShowNewFolderButton = true
             };
             if (dlg.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
             if (LayoutSnapshotService.ExportSnapshot(selected.Id, dlg.SelectedPath))
-                MessageBox.Show("Layout exported successfully.", "Export", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(Strings.ExportSuccess, Strings.ExportTitle, MessageBoxButton.OK, MessageBoxImage.Information);
             else
-                MessageBox.Show("Export failed (folder may already exist).", "Export", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(Strings.ExportFailed, Strings.ExportTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
         private void ImportButton_Click(object sender, RoutedEventArgs e)
         {
             using var dlg = new System.Windows.Forms.FolderBrowserDialog
             {
-                Description = "Select folder containing a snapshot (snapshot.xml)",
+                Description = Strings.ImportFolderDescription,
                 ShowNewFolderButton = false
             };
             if (dlg.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
@@ -95,10 +96,10 @@ namespace Palisades.View
             if (newId != null)
             {
                 RefreshList();
-                MessageBox.Show("Layout imported successfully.", "Import", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(Strings.ImportSuccess, Strings.ImportTitle, MessageBoxButton.OK, MessageBoxImage.Information);
             }
             else
-                MessageBox.Show("No valid snapshot found in the selected folder.", "Import", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(Strings.ImportNoSnapshot, Strings.ImportTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)

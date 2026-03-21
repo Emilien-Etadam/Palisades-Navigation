@@ -1,9 +1,9 @@
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using Palisades.Helpers;
+using Palisades.Properties;
 using Palisades.Services;
 using Palisades.View;
 using System.Windows.Threading;
@@ -17,28 +17,12 @@ namespace Palisades
         [Conditional("DEBUG")]
         private static void WriteStartupLog(string message, Exception? ex = null)
         {
-            try
-            {
-                string path = Path.Combine(Path.GetTempPath(), "Palisades_startup.log");
-                string line = DateTime.Now.ToString("o") + " " + message;
-                if (ex != null)
-                    line += Environment.NewLine + ex.ToString();
-                File.AppendAllText(path, line + Environment.NewLine);
-            }
-            catch { /* ignore */ }
+            PalisadeDiagnostics.LogDebug(message, ex);
         }
 
         private static void WriteCrashLog(string context, Exception? ex)
         {
-            try
-            {
-                string path = Path.Combine(Path.GetTempPath(), "Palisades_startup.log");
-                var line = DateTime.Now.ToString("o") + " " + context + Environment.NewLine;
-                if (ex != null)
-                    line += ex + Environment.NewLine;
-                File.AppendAllText(path, line);
-            }
-            catch { /* ignore */ }
+            PalisadeDiagnostics.Log(context, ex?.Message ?? "(null)", ex);
         }
 
         public App()
@@ -98,8 +82,8 @@ namespace Palisades
                 try
                 {
                     MessageBox.Show(
-                        "Erreur au démarrage : " + ex.Message + Environment.NewLine + Environment.NewLine + ex.StackTrace,
-                        "Palisades - Erreur",
+                        string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.StartupErrorFormat, ex.Message, Environment.NewLine, ex.StackTrace ?? string.Empty),
+                        Strings.PalisadesErrorTitle,
                         MessageBoxButton.OK,
                         MessageBoxImage.Error);
                 }
@@ -111,7 +95,7 @@ namespace Palisades
 
         private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
-            WriteCrashLog("DispatcherUnhandledException", e.Exception);
+            PalisadeDiagnostics.Log("DispatcherUnhandledException", e.Exception.Message, e.Exception);
             e.Handled = true;
         }
 
@@ -123,8 +107,8 @@ namespace Palisades
 
             var result = Current.Dispatcher.Invoke(() =>
                 MessageBox.Show(
-                    $"Version {update.Version} disponible.\n\n{update.ReleaseNotes}\n\nInstaller et relancer ?",
-                    "Mise à jour Palisades",
+                    string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.UpdateAvailableFormat, update.Version, Environment.NewLine, update.ReleaseNotes ?? string.Empty),
+                    Strings.UpdateTitle,
                     MessageBoxButton.YesNo,
                     MessageBoxImage.Information));
 
@@ -139,7 +123,7 @@ namespace Palisades
                         try
                         {
                             if (Application.Current.MainWindow != null)
-                                Application.Current.MainWindow.Title = $"Palisades — Downloading update: {percent:F0}%";
+                                Application.Current.MainWindow.Title = string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.MainWindowTitleUpdatingFormat, percent);
                         }
                         catch { }
                     });
@@ -150,7 +134,7 @@ namespace Palisades
             catch (Exception ex)
             {
                 Current.Dispatcher.Invoke(() =>
-                    MessageBox.Show($"Échec de la mise à jour : {ex.Message}", "Erreur",
+                    MessageBox.Show(string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.UpdateFailedFormat, ex.Message), Strings.ErrorGenericTitle,
                         MessageBoxButton.OK, MessageBoxImage.Warning));
             }
         }

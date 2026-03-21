@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using Palisades.Properties;
 using Palisades.Services;
 
 namespace Palisades.View
@@ -31,12 +32,12 @@ namespace Palisades.View
 
             if (string.IsNullOrWhiteSpace(url) || string.IsNullOrWhiteSpace(user))
             {
-                MessageBox.Show("Please enter CalDAV URL and username.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(Strings.CaldavEnterUrlUser, Strings.ValidationTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
             if (!url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
             {
-                MessageBox.Show("The CalDAV URL must start with https://.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(Strings.CaldavHttpsRequired, Strings.ValidationTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -50,7 +51,7 @@ namespace Palisades.View
 
                 if (_taskLists.Count == 0)
                 {
-                    MessageBox.Show("No task list (VTODO) found at this URL.", "Task Lists", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show(Strings.TaskNoVtodo, Strings.TaskListsTitle, MessageBoxButton.OK, MessageBoxImage.Information);
                     TaskListsListBox.ItemsSource = null;
                     return;
                 }
@@ -60,7 +61,7 @@ namespace Palisades.View
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Could not load task lists: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.TaskLoadFailedFormat, ex.Message), Strings.ErrorTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -73,17 +74,17 @@ namespace Palisades.View
 
             if (string.IsNullOrWhiteSpace(CalDAVUrl))
             {
-                MessageBox.Show("Please enter a CalDAV Server URL.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(Strings.CaldavEnterServerUrl, Strings.ValidationTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
             if (!CalDAVUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
             {
-                MessageBox.Show("The CalDAV URL must start with https://.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(Strings.CaldavHttpsRequired, Strings.ValidationTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
             if (string.IsNullOrWhiteSpace(Username))
             {
-                MessageBox.Show("Please enter a username.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(Strings.MailEnterUsername, Strings.ValidationTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -94,7 +95,7 @@ namespace Palisades.View
 
             if (SelectedTaskListIds.Count == 0 && _taskLists != null && _taskLists.Count > 0)
             {
-                MessageBox.Show("Please select at least one task list.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(Strings.TaskSelectList, Strings.ValidationTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 

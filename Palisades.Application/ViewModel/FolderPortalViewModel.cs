@@ -1,5 +1,6 @@
 using GongSolutions.Wpf.DragDrop;
 using Palisades.Helpers;
+using Palisades.Properties;
 using Palisades.Model;
 using Palisades.Services;
 using Palisades.View;
@@ -12,8 +13,10 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace Palisades.ViewModel
 {
@@ -24,6 +27,11 @@ namespace Palisades.ViewModel
         private string _breadcrumb;
         private string _currentFolderName;
         private string _errorMessage;
+        private FileSystemWatcher? _watcher;
+        private System.Threading.Timer? _fsDebounceTimer;
+        private readonly object _fsDebounceLock = new object();
+        private bool _disposed;
+        private readonly Dispatcher _uiDispatcher;
 
         public string RootPath
         {
@@ -40,6 +48,7 @@ namespace Palisades.ViewModel
                 OnPropertyChanged();
                 UpdateBreadcrumb();
                 Save();
+                RefreshFileSystemWatcher();
             }
         }
 
@@ -85,11 +94,12 @@ namespace Palisades.ViewModel
             }
         }
 
-        public FolderPortalViewModel() : this(new FolderPortalModel { Name = "Browse palisade" })
+        public FolderPortalViewModel() : this(new FolderPortalModel { Name = Strings.FolderDefaultName })
         { }
 
         public FolderPortalViewModel(FolderPortalModel model) : base(model)
         {
+            _uiDispatcher = Application.Current?.Dispatcher ?? Dispatcher.CurrentDispatcher;
             _model = model;
             _items = new ObservableCollection<FolderPortalItem>();
             _breadcrumb = "";
@@ -110,12 +120,12 @@ namespace Palisades.ViewModel
             {
                 var currentPath = GetCurrentDirectoryPath();
                 if (string.IsNullOrEmpty(currentPath)) return;
-                var name = "New Folder";
+                var name = Strings.NewFolderName;
                 var path = Path.Combine(currentPath, name);
                 var counter = 1;
                 while (Directory.Exists(path))
                 {
-                    name = $"New Folder ({counter++})";
+                    name = string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.NewFolderNameFormat, counter++);
                     path = Path.Combine(currentPath, name);
                 }
                 Directory.CreateDirectory(path);
@@ -126,12 +136,12 @@ namespace Palisades.ViewModel
             {
                 var currentPath = GetCurrentDirectoryPath();
                 if (string.IsNullOrEmpty(currentPath)) return;
-                var name = "New File.txt";
+                var name = Strings.NewFileName;
                 var path = Path.Combine(currentPath, name);
                 var counter = 1;
                 while (File.Exists(path))
                 {
-                    name = $"New File ({counter++}).txt";
+                    name = string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.NewFileNameFormat, counter++);
                     path = Path.Combine(currentPath, name);
                 }
                 File.WriteAllText(path, string.Empty);
@@ -175,7 +185,7 @@ namespace Palisades.ViewModel
                     }
                     catch (Exception ex)
                     {
-                        ErrorMessage = "Cannot open file: " + ex.Message;
+                        ErrorMessage = string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.CannotOpenFileFormat, ex.Message);
                     }
                 }
             });
@@ -229,7 +239,7 @@ namespace Palisades.ViewModel
 
             if (!Directory.Exists(path))
             {
-                ErrorMessage = "Folder not found: " + path;
+                ErrorMessage = string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.FolderNotFoundFormat, path);
                 Items.Clear();
                 return;
             }
@@ -262,11 +272,11 @@ namespace Palisades.ViewModel
             }
             catch (UnauthorizedAccessException)
             {
-                ErrorMessage = "Access denied: " + path;
+                ErrorMessage = string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.AccessDeniedFormat, path);
             }
             catch (Exception ex)
             {
-                ErrorMessage = "Error: " + ex.Message;
+                ErrorMessage = string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.ErrorGenericFormat, ex.Message);
             }
         }
 
@@ -375,6 +385,123 @@ namespace Palisades.ViewModel
         {
             if (!string.IsNullOrEmpty(CurrentPath))
                 LoadFolder(CurrentPath);
+        }
+
+        private void RefreshFileSystemWatcher()
+        {
+            try
+            {
+                _watcher?.Dispose();
+            }
+            catch (Exception ex)
+            {
+                PalisadeDiagnostics.Log("FolderPortal", "Dispose watcher", ex);
+            }
+
+            _watcher = null;
+            string path = CurrentPath ?? string.Empty;
+            if (string.IsNullOrEmpty(path))
+                return;
+
+            try
+            {
+                if (!Directory.Exists(path))
+                {
+                    PalisadeDiagnostics.Log("FolderPortal", "Watcher : dossier introuvable ou inaccessible : " + path, null);
+                    return;
+                }
+
+                var w = new FileSystemWatcher(path)
+                {
+                    IncludeSubdirectories = false,
+                    NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite,
+                };
+                w.Created += (_, _) => OnFileSystemChanged();
+                w.Deleted += (_, _) => OnFileSystemChanged();
+                w.Renamed += (_, _) => OnFileSystemChanged();
+                w.Changed += (_, _) => OnFileSystemChanged();
+                w.EnableRaisingEvents = true;
+                _watcher = w;
+            }
+            catch (Exception ex)
+            {
+                PalisadeDiagnostics.Log("FolderPortal", "Création FileSystemWatcher impossible.", ex);
+            }
+        }
+
+        private void OnFileSystemChanged()
+        {
+            ScheduleDebouncedRefresh();
+        }
+
+        private void ScheduleDebouncedRefresh()
+        {
+            lock (_fsDebounceLock)
+            {
+                if (_disposed)
+                    return;
+                if (_fsDebounceTimer == null)
+                    _fsDebounceTimer = new System.Threading.Timer(_ => OnDebounceTick(), null, 500, Timeout.Infinite);
+                else
+                    _fsDebounceTimer.Change(500, Timeout.Infinite);
+            }
+        }
+
+        private void OnDebounceTick()
+        {
+            try
+            {
+                InvokeOnUiThread(() =>
+                {
+                    if (_disposed)
+                        return;
+                    if (!string.IsNullOrEmpty(CurrentPath) && Directory.Exists(CurrentPath))
+                        LoadFolder(CurrentPath);
+                });
+            }
+            catch (Exception ex)
+            {
+                PalisadeDiagnostics.Log("FolderPortal", "Rafraîchissement après événement fichier.", ex);
+            }
+        }
+
+        private void InvokeOnUiThread(Action action)
+        {
+            var dispatcher = _uiDispatcher;
+            if (dispatcher == null)
+            {
+                action();
+                return;
+            }
+
+            if (dispatcher.CheckAccess())
+                action();
+            else
+                dispatcher.BeginInvoke(action);
+        }
+
+        public override void Dispose()
+        {
+            if (_disposed)
+                return;
+            _disposed = true;
+            try
+            {
+                _watcher?.Dispose();
+            }
+            catch (Exception ex)
+            {
+                PalisadeDiagnostics.Log("FolderPortal", "Dispose watcher (Dispose)", ex);
+            }
+
+            _watcher = null;
+            lock (_fsDebounceLock)
+            {
+                _fsDebounceTimer?.Dispose();
+                _fsDebounceTimer = null;
+            }
+
+            base.Dispose();
         }
 
         private string GetCurrentDirectoryPath()
@@ -502,7 +629,7 @@ namespace Palisades.ViewModel
                 }
                 catch (Exception ex)
                 {
-                    ErrorMessage = $"Failed to {(isCopy ? "copy" : "move")} {Path.GetFileName(sourcePath)}: {ex.Message}";
+                    ErrorMessage = string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.FileOperationFailedFormat, isCopy ? Strings.CopyVerb : Strings.MoveVerb, Path.GetFileName(sourcePath), ex.Message);
                 }
             }
 

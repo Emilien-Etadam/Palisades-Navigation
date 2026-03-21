@@ -2,6 +2,7 @@ using Palisades.Helpers;
 using Palisades.Model;
 using System;
 using Palisades;
+using Palisades.Serialization;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,15 +14,6 @@ namespace Palisades.Services
     public static class LayoutSnapshotService
     {
         private static readonly XmlSerializer SnapshotSerializer = new(typeof(LayoutSnapshot), new[] { typeof(SnapshotEntry) });
-        private static readonly XmlSerializer ModelSerializer = new(typeof(PalisadeModelBase), new[]
-        {
-            typeof(PalisadeModel),
-            typeof(StandardPalisadeModel),
-            typeof(FolderPortalModel),
-            typeof(TaskPalisadeModel),
-            typeof(CalendarPalisadeModel),
-            typeof(MailPalisadeModel)
-        });
 
         public static LayoutSnapshot SaveSnapshot(string name)
         {
@@ -54,13 +46,17 @@ namespace Palisades.Services
                 try
                 {
                     using var sr = new StringReader(content);
-                    if (ModelSerializer.Deserialize(sr) is PalisadeModelBase model)
+                    if (PalisadeXmlSerialization.PalisadeModelSerializer.Deserialize(sr) is PalisadeModelBase model)
                     {
                         groupId = model.GroupId;
                         tabOrder = model.TabOrder;
                     }
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    PalisadeDiagnostics.Log("LayoutSnapshot", "Lecture state.xml pour métadonnées snapshot : " + identifier, ex);
+                }
+
                 snapshot.Entries.Add(new SnapshotEntry
                 {
                     PalisadeIdentifier = identifier,
@@ -95,7 +91,10 @@ namespace Palisades.Services
                         list.Add(s);
                     }
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    PalisadeDiagnostics.Log("LayoutSnapshot", "ListSnapshots : " + path, ex);
+                }
             }
             return list.OrderByDescending(s => s.CreatedAt).ToList();
         }
@@ -219,7 +218,10 @@ namespace Palisades.Services
                 foreach (var s in autoSaves.Skip(keepCount))
                     DeleteSnapshot(s.Id);
             }
-            catch { /* ignore */ }
+            catch (Exception ex)
+            {
+                PalisadeDiagnostics.Log("LayoutSnapshot", "SaveAutoSnapshotAndPrune", ex);
+            }
         }
     }
 }

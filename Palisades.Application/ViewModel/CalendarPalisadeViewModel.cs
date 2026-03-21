@@ -4,6 +4,7 @@ using Ical.Net.DataTypes;
 using Ical.Net.Serialization;
 using Palisades;
 using Palisades.Helpers;
+using Palisades.Properties;
 using Palisades.Model;
 using Palisades.Services;
 using Palisades.View;
@@ -106,7 +107,7 @@ namespace Palisades.ViewModel
         {
             if (_model.CalendarIds == null || _model.CalendarIds.Count == 0)
             {
-                Dispatch(() => { Events.Clear(); ErrorMessage = "No calendars configured. Right-click > Edit to configure."; });
+                Dispatch(() => { Events.Clear(); ErrorMessage = Strings.CalendarNoCalendarsConfigured; });
                 Dispatch(() => OnPropertyChanged(nameof(HasNoEvents)));
                 return;
             }

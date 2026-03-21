@@ -11,26 +11,15 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows.Input;
 using System.Xml.Serialization;
+using Palisades.Serialization;
+using Palisades.Properties;
 
 namespace Palisades.ViewModel
 {
     public abstract class ViewModelBase : INotifyPropertyChanged, IPalisadeViewModel, IDisposable
     {
         /// <summary>Sérialiseur partagé pour garantir un format XML compatible avec LoadPalisades (root/namespace cohérents).</summary>
-        public static readonly XmlSerializer SharedSerializer = new XmlSerializer(
-            typeof(PalisadeModelBase),
-            new[]
-            {
-                typeof(PalisadeModel),
-                typeof(StandardPalisadeModel),
-                typeof(FolderPortalModel),
-                typeof(TaskPalisadeModel),
-                typeof(CalendarPalisadeModel),
-                typeof(MailPalisadeModel),
-                typeof(Shortcut),
-                typeof(LnkShortcut),
-                typeof(UrlShortcut)
-            });
+        public static readonly XmlSerializer SharedSerializer = PalisadeXmlSerialization.PalisadeModelSerializer;
 
         protected readonly PalisadeModelBase Model;
         protected volatile bool ShouldSave;
@@ -178,7 +167,7 @@ namespace Palisades.ViewModel
         public ICommand RestoreSnapshotCommand { get; } = new RelayCommand<string>(id =>
         {
             if (string.IsNullOrEmpty(id)) return;
-            if (System.Windows.MessageBox.Show("This will replace your current layout. Continue?", "Restore layout",
+            if (System.Windows.MessageBox.Show(Strings.RestoreLayoutConfirm, Strings.RestoreLayoutTitle,
                     System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Question) != System.Windows.MessageBoxResult.Yes)
                 return;
             LayoutSnapshotService.RestoreSnapshot(id);

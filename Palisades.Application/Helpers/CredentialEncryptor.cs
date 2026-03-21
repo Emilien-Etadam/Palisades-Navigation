@@ -22,8 +22,9 @@ namespace Palisades.Helpers
                 var protectedBytes = ProtectedData.Protect(bytes, OptionalEntropy, DataProtectionScope.CurrentUser);
                 return Convert.ToBase64String(protectedBytes);
             }
-            catch
+            catch (Exception ex)
             {
+                PalisadeDiagnostics.Log("CredentialEncryptor", "Encrypt a échoué (DPAPI).", ex);
                 return string.Empty;
             }
         }
@@ -38,8 +39,9 @@ namespace Palisades.Helpers
                 var bytes = ProtectedData.Unprotect(protectedBytes, OptionalEntropy, DataProtectionScope.CurrentUser);
                 return Encoding.UTF8.GetString(bytes);
             }
-            catch
+            catch (Exception ex)
             {
+                PalisadeDiagnostics.Log("CredentialEncryptor", "Decrypt a échoué (données corrompues ou autre profil utilisateur).", ex);
                 return string.Empty;
             }
         }

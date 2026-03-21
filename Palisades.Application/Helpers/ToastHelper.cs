@@ -1,5 +1,7 @@
 using Microsoft.Toolkit.Uwp.Notifications;
+using Palisades.Properties;
 using System;
+using System.Globalization;
 
 namespace Palisades.Helpers
 {
@@ -11,8 +13,8 @@ namespace Palisades.Helpers
             try
             {
                 new ToastContentBuilder()
-                    .AddText($"{newCount} new message{(newCount > 1 ? "s" : "")} in {folderName}")
-                    .AddAttributionText("Palisades Mail")
+                    .AddText(string.Format(CultureInfo.CurrentCulture, Strings.ToastNewMessagesFormat, newCount, folderName))
+                    .AddAttributionText(Strings.ToastMailAttribution)
                     .Show();
             }
             catch { }
@@ -25,8 +27,8 @@ namespace Palisades.Helpers
                 var timeStr = startTime.ToString("HH:mm");
                 new ToastContentBuilder()
                     .AddText(summary)
-                    .AddText($"Starts at {timeStr}")
-                    .AddAttributionText("Palisades Calendar")
+                    .AddText(string.Format(CultureInfo.CurrentCulture, Strings.ToastStartsAtFormat, timeStr))
+                    .AddAttributionText(Strings.ToastCalendarAttribution)
                     .Show();
             }
             catch { }
