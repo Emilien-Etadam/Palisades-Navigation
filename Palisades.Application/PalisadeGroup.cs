@@ -1,15 +1,33 @@
 using Palisades.ViewModel;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows.Input;
 
 namespace Palisades
 {
-    public class PalisadeGroup
+    public class PalisadeGroup : INotifyPropertyChanged
     {
         public string GroupId { get; }
         public ObservableCollection<IPalisadeViewModel> Members { get; } = new ObservableCollection<IPalisadeViewModel>();
 
         public IPalisadeViewModel? FirstMember => Members.Count > 0 ? Members[0] : null;
+
+        private IPalisadeViewModel? _selectedMember;
+
+        public IPalisadeViewModel? SelectedMember
+        {
+            get => _selectedMember;
+            set
+            {
+                if (_selectedMember == value) return;
+                _selectedMember = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ICommand SelectMemberCommand { get; }
 
         public int X => Members.Count > 0 ? Members[0].FenceX : 0;
         public int Y => Members.Count > 0 ? Members[0].FenceY : 0;
@@ -19,6 +37,7 @@ namespace Palisades
         public PalisadeGroup(string groupId)
         {
             GroupId = groupId ?? throw new ArgumentNullException(nameof(groupId));
+            SelectMemberCommand = new RelayCommand<IPalisadeViewModel>(vm => SelectedMember = vm);
         }
 
         public void AddMember(IPalisadeViewModel vm)
@@ -33,11 +52,15 @@ namespace Palisades
             vm.GroupId = GroupId;
             vm.TabOrder = Members.Count;
             Members.Add(vm);
+            if (SelectedMember == null)
+                SelectedMember = vm;
         }
 
         public void RemoveMember(IPalisadeViewModel vm)
         {
             Members.Remove(vm);
+            if (SelectedMember == vm)
+                SelectedMember = Members.Count > 0 ? Members[0] : null;
             RecalculateTabOrder();
         }
 
@@ -69,6 +92,13 @@ namespace Palisades
                 m.Width = width;
                 m.Height = height;
             }
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

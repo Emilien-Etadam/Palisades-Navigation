@@ -1,12 +1,11 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
-using Microsoft.Extensions.Configuration;
 using Palisades.Helpers;
 using Palisades.Services;
 using Palisades.View;
-using Sentry;
 using System.Windows.Threading;
 
 namespace Palisades
@@ -15,6 +14,7 @@ namespace Palisades
     {
         private TrayIconManager? _trayIcon;
 
+        [Conditional("DEBUG")]
         private static void WriteStartupLog(string message, Exception? ex = null)
         {
             try
@@ -28,20 +28,32 @@ namespace Palisades
             catch { /* ignore */ }
         }
 
+        private static void WriteCrashLog(string context, Exception? ex)
+        {
+            try
+            {
+                string path = Path.Combine(Path.GetTempPath(), "Palisades_startup.log");
+                var line = DateTime.Now.ToString("o") + " " + context + Environment.NewLine;
+                if (ex != null)
+                    line += ex + Environment.NewLine;
+                File.AppendAllText(path, line);
+            }
+            catch { /* ignore */ }
+        }
+
         public App()
         {
             AppDomain.CurrentDomain.UnhandledException += (_, e) =>
             {
-                WriteStartupLog("UnhandledException", e.ExceptionObject as Exception);
+                WriteCrashLog("UnhandledException", e.ExceptionObject as Exception);
             };
+
+            DispatcherUnhandledException += App_DispatcherUnhandledException;
 
             WriteStartupLog("App() début");
 
             try
             {
-                SetupSentry();
-                WriteStartupLog("SetupSentry() ok");
-
                 ThemeWatcher.Apply(Resources);
 
                 PalisadesManager.LoadPalisades();
@@ -82,7 +94,7 @@ namespace Palisades
             }
             catch (Exception ex)
             {
-                WriteStartupLog("EXCEPTION", ex);
+                WriteCrashLog("EXCEPTION au démarrage", ex);
                 try
                 {
                     MessageBox.Show(
@@ -91,44 +103,15 @@ namespace Palisades
                         MessageBoxButton.OK,
                         MessageBoxImage.Error);
                 }
-                catch { WriteStartupLog("MessageBox a échoué"); }
+                catch { WriteCrashLog("MessageBox a échoué", null); }
                 Shutdown();
                 return;
             }
         }
 
-        private static string GetSentryDsn()
+        private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
-            var dsn = Environment.GetEnvironmentVariable("SENTRY_DSN");
-            if (!string.IsNullOrWhiteSpace(dsn))
-                return dsn.Trim();
-
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(AppContext.BaseDirectory)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false);
-            var config = builder.Build();
-            return config["Sentry:Dsn"] ?? string.Empty;
-        }
-
-        private void SetupSentry()
-        {
-            DispatcherUnhandledException += App_DispatcherUnhandledException;
-
-            var dsn = GetSentryDsn();
-            if (string.IsNullOrWhiteSpace(dsn))
-                return;
-
-            SentrySdk.Init(o =>
-            {
-                o.Dsn = dsn;
-                o.Debug = PEnv.IsDev();
-                o.TracesSampleRate = 1;
-            });
-        }
-
-        void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
-        {
-            SentrySdk.CaptureException(e.Exception);
+            WriteCrashLog("DispatcherUnhandledException", e.Exception);
             e.Handled = true;
         }
 

@@ -58,7 +58,12 @@ namespace Palisades.ViewModel
         public string CurrentFolderName
         {
             get => _currentFolderName;
-            set { _currentFolderName = value; OnPropertyChanged(); }
+            set
+            {
+                _currentFolderName = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(TabBarLabel));
+            }
         }
 
         public string ErrorMessage
@@ -262,6 +267,16 @@ namespace Palisades.ViewModel
             catch (Exception ex)
             {
                 ErrorMessage = "Error: " + ex.Message;
+            }
+        }
+
+        public override string TabBarLabel
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(CurrentFolderName))
+                    return Name;
+                return $"{Name} — {CurrentFolderName}";
             }
         }
 

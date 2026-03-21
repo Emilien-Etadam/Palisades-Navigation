@@ -150,7 +150,7 @@ namespace Palisades
                 g.AddMember(viewModel);
                 palisades[viewModel.Identifier] = tabbedWindow;
                 viewModel.Save();
-                tabbedWindow.TabControl.SelectedItem = viewModel;
+                g.SelectedMember = viewModel;
                 return;
             }
 
@@ -181,7 +181,7 @@ namespace Palisades
                 g.AddMember(viewModel);
                 palisades[viewModel.Identifier] = tabbedWindow;
                 viewModel.Save();
-                tabbedWindow.TabControl.SelectedItem = viewModel;
+                g.SelectedMember = viewModel;
                 return;
             }
 
@@ -341,6 +341,7 @@ namespace Palisades
             var tabbed = new TabbedPalisade(group);
             foreach (var m in group.Members)
                 palisades[m.Identifier] = tabbed;
+            group.SelectedMember = vmNew;
             vmNew.Save();
         }
 
@@ -398,7 +399,7 @@ namespace Palisades
                 g.AddMember(viewModel);
                 palisades[viewModel.Identifier] = tabbedWindow;
                 viewModel.Save();
-                tabbedWindow.TabControl.SelectedItem = viewModel;
+                g.SelectedMember = viewModel;
                 return;
             }
 
@@ -460,7 +461,7 @@ namespace Palisades
                 g.AddMember(viewModel);
                 palisades[viewModel.Identifier] = tabbedWindow;
                 viewModel.Save();
-                tabbedWindow.TabControl.SelectedItem = viewModel;
+                g.SelectedMember = viewModel;
                 return;
             }
 
@@ -512,7 +513,7 @@ namespace Palisades
                 g.AddMember(viewModel);
                 palisades[viewModel.Identifier] = tabbedWindow;
                 viewModel.Save();
-                tabbedWindow.TabControl.SelectedItem = viewModel;
+                g.SelectedMember = viewModel;
                 return;
             }
 

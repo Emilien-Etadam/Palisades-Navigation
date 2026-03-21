@@ -3,11 +3,10 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using Palisades.Model;
 using Palisades.ViewModel;
 using Palisades;
-using Palisades.Model;
 using Palisades.Services;
-
 
 namespace Palisades.View
 {
@@ -30,7 +29,7 @@ namespace Palisades.View
             {
                 if (e.Key != Key.Delete && e.Key != Key.Back)
                     return;
-                if (TabControl.SelectedItem is PalisadeViewModel vm)
+                if (_group.SelectedMember is PalisadeViewModel vm)
                 {
                     vm.DeleteShortcut();
                     e.Handled = true;
@@ -43,9 +42,9 @@ namespace Palisades.View
         private void ApplyTabStyle()
         {
             var settings = AppSettingsStore.Load();
-            var styleKey = settings.DefaultTabStyle == TabStyle.Rounded ? "RoundedTabItemStyle" : "FlatTabItemStyle";
+            var styleKey = settings.DefaultTabStyle == TabStyle.Rounded ? "RoundedTabHeaderButtonStyle" : "FlatTabHeaderButtonStyle";
             if (Resources[styleKey] is System.Windows.Style style)
-                TabControl.ItemContainerStyle = style;
+                Resources["CurrentTabHeaderButtonStyle"] = style;
         }
 
         private void SyncBounds()
@@ -83,13 +82,13 @@ namespace Palisades.View
                 vb.RefreshRecentSnapshots();
         }
 
-        private void TabControl_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        private void TabStrip_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton != MouseButton.Right)
                 return;
-            if (FindAncestor<TabItem>(e.OriginalSource as DependencyObject) is not TabItem tabItem)
+            if (FindAncestor<Button>(e.OriginalSource as DependencyObject) is not Button btn)
                 return;
-            if (tabItem.DataContext is not IPalisadeViewModel vm)
+            if (btn.DataContext is not IPalisadeViewModel vm)
                 return;
 
             var menu = new ContextMenu();
@@ -107,7 +106,7 @@ namespace Palisades.View
             right.IsEnabled = _group.Members.IndexOf(vm) < _group.Members.Count - 1;
             menu.Items.Add(right);
 
-            menu.PlacementTarget = tabItem;
+            menu.PlacementTarget = btn;
             menu.Placement = PlacementMode.Bottom;
             menu.IsOpen = true;
             e.Handled = true;
@@ -142,7 +141,7 @@ namespace Palisades.View
         {
             if (!_group.TryMoveMember(vm, delta))
                 return;
-            TabControl.SelectedItem = vm;
+            _group.SelectedMember = vm;
         }
     }
 }

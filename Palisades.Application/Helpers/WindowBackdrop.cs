@@ -34,8 +34,9 @@ namespace Palisades.Helpers
             int mica = 2; // DWMSBT_MAINWINDOW = Mica
             DwmSetWindowAttribute(hwnd, 38, ref mica, sizeof(int));
 
-            int round = 2; // DWMWCP_ROUND
-            DwmSetWindowAttribute(hwnd, 33, ref round, sizeof(int));
+            // DWMWCP_DONOTROUND : sans cela, Windows 11 trace ombre + liseré autour des fenêtres sans chrome / transparentes.
+            int corner = 1; // DWMWCP_DONOTROUND (voir DWM_WINDOW_CORNER_PREFERENCE)
+            DwmSetWindowAttribute(hwnd, 33, ref corner, sizeof(int));
 
             int useDark = IsSystemDarkMode() ? 1 : 0;
             DwmSetWindowAttribute(hwnd, 20, ref useDark, sizeof(int));

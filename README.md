@@ -33,7 +33,7 @@ dotnet build Palisades.sln -c Release
 
 L’exécutable se trouve sous `Palisades.Application\bin\Release\net10.0-windows10.0.17763.0\Palisades.exe`.
 
-Pour le rapport d’erreurs Sentry en local, copiez `Palisades.Application\appsettings.example.json` vers `appsettings.json` et renseignez votre DSN.
+En cas d’erreur fatale, un détail peut être écrit dans `%TEMP%\Palisades_startup.log` (les traces verbeuses de démarrage ne sont produites qu’en build Debug).
 
 ## Fonctionnalités
 

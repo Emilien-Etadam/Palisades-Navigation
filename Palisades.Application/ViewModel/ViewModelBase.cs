@@ -35,12 +35,15 @@ namespace Palisades.ViewModel
         protected readonly PalisadeModelBase Model;
         protected volatile bool ShouldSave;
         private readonly object _saveLock = new object();
-        private readonly System.Threading.Timer _saveTimer;
+        private readonly System.Threading.Timer? _saveTimer;
+
+        /// <summary>Délai après le dernier <see cref="Save"/> avant écriture disque (regroupe les redimensionnements / déplacements rapides).</summary>
+        private static readonly TimeSpan SaveDebounce = TimeSpan.FromMilliseconds(800);
 
         protected ViewModelBase(PalisadeModelBase model)
         {
             Model = model;
-            _saveTimer = new System.Threading.Timer(_ => SaveAsync(), null, 1000, 1000);
+            _saveTimer = new System.Threading.Timer(_ => FlushSave(), null, Timeout.Infinite, Timeout.Infinite);
         }
 
         #region Propriétés communes
@@ -54,8 +57,10 @@ namespace Palisades.ViewModel
         public string Name
         {
             get => Model.Name;
-            set { Model.Name = value; OnPropertyChanged(); Save(); }
+            set { Model.Name = value; OnPropertyChanged(); OnPropertyChanged(nameof(TabBarLabel)); Save(); }
         }
+
+        public virtual string TabBarLabel => Name;
 
         public int FenceX
         {
@@ -92,6 +97,7 @@ namespace Palisades.ViewModel
         public void Save()
         {
             ShouldSave = true;
+            _saveTimer?.Change(SaveDebounce, Timeout.InfiniteTimeSpan);
         }
 
         public void Delete()
@@ -103,10 +109,8 @@ namespace Palisades.ViewModel
             }
         }
 
-        /// <summary>
-        /// Callback du timer : sauvegarde toutes les 1 s si nécessaire.
-        /// </summary>
-        private void SaveAsync()
+        /// <summary>Écrit sur disque si <see cref="ShouldSave"/> ; appelé une fois après période d’inactivité (pas de boucle périodique).</summary>
+        private void FlushSave()
         {
             if (!ShouldSave) return;
             lock (_saveLock)
@@ -119,7 +123,7 @@ namespace Palisades.ViewModel
                     using StreamWriter writer = new(Path.Combine(saveDirectory, "state.xml"));
                     SharedSerializer.Serialize(writer, Model);
                 }
-                catch { /* réessayer au prochain cycle */ }
+                catch { /* réessayer au prochain Save */ }
                 finally { ShouldSave = false; }
             }
         }
@@ -193,8 +197,8 @@ namespace Palisades.ViewModel
 
         public virtual void Dispose()
         {
-            _saveTimer.Dispose();
-            if (ShouldSave) SaveAsync();
+            _saveTimer?.Dispose();
+            if (ShouldSave) FlushSave();
         }
 
         #region INotifyPropertyChanged

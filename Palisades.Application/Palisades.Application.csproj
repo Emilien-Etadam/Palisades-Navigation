@@ -30,6 +30,8 @@
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <DebugSymbols>False</DebugSymbols>
     <DebugType>None</DebugType>
+    <Optimize>true</Optimize>
+    <DebuggerSupport>false</DebuggerSupport>
   </PropertyGroup>
 
   <ItemGroup>
@@ -45,12 +47,8 @@
 
   <ItemGroup>
     <AdditionalFiles Include="..\stylecop.json" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="10.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0" />
     <PackageReference Include="gong-wpf-dragdrop" Version="4.0.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
-    <PackageReference Include="Sentry" Version="6.1.0" />
     <PackageReference Include="System.Drawing.Common" Version="10.0.0" />
     <PackageReference Include="Ical.Net" Version="5.2.1" />
     <PackageReference Include="MailKit" Version="4.15.0" />
@@ -64,9 +62,6 @@
   <ItemGroup>
     <None Update="Ressources\icon.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="appsettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
