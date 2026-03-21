@@ -493,7 +493,8 @@
     </Window.Resources>
     <Border x:Name="LayoutRoot" CornerRadius="0" ClipToBounds="True">
         <DockPanel>
-            <Grid DockPanel.Dock="Top" x:Name="Header" Height="32" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource PalisadeWindowBrush}" ColumnDefinitions="Auto,*,Auto">
+            <!-- Colonne « poignée » : les onglets Parcourir ont un libellé long (TabBarLabel) et couvrent presque toute la barre ; les boutons d’onglet absorbent le clic et empêchent DragMove sur le Grid parent. -->
+            <Grid DockPanel.Dock="Top" x:Name="Header" Height="32" MouseLeftButtonDown="Header_MouseLeftButtonDown" IsHitTestVisible="True" Background="{DynamicResource PalisadeWindowBrush}" ColumnDefinitions="Auto, 12, *, Auto">
                 <Grid.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="{x:Static properties:Strings.MenuEdit}" Command="{x:Static pal:PalisadesWpfCommands.OpenEditSelectedTabCommand}" CommandParameter="{Binding SelectedMember}" />
@@ -529,7 +530,8 @@
                 <Button Grid.Column="0" x:Name="TitleBarMenuButton" Style="{StaticResource PalisadeNavButton}" Click="TitleBarMenuButton_Click" ToolTip="{x:Static properties:Strings.TooltipMenu}">
                     <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE700;" FontSize="14" VerticalAlignment="Center"/>
                 </Button>
-                <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled"
+                <Border Grid.Column="1" Background="{DynamicResource PalisadeWindowBrush}" Cursor="SizeAll"/>
+                <ScrollViewer Grid.Column="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled"
                               PreviewMouseRightButtonDown="TabStrip_PreviewMouseRightButtonDown">
                     <ItemsControl ItemsSource="{Binding Members}">
                         <ItemsControl.ItemsPanel>
@@ -555,7 +557,7 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </ScrollViewer>
-                <Button Grid.Column="2" Style="{StaticResource PalisadeNavButton}" Click="AddFolderPortalTab_Click" ToolTip="{x:Static properties:Strings.TooltipAddTabBrowseSameGroup}">
+                <Button Grid.Column="3" Style="{StaticResource PalisadeNavButton}" Click="AddFolderPortalTab_Click" ToolTip="{x:Static properties:Strings.TooltipAddTabBrowseSameGroup}">
                     <TextBlock Text="+" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource PalisadeTextBrush}" VerticalAlignment="Center"/>
                 </Button>
             </Grid>
