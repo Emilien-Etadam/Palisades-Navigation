@@ -9,9 +9,11 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 
 namespace Palisades.ViewModel
@@ -26,6 +28,7 @@ namespace Palisades.ViewModel
         private bool _isLoading;
         private string _syncStatus = Strings.SyncReady;
         private Timer? _syncTimer;
+        private readonly CollectionViewSource _visibleTasksView = new();
 
         public string CalDAVUrl
         {
@@ -85,15 +88,37 @@ namespace Palisades.ViewModel
         public ObservableCollection<CalDAVTask> ActiveTasks =>
             HasMultipleLists && SelectedTaskTab != null ? SelectedTaskTab.Tasks : Tasks;
 
+        public ICollectionView FilteredActiveTasks => _visibleTasksView.View;
+
         public ObservableCollection<TaskTabItem> TaskTabs { get; } = new ObservableCollection<TaskTabItem>();
         public bool HasMultipleLists => TaskTabs.Count > 1;
-        public bool HasNoTasks => !IsLoading && ActiveTasks.Count == 0;
+
+        public bool HasNoTasks
+        {
+            get
+            {
+                if (IsLoading) return false;
+                foreach (var t in ActiveTasks)
+                {
+                    if (!IsTaskHiddenInUi(t))
+                        return false;
+                }
+                return true;
+            }
+        }
 
         private TaskTabItem? _selectedTaskTab;
         public TaskTabItem? SelectedTaskTab
         {
             get => _selectedTaskTab;
-            set { _selectedTaskTab = value; OnPropertyChanged(); OnPropertyChanged(nameof(ActiveTasks)); OnPropertyChanged(nameof(HasNoTasks)); }
+            set
+            {
+                _selectedTaskTab = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(ActiveTasks));
+                RefreshVisibleTasksFilter();
+                OnPropertyChanged(nameof(HasNoTasks));
+            }
         }
 
         public CalDAVTask? SelectedTask
@@ -117,7 +142,7 @@ namespace Palisades.ViewModel
         public bool IsLoading
         {
             get => _isLoading;
-            set { _isLoading = value; OnPropertyChanged(); }
+            set { _isLoading = value; OnPropertyChanged(); OnPropertyChanged(nameof(HasNoTasks)); }
         }
 
         public string SyncStatus
@@ -135,6 +160,13 @@ namespace Palisades.ViewModel
             _caldavService = caldavService;
 
             Tasks.CollectionChanged += Tasks_CollectionChanged;
+            _visibleTasksView.Filter += (_, e) =>
+            {
+                if (e.Item is CalDAVTask t)
+                    e.Accepted = !IsTaskHiddenInUi(t);
+                else
+                    e.Accepted = true;
+            };
 
             SelectTabCommand = new RelayCommand<TaskTabItem>(tab => { if (tab != null) SelectedTaskTab = tab; });
             ForceSyncCommand = new RelayCommand(async () => await ForceSyncAsync());
@@ -155,25 +187,14 @@ namespace Palisades.ViewModel
                 }
                 SelectedTask = newTask;
             });
-            DeleteTaskCommand = new RelayCommand<CalDAVTask>(async task =>
+            HideTaskCommand = new RelayCommand<CalDAVTask>(task =>
             {
                 var t = task ?? SelectedTask;
                 if (t == null) return;
-                var listId = GetListIdForTask(t);
-                try
-                {
-                    if (!string.IsNullOrEmpty(t.CalDAVId))
-                        await _caldavService.DeleteTaskAsync(listId, t.CalDAVId);
-                    if (HasMultipleLists && SelectedTaskTab != null && SelectedTaskTab.Tasks.Contains(t))
-                        SelectedTaskTab.Tasks.Remove(t);
-                    else
-                        Tasks.Remove(t);
-                    if (SelectedTask == t) SelectedTask = null;
-                }
-                catch (Exception ex)
-                {
-                    ErrorMessage = string.Format(CultureInfo.CurrentCulture, Strings.TaskDeleteFailedFormat, ex.Message);
-                }
+                RegisterTaskHiddenKeys(t);
+                if (SelectedTask == t) SelectedTask = null;
+                RefreshVisibleTasksFilter();
+                OnPropertyChanged(nameof(HasNoTasks));
             });
             ToggleTaskCompletedCommand = new RelayCommand<CalDAVTask>(async task =>
             {
@@ -199,20 +220,17 @@ namespace Palisades.ViewModel
             {
                 var t = task ?? SelectedTask;
                 if (t == null) return;
+                if (!string.IsNullOrEmpty(t.CalDAVId))
+                    return;
                 var listId = GetListIdForTask(t);
                 try
                 {
                     t.LastModified = DateTime.Now;
-                    if (string.IsNullOrEmpty(t.CalDAVId))
-                    {
-                        var createdTask = await _caldavService.CreateTaskAsync(listId, t);
-                        t.CalDAVId = createdTask.CalDAVId;
-                        t.CalDAVEtag = createdTask.CalDAVEtag;
-                    }
-                    else
-                    {
-                        await _caldavService.UpdateTaskAsync(listId, t);
-                    }
+                    var createdTask = await _caldavService.CreateTaskAsync(listId, t);
+                    t.CalDAVId = createdTask.CalDAVId;
+                    t.CalDAVEtag = createdTask.CalDAVEtag;
+                    if (!string.IsNullOrEmpty(createdTask.Uid))
+                        t.Uid = createdTask.Uid;
                     SyncStatus = Strings.TaskSavedSuccess;
                 }
                 catch (Exception ex)
@@ -220,6 +238,9 @@ namespace Palisades.ViewModel
                     ErrorMessage = string.Format(CultureInfo.CurrentCulture, Strings.TaskSaveFailedFormat, ex.Message);
                 }
             });
+
+            _visibleTasksView.Source = Tasks;
+            RefreshVisibleTasksFilter();
 
             var hasListIds = _model.TaskListIds != null && _model.TaskListIds.Count > 0;
             var hasLegacyId = !string.IsNullOrEmpty(_model.TaskListId);
@@ -229,6 +250,47 @@ namespace Palisades.ViewModel
             }
 
             StartSyncTimer();
+        }
+
+        private static IEnumerable<string> GetTaskHideKeys(CalDAVTask t)
+        {
+            yield return "id:" + t.Id;
+            if (!string.IsNullOrEmpty(t.CalDAVId))
+                yield return "caldav:" + t.CalDAVId;
+            if (!string.IsNullOrEmpty(t.Uid))
+                yield return "uid:" + t.Uid;
+        }
+
+        private bool IsTaskHiddenInUi(CalDAVTask t)
+        {
+            if (_model.HiddenTaskKeys == null || _model.HiddenTaskKeys.Count == 0)
+                return false;
+            foreach (var key in GetTaskHideKeys(t))
+            {
+                if (_model.HiddenTaskKeys.Contains(key))
+                    return true;
+            }
+            return false;
+        }
+
+        private void RegisterTaskHiddenKeys(CalDAVTask t)
+        {
+            _model.HiddenTaskKeys ??= new List<string>();
+            foreach (var key in GetTaskHideKeys(t))
+            {
+                if (!_model.HiddenTaskKeys.Contains(key))
+                    _model.HiddenTaskKeys.Add(key);
+            }
+            Save();
+        }
+
+        private void RefreshVisibleTasksFilter()
+        {
+            var src = HasMultipleLists && SelectedTaskTab != null ? (object)SelectedTaskTab.Tasks : Tasks;
+            if (!ReferenceEquals(_visibleTasksView.Source, src))
+                _visibleTasksView.Source = src;
+            _visibleTasksView.View?.Refresh();
+            OnPropertyChanged(nameof(FilteredActiveTasks));
         }
 
         private string GetListIdForSelectedTask()
@@ -298,7 +360,13 @@ namespace Palisades.ViewModel
                                 SelectedTaskTab = TaskTabs[0];
                         });
                     }
-                    Dispatch(() => { SyncStatus = Strings.SyncTasksLoaded; OnPropertyChanged(nameof(ActiveTasks)); OnPropertyChanged(nameof(HasNoTasks)); });
+                    Dispatch(() =>
+                    {
+                        SyncStatus = Strings.SyncTasksLoaded;
+                        OnPropertyChanged(nameof(ActiveTasks));
+                        RefreshVisibleTasksFilter();
+                        OnPropertyChanged(nameof(HasNoTasks));
+                    });
                 }
                 else
                 {
@@ -311,6 +379,7 @@ namespace Palisades.ViewModel
                             Tasks.Add(task);
                         SyncStatus = Strings.SyncTasksLoaded;
                         OnPropertyChanged(nameof(ActiveTasks));
+                        RefreshVisibleTasksFilter();
                         OnPropertyChanged(nameof(HasNoTasks));
                     });
                 }
@@ -318,7 +387,14 @@ namespace Palisades.ViewModel
             catch (Exception ex)
             {
                 var msg = string.Format(CultureInfo.CurrentCulture, Strings.SyncLoadFailedFormat, ex.Message);
-                Dispatch(() => { ErrorMessage = msg; SyncStatus = Strings.SyncLoadError; OnPropertyChanged(nameof(ActiveTasks)); OnPropertyChanged(nameof(HasNoTasks)); });
+                Dispatch(() =>
+                {
+                    ErrorMessage = msg;
+                    SyncStatus = Strings.SyncLoadError;
+                    OnPropertyChanged(nameof(ActiveTasks));
+                    RefreshVisibleTasksFilter();
+                    OnPropertyChanged(nameof(HasNoTasks));
+                });
             }
             finally
             {
@@ -375,7 +451,12 @@ namespace Palisades.ViewModel
                                 tab.Tasks.Add(t);
                         });
                     }
-                    Dispatch(() => SyncStatus = string.Format(CultureInfo.CurrentCulture, Strings.SyncCompletedFormat, DateTime.Now.ToShortTimeString()));
+                    Dispatch(() =>
+                    {
+                        SyncStatus = string.Format(CultureInfo.CurrentCulture, Strings.SyncCompletedFormat, DateTime.Now.ToShortTimeString());
+                        RefreshVisibleTasksFilter();
+                        OnPropertyChanged(nameof(HasNoTasks));
+                    });
                 }
                 else
                 {
@@ -387,6 +468,8 @@ namespace Palisades.ViewModel
                         foreach (var t in merged)
                             Tasks.Add(t);
                         SyncStatus = string.Format(CultureInfo.CurrentCulture, Strings.SyncCompletedFormat, DateTime.Now.ToShortTimeString());
+                        RefreshVisibleTasksFilter();
+                        OnPropertyChanged(nameof(HasNoTasks));
                     });
                 }
             }
@@ -423,7 +506,7 @@ namespace Palisades.ViewModel
         public ICommand SelectTabCommand { get; }
         public ICommand ForceSyncCommand { get; }
         public ICommand AddTaskCommand { get; }
-        public ICommand DeleteTaskCommand { get; }
+        public ICommand HideTaskCommand { get; }
         public ICommand ToggleTaskCompletedCommand { get; }
         public ICommand SaveTaskCommand { get; }
     }

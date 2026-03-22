@@ -225,6 +225,7 @@ namespace Palisades.Properties
         public static string TooltipRefresh => ResourceManager.GetString(nameof(TooltipRefresh)) ?? string.Empty;
         public static string TooltipSave => ResourceManager.GetString(nameof(TooltipSave)) ?? string.Empty;
         public static string TooltipDelete => ResourceManager.GetString(nameof(TooltipDelete)) ?? string.Empty;
+        public static string TooltipHideTask => ResourceManager.GetString(nameof(TooltipHideTask)) ?? string.Empty;
         public static string TooltipSettings => ResourceManager.GetString(nameof(TooltipSettings)) ?? string.Empty;
         public static string TooltipEdit => ResourceManager.GetString(nameof(TooltipEdit)) ?? string.Empty;
         public static string TooltipToday => ResourceManager.GetString(nameof(TooltipToday)) ?? string.Empty;

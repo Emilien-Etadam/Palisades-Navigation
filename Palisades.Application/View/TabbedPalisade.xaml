@@ -29,10 +29,13 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/View/Styles/PalisadeStyles.xaml"/>
+                <!-- Même dictionnaire qu’en App.xaml : le ContextMenu ne résout pas toujours StaticResource vers Application au chargement. -->
+                <ResourceDictionary Source="/View/Styles/ThemeResources.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <converters:PathToImageConverter x:Key="PathToImage" />
             <converters:MultiValueEqualityConverter x:Key="MultiValueEqualityConverter" />
             <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
+            <converters:InverseEmptyStringToVisibilityConverter x:Key="InverseEmptyStringToVisibilityConverter" />
             <BooleanToVisibilityConverter x:Key="BoolToVis" />
             <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVis" />
             <helpers:BindingProxy x:Key="proxy" Data="{Binding Members[0]}" />
@@ -263,7 +266,7 @@
                     <TextBlock Grid.Row="1" Text="{x:Static properties:Strings.EmptyNoTasks}" HorizontalAlignment="Center" VerticalAlignment="Center"
                                FontSize="13" Foreground="{DynamicResource PalisadeSubtleBrush}" FontStyle="Italic"
                                Visibility="{Binding HasNoTasks, Converter={StaticResource BoolToVis}}"/>
-                    <ListBox Grid.Row="1" ItemsSource="{Binding ActiveTasks}"
+                    <ListBox Grid.Row="1" ItemsSource="{Binding FilteredActiveTasks}"
                              VirtualizingPanel.IsVirtualizing="True"
                              VirtualizingPanel.VirtualizationMode="Recycling"
                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -297,9 +300,10 @@
                                         </StackPanel>
                                         <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                                             <Button Content="💾" ToolTip="{x:Static properties:Strings.TooltipSave}" Style="{StaticResource CircleButton}" Width="22" Height="22" Margin="0,0,2,0"
+                                                    Visibility="{Binding CalDAVId, Converter={StaticResource InverseEmptyStringToVisibilityConverter}}"
                                                     Command="{Binding DataContext.SaveTaskCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}"/>
-                                            <Button Content="🗑" ToolTip="{x:Static properties:Strings.TooltipDelete}" Style="{StaticResource CircleButton}" Width="22" Height="22"
-                                                    Command="{Binding DataContext.DeleteTaskCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}"/>
+                                            <Button Content="🗑" ToolTip="{x:Static properties:Strings.TooltipHideTask}" Style="{StaticResource CircleButton}" Width="22" Height="22"
+                                                    Command="{Binding DataContext.HideTaskCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}"/>
                                         </StackPanel>
                                     </Grid>
                                 </Border>
@@ -507,7 +511,7 @@
                             <Separator />
                             <MenuItem ItemsSource="{Binding Path=Data.RecentSnapshots, Source={StaticResource proxy}}">
                                 <MenuItem.ItemContainerStyle>
-                                    <Style TargetType="MenuItem">
+                                    <Style TargetType="MenuItem" BasedOn="{StaticResource PalisadeMenuItemStyle}">
                                         <Setter Property="Header" Value="{Binding Name}" />
                                         <Setter Property="Command" Value="{Binding Path=Data.RestoreSnapshotCommand, Source={StaticResource proxy}}" />
                                         <Setter Property="CommandParameter" Value="{Binding Id}" />

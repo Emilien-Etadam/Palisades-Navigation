@@ -1095,6 +1095,11 @@
     "en": "Delete"
   },
   {
+    "key": "TooltipHideTask",
+    "fr": "Masquer de la liste (la tâche reste sur le serveur)",
+    "en": "Hide from list (task stays on server)"
+  },
+  {
     "key": "TooltipSettings",
     "fr": "Paramètres",
     "en": "Settings"

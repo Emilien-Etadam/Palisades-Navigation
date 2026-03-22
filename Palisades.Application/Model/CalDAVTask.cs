@@ -1,10 +1,12 @@
 using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
 
 namespace Palisades.Model
 {
     [Serializable]
-    public class CalDAVTask
+    public class CalDAVTask : INotifyPropertyChanged
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public string Title { get; set; } = string.Empty;
@@ -15,7 +17,17 @@ namespace Palisades.Model
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime LastModified { get; set; } = DateTime.Now;
         /// <summary>Chemin/href serveur (ex. nom fichier .ics).</summary>
-        public string CalDAVId { get; set; } = string.Empty;
+        private string _calDAVId = string.Empty;
+        public string CalDAVId
+        {
+            get => _calDAVId;
+            set
+            {
+                if (_calDAVId == value) return;
+                _calDAVId = value ?? string.Empty;
+                OnPropertyChanged();
+            }
+        }
         /// <summary>Uid iCalendar (identifiant interne du VTODO).</summary>
         public string Uid { get; set; } = string.Empty;
         public string CalDAVEtag { get; set; } = string.Empty;
@@ -42,6 +54,13 @@ namespace Palisades.Model
         public CalDAVTask(string title)
         {
             Title = title;
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

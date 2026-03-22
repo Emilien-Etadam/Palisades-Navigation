@@ -661,6 +661,9 @@
   <data name="TooltipDelete" xml:space="preserve">
     <value>Supprimer</value>
   </data>
+  <data name="TooltipHideTask" xml:space="preserve">
+    <value>Masquer de la liste (la tâche reste sur le serveur)</value>
+  </data>
   <data name="TooltipSettings" xml:space="preserve">
     <value>Paramètres</value>
   </data>

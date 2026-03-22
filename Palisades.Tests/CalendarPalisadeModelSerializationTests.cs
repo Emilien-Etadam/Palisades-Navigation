@@ -101,7 +101,8 @@ namespace Palisades.Tests
                 CalDAVUrl = "https://zimbra1.mail.ovh.net/dav/user@domain/Tasks",
                 CalDAVUsername = "user@domain",
                 CalDAVPassword = "encrypted-data",
-                TaskListId = "Tasks"
+                TaskListId = "Tasks",
+                HiddenTaskKeys = new List<string> { "caldav:abc.ics", "id:local-guid" }
             };
 
             var serializer = new XmlSerializer(typeof(TaskPalisadeModel));
@@ -116,6 +117,9 @@ namespace Palisades.Tests
             Assert.Equal(model.CalDAVUsername, deserialized.CalDAVUsername);
             Assert.Equal(model.CalDAVPassword, deserialized.CalDAVPassword);
             Assert.Equal(model.TaskListId, deserialized.TaskListId);
+            Assert.Equal(model.HiddenTaskKeys.Count, deserialized.HiddenTaskKeys.Count);
+            Assert.Equal(model.HiddenTaskKeys[0], deserialized.HiddenTaskKeys[0]);
+            Assert.Equal(model.HiddenTaskKeys[1], deserialized.HiddenTaskKeys[1]);
         }
     }
 

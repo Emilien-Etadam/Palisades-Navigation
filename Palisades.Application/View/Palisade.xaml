@@ -31,6 +31,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/View/Styles/PalisadeStyles.xaml"/>
+                <ResourceDictionary Source="/View/Styles/ThemeResources.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <converters:PathToImageConverter x:Key="PathToImage" />
             <converters:MultiValueEqualityConverter x:Key="MultiValueEqualityConverter" />
@@ -63,7 +64,7 @@
                             <Separator />
                             <MenuItem ItemsSource="{Binding Path=Data.RecentSnapshots, Source={StaticResource proxy}}">
                                 <MenuItem.ItemContainerStyle>
-                                    <Style TargetType="MenuItem">
+                                    <Style TargetType="MenuItem" BasedOn="{StaticResource PalisadeMenuItemStyle}">
                                         <Setter Property="Header" Value="{Binding Name}" />
                                         <Setter Property="Command" Value="{Binding Path=Data.RestoreSnapshotCommand, Source={StaticResource proxy}}" />
                                         <Setter Property="CommandParameter" Value="{Binding Id}" />

@@ -9,4 +9,29 @@
     <SolidColorBrush x:Key="PalisadeHighlightTextBrush" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="PalisadeErrorBrush" Color="#FF6B6B"/>
     <SolidColorBrush x:Key="PalisadeBorderBrush" Color="#404040"/>
+
+    <!-- Menus contextuels : pas de gras, police plus petite, lignes plus serrées (surcharge Fluent) -->
+    <Style x:Key="PalisadeContextMenuStyle" TargetType="ContextMenu">
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontWeight" Value="Normal"/>
+        <Setter Property="TextElement.FontSize" Value="11"/>
+        <Setter Property="TextElement.FontWeight" Value="Normal"/>
+        <Setter Property="Padding" Value="2"/>
+    </Style>
+    <Style TargetType="ContextMenu" BasedOn="{StaticResource PalisadeContextMenuStyle}"/>
+
+    <Style x:Key="PalisadeMenuItemStyle" TargetType="MenuItem">
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontWeight" Value="Normal"/>
+        <Setter Property="TextElement.FontSize" Value="11"/>
+        <Setter Property="TextElement.FontWeight" Value="Normal"/>
+        <Setter Property="Padding" Value="8,2,10,2"/>
+        <Setter Property="MinHeight" Value="22"/>
+    </Style>
+    <Style TargetType="MenuItem" BasedOn="{StaticResource PalisadeMenuItemStyle}"/>
+
+    <Style TargetType="Separator">
+        <Setter Property="Margin" Value="8,2"/>
+        <Setter Property="MinHeight" Value="1"/>
+    </Style>
 </ResourceDictionary>

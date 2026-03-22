@@ -23,5 +23,8 @@ namespace Palisades.Model
         public int SyncIntervalMinutes { get; set; } = 5;
         public bool EnableLogging { get; set; }
         public bool ShowCompletedTasks { get; set; } = true;
+
+        /// <summary>Clés locales (id:/caldav:/uid:) des tâches masquées dans l’interface — elles restent sur le serveur.</summary>
+        public List<string> HiddenTaskKeys { get; set; } = new();
     }
 }
