@@ -110,18 +110,17 @@ namespace Palisades.ViewModel
             if (_disposed || Interlocked.Exchange(ref _loadEventsInProgress, 1) == 1)
                 return;
 
-            if (_model.CalendarIds == null || _model.CalendarIds.Count == 0)
-            {
-                Dispatch(() => { Events.Clear(); ErrorMessage = Strings.CalendarNoCalendarsConfigured; });
-                Dispatch(() => OnPropertyChanged(nameof(HasNoEvents)));
-                Interlocked.Exchange(ref _loadEventsInProgress, 0);
-                return;
-            }
-
-            IsLoading = true;
-            ErrorMessage = "";
             try
             {
+                if (_model.CalendarIds == null || _model.CalendarIds.Count == 0)
+                {
+                    Dispatch(() => { Events.Clear(); ErrorMessage = Strings.CalendarNoCalendarsConfigured; });
+                    Dispatch(() => OnPropertyChanged(nameof(HasNoEvents)));
+                    return;
+                }
+
+                IsLoading = true;
+                ErrorMessage = "";
                 var start = SelectedDate.Date;
                 var end = start.AddDays(DaysToShow);
                 var allEvents = new List<Model.CalendarEvent>();

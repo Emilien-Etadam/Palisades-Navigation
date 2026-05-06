@@ -438,15 +438,12 @@ namespace Palisades.ViewModel
             if (_disposed || Interlocked.Exchange(ref _syncInProgress, 1) == 1)
                 return;
 
-            var listIds = GetListIds().ToList();
-            if (listIds.Count == 0 || string.IsNullOrEmpty(CalDAVUrl))
-            {
-                Interlocked.Exchange(ref _syncInProgress, 0);
-                return;
-            }
-
             try
             {
+                var listIds = GetListIds().ToList();
+                if (listIds.Count == 0 || string.IsNullOrEmpty(CalDAVUrl))
+                    return;
+
                 Dispatch(() => { IsSyncing = true; SyncStatus = Strings.SyncWithCalDav; ErrorMessage = string.Empty; });
 
                 if (TaskTabs.Count > 1)

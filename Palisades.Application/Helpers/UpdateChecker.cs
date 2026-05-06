@@ -232,6 +232,7 @@ namespace Palisades.Helpers
             {
                 if (PFile != IntPtr.Zero)
                 {
+                    Marshal.DestroyStructure<WinTrustFileInfo>(PFile);
                     Marshal.FreeHGlobal(PFile);
                     PFile = IntPtr.Zero;
                 }

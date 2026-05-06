@@ -124,19 +124,16 @@ namespace Palisades.ViewModel
             if (_disposed || Interlocked.Exchange(ref _refreshInProgress, 1) == 1)
                 return;
 
-            if (_mailService == null || !_mailService.IsConnected)
-            {
-                await EnsureConnectedAsync();
-                if (_mailService == null || !_mailService.IsConnected)
-                {
-                    Interlocked.Exchange(ref _refreshInProgress, 0);
-                    return;
-                }
-            }
-
-            IsLoading = true;
             try
             {
+                if (_mailService == null || !_mailService.IsConnected)
+                {
+                    await EnsureConnectedAsync();
+                    if (_mailService == null || !_mailService.IsConnected)
+                        return;
+                }
+
+                IsLoading = true;
                 var counts = new Dictionary<string, int>();
                 foreach (var folder in _model.MonitoredFolders ?? new List<string> { "INBOX" })
                 {
