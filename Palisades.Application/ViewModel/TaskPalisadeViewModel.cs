@@ -28,6 +28,8 @@ namespace Palisades.ViewModel
         private bool _isLoading;
         private string _syncStatus = Strings.SyncReady;
         private Timer? _syncTimer;
+        private int _syncInProgress;
+        private bool _disposed;
         private readonly CollectionViewSource _visibleTasksView = new();
 
         public string CalDAVUrl
@@ -424,15 +426,24 @@ namespace Palisades.ViewModel
             var syncInterval = TimeSpan.FromMinutes(SyncIntervalMinutes);
             _syncTimer = new Timer(async _ =>
             {
+                if (_disposed)
+                    return;
+
                 await SyncWithCalDAVAsync();
             }, null, syncInterval, syncInterval);
         }
 
         public async Task SyncWithCalDAVAsync()
         {
+            if (_disposed || Interlocked.Exchange(ref _syncInProgress, 1) == 1)
+                return;
+
             var listIds = GetListIds().ToList();
             if (listIds.Count == 0 || string.IsNullOrEmpty(CalDAVUrl))
+            {
+                Interlocked.Exchange(ref _syncInProgress, 0);
                 return;
+            }
 
             try
             {
@@ -481,6 +492,7 @@ namespace Palisades.ViewModel
             finally
             {
                 Dispatch(() => { IsSyncing = false; });
+                Interlocked.Exchange(ref _syncInProgress, 0);
             }
         }
 
@@ -509,5 +521,14 @@ namespace Palisades.ViewModel
         public ICommand HideTaskCommand { get; }
         public ICommand ToggleTaskCompletedCommand { get; }
         public ICommand SaveTaskCommand { get; }
+
+        public override void Dispose()
+        {
+            _disposed = true;
+            _syncTimer?.Dispose();
+            _syncTimer = null;
+            (_caldavService as IDisposable)?.Dispose();
+            base.Dispose();
+        }
     }
 }

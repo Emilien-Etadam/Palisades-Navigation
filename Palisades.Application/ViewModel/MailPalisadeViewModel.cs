@@ -25,6 +25,8 @@ namespace Palisades.ViewModel
         private bool _isConnected;
         private bool _isLoading;
         private Timer? _pollTimer;
+        private int _refreshInProgress;
+        private bool _disposed;
         private readonly object _countsLock = new object();
         private Dictionary<string, int> _unreadCounts = new Dictionary<string, int>();
         private readonly Dictionary<string, int> _previousUnreadCounts = new Dictionary<string, int>();
@@ -37,7 +39,7 @@ namespace Palisades.ViewModel
         {
             _model = model;
             RecentSubjects = new ObservableCollection<MailSummaryItem>();
-            _ = EnsureConnectedAndRefreshAsync();
+            _ = RefreshAsync();
             StartPollTimer();
         }
 
@@ -93,10 +95,16 @@ namespace Palisades.ViewModel
         {
             _pollTimer?.Dispose();
             int minutes = _model.PollIntervalMinutes <= 0 ? 3 : _model.PollIntervalMinutes;
-            _pollTimer = new Timer(async _ => await RefreshAsync(), null, TimeSpan.FromMinutes(minutes), TimeSpan.FromMinutes(minutes));
+            _pollTimer = new Timer(async _ =>
+            {
+                if (_disposed)
+                    return;
+
+                await RefreshAsync();
+            }, null, TimeSpan.FromMinutes(minutes), TimeSpan.FromMinutes(minutes));
         }
 
-        private async Task EnsureConnectedAndRefreshAsync()
+        private async Task EnsureConnectedAsync()
         {
             if (_mailService == null)
                 _mailService = PalisadeFactory.CreateImapMailService(_model);
@@ -104,7 +112,6 @@ namespace Palisades.ViewModel
             {
                 await _mailService.ConnectAsync();
                 Dispatch(() => { IsConnected = true; ErrorMessage = ""; });
-                await RefreshAsync();
             }
             catch (Exception ex)
             {
@@ -114,11 +121,19 @@ namespace Palisades.ViewModel
 
         public async Task RefreshAsync()
         {
+            if (_disposed || Interlocked.Exchange(ref _refreshInProgress, 1) == 1)
+                return;
+
             if (_mailService == null || !_mailService.IsConnected)
             {
-                await EnsureConnectedAndRefreshAsync();
-                return;
+                await EnsureConnectedAsync();
+                if (_mailService == null || !_mailService.IsConnected)
+                {
+                    Interlocked.Exchange(ref _refreshInProgress, 0);
+                    return;
+                }
             }
+
             IsLoading = true;
             try
             {
@@ -130,7 +145,11 @@ namespace Palisades.ViewModel
                         var count = await _mailService.GetUnreadCountAsync(folder);
                         counts[folder] = count;
                     }
-                    catch { counts[folder] = 0; }
+                    catch (Exception ex)
+                    {
+                        PalisadeDiagnostics.Log("MailPalisade", "Lecture du nombre de messages impossible pour " + folder, ex);
+                        counts[folder] = 0;
+                    }
                 }
                 lock (_countsLock)
                 {
@@ -176,6 +195,7 @@ namespace Palisades.ViewModel
             finally
             {
                 Dispatch(() => IsLoading = false);
+                Interlocked.Exchange(ref _refreshInProgress, 0);
             }
         }
 
@@ -201,5 +221,14 @@ namespace Palisades.ViewModel
         public ICommand OpenWebmailCommand { get; } = new RelayCommand<MailPalisadeViewModel>(vm => { vm?.OpenWebmail(); });
 
         #endregion
+
+        public override void Dispose()
+        {
+            _disposed = true;
+            _pollTimer?.Dispose();
+            _pollTimer = null;
+            _mailService?.Disconnect();
+            base.Dispose();
+        }
     }
 }
